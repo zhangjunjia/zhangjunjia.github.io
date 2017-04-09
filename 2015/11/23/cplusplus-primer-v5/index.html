@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>《C++ Primer v5》读书笔记 | 张++</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="《C++ Primer v5》的读书笔记。">
+<meta name="keywords" content="C/C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《C++ Primer v5》读书笔记">
+<meta property="og:url" content="http://zhangjunjia.github.io/2015/11/23/cplusplus-primer-v5/index.html">
+<meta property="og:site_name" content="张++">
+<meta property="og:description" content="《C++ Primer v5》的读书笔记。">
+<meta property="og:updated_time" content="2017-04-09T14:46:19.093Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《C++ Primer v5》读书笔记">
+<meta name="twitter:description" content="《C++ Primer v5》的读书笔记。">
+  
+    <link rel="alternate" href="/atom.xml" title="张++" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">张++</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">成长并帮助他人成长</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://zhangjunjia.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-cplusplus-primer-v5" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/11/23/cplusplus-primer-v5/" class="article-date">
+  <time datetime="2015-11-23T12:31:00.000Z" itemprop="datePublished">2015-11-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/读书笔记/">读书笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      《C++ Primer v5》读书笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>《C++ Primer v5》的读书笔记。</p>
+<a id="more"></a>
+<h2 id="CHAPTER-1-GETTING-STARTED"><a href="#CHAPTER-1-GETTING-STARTED" class="headerlink" title="CHAPTER 1 GETTING STARTED"></a>CHAPTER 1 GETTING STARTED</h2><ul>
+<li><p>Variable type: when we wrote<code>T t</code>, we sayed that “t has type T”, or “t is a T”</p>
+</li>
+<li><p>gcc/g++ warning all options: <code>-Wall</code> for *nix, <code>/W4</code> for windows</p>
+</li>
+<li><p>Flush the stream: we should always put <code>std::cout &lt;&lt; std::endl;</code> at the end of <code>std::cout</code> to flush the stream of std-out, or else it won’t output immediately</p>
+</li>
+<li><p>Left operating left: <code>std::cout &lt;&lt; &quot;text 1&quot; &lt;&lt; &quot; and text 2&quot; &lt;&lt; std::endl;</code> equals to</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"text 1"</span>;</div><div class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">" and text 2"</span>;</div><div class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>:<span class="built_in">endl</span>;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<!--more-->
+<ul>
+<li>istream hits invalid state: <code>while (std::cin &gt;&gt; value)</code> will end at<ol>
+<li>hit the <strong>end-of-file</strong></li>
+<li>encounter an invalid input, such as reading a value is not a integer</li>
+</ol>
+</li>
+</ul>
+<h2 id="CHAPTER-2-VARIABLES-AND-BASIC-TYPES"><a href="#CHAPTER-2-VARIABLES-AND-BASIC-TYPES" class="headerlink" title="CHAPTER 2 VARIABLES AND BASIC TYPES"></a>CHAPTER 2 VARIABLES AND BASIC TYPES</h2><h3 id="Primitive-built-in-types"><a href="#Primitive-built-in-types" class="headerlink" title="Primitive built-in types"></a>Primitive built-in types</h3><ul>
+<li><p>Signed and unsigned types</p>
+<ol>
+<li>except for bool and extended character types, the integral types may be signed or unsigned(float is not integral types)</li>
+<li>there are three character types (two in real usage): char, signed char and unsigned char<ul>
+<li>char is signed in some machine and unsiged in others</li>
+</ul>
+</li>
+<li>use an unsigned when you are sure of it’s usage</li>
+<li>don’t use plain char or bool in arithmetic experssions</li>
+<li>double is better for float, float has not enough precison and in some machines double computation is faster than float</li>
+</ol>
+</li>
+<li><p>Type conversions</p>
+<ol>
+<li>when assign a float to int, <ul>
+<li>the fractional part of float is truncated as temp</li>
+<li>give temp to the int mentioned above</li>
+</ul>
+</li>
+<li>when assign an out-of-value to unsigned type, the lower bits doesn’t change, the higher bit out-of-range is truncated, this is same to modulo</li>
+<li>when assign an out-of-value to signed type, the result is undefined</li>
+</ol>
+</li>
+</ul>
+<h3 id="Variables"><a href="#Variables" class="headerlink" title="Variables"></a>Variables</h3><ul>
+<li><p>List initialization</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> sold = <span class="number">0</span>;   <span class="comment">// ok</span></div><div class="line"><span class="keyword">int</span> sold = &#123;<span class="number">0</span>&#125;; <span class="comment">// ok</span></div><div class="line"><span class="keyword">int</span> sold&#123;<span class="number">0</span>&#125;;    <span class="comment">// ok</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">sold</span><span class="params">(<span class="number">0</span>)</span></span>;    <span class="comment">// ok</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">sold</span><span class="params">(<span class="number">1</span>d)</span></span>;   <span class="comment">// ok but truncated</span></div><div class="line"><span class="keyword">int</span> sold&#123;<span class="number">1</span>d&#125;;   <span class="comment">// error:narrowing conversation required</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>Default initialization: built-in type defined outside any function body are initialized to zero, inside the function is uninitialized</p>
+</li>
+<li><p>declaration and definition are different</p>
+<ol>
+<li>declaration secifies the type and name of a variable</li>
+<li>definition inits the variable</li>
+<li>to use the same variable in multiple files, you must only have one definition and multi declaration<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// declaration but not definition, must be outside the function</span></div><div class="line"><span class="keyword">extern</span> <span class="keyword">int</span> j; </div><div class="line"><span class="comment">// declaration and definition</span></div><div class="line"><span class="keyword">int</span> j;        </div><div class="line"><span class="comment">// only definition, declaration is override, must be outside the function</span></div><div class="line"><span class="keyword">extern</span> <span class="keyword">double</span> pi = <span class="number">3.14</span>;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>illegal variable names</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> __a; <span class="comment">// contains 2 underscores</span></div><div class="line"><span class="keyword">int</span> _Ab; <span class="comment">// start with underscore, and follow with a upper letter immediately</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>get variables outer scope</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; ::reused &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// use '::'</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Compound-Types"><a href="#Compound-Types" class="headerlink" title="Compound Types"></a>Compound Types</h3><ul>
+<li><p>Reference: </p>
+<ol>
+<li>a reference to object, it’s not an object</li>
+<li>must be initialized, can’t re-bind<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> val1 = <span class="number">1024</span>;</div><div class="line"><span class="keyword">double</span> val2 = <span class="number">123</span>;</div><div class="line"><span class="keyword">int</span> &amp;relVal1 = val1; <span class="comment">// ok</span></div><div class="line"><span class="keyword">int</span> &amp;relVal2;        <span class="comment">// error, must be init</span></div><div class="line"><span class="keyword">int</span> &amp;relVal3 = val2; <span class="comment">// error, type error</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>Pointers</p>
+<ul>
+<li>different to reference<ol>
+<li>it’s an object</li>
+<li>can be rebind</li>
+<li>needn’t initialized when defined</li>
+<li>like built-in types, it has undefined value in function if it’s not defined</li>
+</ol>
+</li>
+<li>pointer value state<ol>
+<li>point to an object</li>
+<li>point to the location just immediately past the end of an object (illegal pointer)</li>
+<li>null pointer</li>
+<li>invalid pointer (not initialized)</li>
+</ol>
+</li>
+<li>special<ol>
+<li>same type valid pointers can use in comparation (address compare)</li>
+<li>void pointers<ul>
+<li>can compare to another pointer</li>
+<li>pass or return it from a function</li>
+<li>assign it to another void* pointer</li>
+</ul>
+</li>
+<li>define two pointer in a line: <code>int *p1, *p2</code>, ‘*’ only works for the variable name</li>
+<li>reference to pointers (example below)</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// normal</span></div><div class="line"><span class="keyword">double</span> val = <span class="number">123</span>;</div><div class="line"><span class="keyword">double</span> *pd1 = &amp;val; </div><div class="line">             <span class="comment">// ok, give the pointer itself a new value</span></div><div class="line"><span class="keyword">int</span> *pd2 = &amp;val;    <span class="comment">// error, types differ</span></div><div class="line">pd2 = pd1;   <span class="comment">// error, types differ</span></div><div class="line">pd1 = val;   <span class="comment">// error, can't assign object to pointer</span></div><div class="line"></div><div class="line"><span class="comment">// special</span></div><div class="line"><span class="keyword">int</span> *p1, p2; <span class="comment">// only p1 is pointer</span></div><div class="line"><span class="keyword">int</span> i=<span class="number">0</span>;</div><div class="line"><span class="keyword">int</span> *p;</div><div class="line"><span class="keyword">int</span> *&amp;r = p; <span class="comment">// read from right to left: r is a reference to pointer</span></div><div class="line">r = &amp;i;</div><div class="line">*r = <span class="number">0</span>;      <span class="comment">// set i to 0</span></div></pre></td></tr></table></figure>
+<h3 id="const-Qualifer"><a href="#const-Qualifer" class="headerlink" title="const Qualifer"></a>const Qualifer</h3><ul>
+<li><p>local to file</p>
+<ol>
+<li>default internal linkage in C++<ul>
+<li>if we define <code>const int ivv = 0</code> in source file, and <code>extern const int ivv</code> in header file, ‘ivv’ only works in that source file, this is the so-called ‘local-to-file’, differ to the normal case</li>
+<li>to use ‘ivv’ in multi files, we should declare <code>extern const int ivv</code> in header file, and define <code>extern const int ivv = 0</code> in source file</li>
+</ul>
+</li>
+<li>default external linkage in C<ul>
+<li>in C, const variable’s scope is the same to normal case</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>reference to const</p>
+<ol>
+<li>const reference to const object/normal/plain/expression/double, means read only</li>
+<li>if reference to double, it’s a tempory value, if the origin double changes, the reference to const will never know that<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ok initialization</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> ci = <span class="number">1024</span>;</div><div class="line"><span class="keyword">int</span> i = <span class="number">1024</span>;</div><div class="line"><span class="keyword">double</span> dval = <span class="number">3.14</span>;</div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r1 = ci; <span class="comment">// from const object</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r2 = i;  <span class="comment">// from normal int</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r3 = <span class="number">12</span>; <span class="comment">// from plain int</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r4 = r1 * <span class="number">2</span>; <span class="comment">// from expression</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r5 = dval; <span class="comment">// dval --&gt; temp int --&gt; r5</span></div><div class="line"><span class="comment">// error case</span></div><div class="line">r1 = <span class="number">123</span>; <span class="comment">// can't rebind</span></div><div class="line"><span class="keyword">int</span> &amp;r6 = ci; <span class="comment">// only const reference can reference to const object</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>pointer to const(<strong>can’t change the memory the address points to</strong>)</p>
+<ol>
+<li>similar to ‘reference to const’, it stores the address of a object and has read access but not write access to the address</li>
+<li><strong>can rebind</strong></li>
+</ol>
+</li>
+<li><p>const pointers(<strong>can’t change the address</strong>)</p>
+<ol>
+<li>can’t rebind, must be initialized at first time</li>
+<li>itself const, always point to the same address</li>
+<li><strong>can change the address’s real value</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> errNumb = <span class="number">0</span>;</div><div class="line"><span class="keyword">int</span> *<span class="keyword">const</span> curErr = &amp;errNumb; <span class="comment">// const pointers</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> *curPnt = &amp;errNumb; <span class="comment">// pointer to const</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> i = <span class="number">123</span>;</div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> *<span class="keyword">const</span> curNor = &amp;i; <span class="comment">// a const pointer to a const int</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>top-level &amp; low-level const</p>
+<ol>
+<li>top-level: itself const, const objects(pointers)</li>
+<li>low-level: pointer or reference to const</li>
+<li>when we copy a object, top-level is ignored and low-level will never be ignored<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> a = <span class="number">0</span>;</div><div class="line"><span class="keyword">int</span> b = a; <span class="comment">// ok: top-level ignore</span></div><div class="line"><span class="keyword">int</span> <span class="keyword">const</span> *m = <span class="number">0</span>;</div><div class="line"><span class="keyword">int</span> *n = m; <span class="comment">// error: low-level can't be ignore</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>constexpr:<strong>applies to the pointer</strong> but not the type to which the pointer points</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> *p = <span class="number">0</span>; <span class="comment">// pointer to const</span></div><div class="line"><span class="keyword">constexpr</span> <span class="keyword">int</span> *q = <span class="number">0</span>; <span class="comment">// a const pointer to int</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Dealing-with-type"><a href="#Dealing-with-type" class="headerlink" title="Dealing with type"></a>Dealing with type</h3><ul>
+<li><p>type alias</p>
+<ol>
+<li>typedef is the alias of an object<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">double</span> wages; <span class="comment">// `wages` is same to double</span></div><div class="line"><span class="keyword">using</span> wages = <span class="keyword">double</span>;</div><div class="line"><span class="comment">// pointer</span></div><div class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> *pstring; <span class="comment">// pstring is an object: char*, pointer to char</span></div><div class="line"><span class="keyword">const</span> pstring cstr = <span class="number">0</span>; <span class="comment">// same to `const (char*) cstr = 0`, cstr is a const pointer to char</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>auto: automatically determines the type, <strong>ignores the top-level</strong></p>
+</li>
+<li>decltype: similar to auto, but <strong>top-level is keeped</strong><ol>
+<li>decltype((v)) is always a reference type<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line"><span class="keyword">auto</span> a = i; <span class="comment">// normal int </span></div><div class="line"><span class="keyword">decltype</span>(i) b = <span class="number">0</span>; <span class="comment">// const int</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="CHAPTER-3-STRINGS-VECTORS-AND-ARRAYS"><a href="#CHAPTER-3-STRINGS-VECTORS-AND-ARRAYS" class="headerlink" title="CHAPTER 3 STRINGS, VECTORS, AND ARRAYS"></a>CHAPTER 3 STRINGS, VECTORS, AND ARRAYS</h2><h3 id="Namespace-using-Declarations"><a href="#Namespace-using-Declarations" class="headerlink" title="Namespace using Declarations"></a>Namespace using Declarations</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// main.cpp</span></div><div class="line"><span class="keyword">using</span> <span class="built_in">std</span>::<span class="built_in">cout</span>; <span class="comment">// 只使用于本源文件，引入另外一个命名空间的成员到当前作用域</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"hello"</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<!--more-->
+<h3 id="Library-string-Type"><a href="#Library-string-Type" class="headerlink" title="Library string Type"></a>Library string Type</h3><p>使用前提：</p>
+<ul>
+<li>头文件引入：<code>#include &lt;string&gt;</code></li>
+<li>作用域引入：<code>using std::string</code></li>
+</ul>
+<h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 默认实例化为空</span></div><div class="line"><span class="built_in">string</span> s1;</div><div class="line"><span class="comment">// 直接实例化为指定值</span></div><div class="line"><span class="function"><span class="built_in">string</span> <span class="title">s1</span><span class="params">(<span class="number">10</span>, <span class="string">'c'</span>)</span></span>;</div><div class="line"><span class="function"><span class="built_in">string</span> <span class="title">s2</span><span class="params">(<span class="string">"haha"</span>)</span></span>;</div><div class="line"><span class="comment">// 复制实例化</span></div><div class="line"><span class="built_in">string</span> s3 = <span class="string">"haha"</span>;</div></pre></td></tr></table></figure>
+<h4 id="字符串操作"><a href="#字符串操作" class="headerlink" title="字符串操作"></a>字符串操作</h4><p>几个特殊的字符串操作举例如下：</p>
+<ul>
+<li>输入和输出</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">string</span> word;</div><div class="line"><span class="keyword">while</span>(<span class="built_in">cin</span> &gt;&gt; word) <span class="comment">// is&gt;&gt;s，返回is</span></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; word &lt;&lt; <span class="built_in">endl</span>; <span class="comment">// os &lt;&lt; s，返回os</span></div><div class="line"><span class="keyword">while</span>(getline(<span class="built_in">cin</span>, word)) <span class="comment">// 返回is</span></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; word &lt;&lt; <span class="built_in">endl</span>;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>比较：比较从左到右第一个不同的字符的ASCII值，如从左到右无不同字符则长度较长的字符串大</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// s2大s1，s3大于前两个字符串</span></div><div class="line"><span class="built_in">string</span> s1 = <span class="string">"hello"</span>;</div><div class="line"><span class="built_in">string</span> s2 = <span class="string">"hello, world"</span>;</div><div class="line"><span class="built_in">string</span> s3 = <span class="string">"hexo"</span>;</div></pre></td></tr></table></figure>
+</li>
+<li><p>size()</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">string</span> s1;</div><div class="line"><span class="keyword">auto</span> size = s1.size(); <span class="comment">// string::size_type，一个无符号整型</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>拼接</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// string类型间可自由拼接</span></div><div class="line"><span class="built_in">string</span> s1 = <span class="string">"t"</span>;</div><div class="line"><span class="built_in">string</span> s2 = <span class="string">"x"</span>;</div><div class="line">s1 += s2;</div><div class="line"><span class="comment">// string和literals</span></div><div class="line"><span class="built_in">string</span> s3 = <span class="string">"t"</span> + <span class="string">"x"</span>; <span class="comment">// error：字面量不可相加</span></div><div class="line"><span class="built_in">string</span> s4 = <span class="string">"t"</span> + s1 + <span class="string">"x"</span>; <span class="comment">// 合法，运算顺序从左到右</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="处理字符串内的字符"><a href="#处理字符串内的字符" class="headerlink" title="处理字符串内的字符"></a>处理字符串内的字符</h4><p>一共有两类操作，</p>
+<ul>
+<li>字符串遍历（copy和reference）</li>
+<li>数组下标（reference）</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">string</span> s1 = <span class="string">"test"</span>;</div><div class="line"><span class="comment">// 字符串遍历</span></div><div class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> c : s1) <span class="comment">// c是copy，改变c的值不影响字符串</span></div><div class="line">    <span class="comment">// do sth</span></div><div class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> &amp;c : s1) <span class="comment">// c是reference</span></div><div class="line">    <span class="comment">// do sth</span></div><div class="line">s1[<span class="number">0</span>] = <span class="string">'y'</span>; <span class="comment">// 引用第0个数组下标的字符</span></div></pre></td></tr></table></figure>
+<h3 id="Library-vector-Type"><a href="#Library-vector-Type" class="headerlink" title="Library vector Type"></a>Library vector Type</h3><p>使用前提：</p>
+<ul>
+<li>头文件引入：<code>#include &lt;vector&gt;</code></li>
+<li>作用域引入：<code>using std::vector</code></li>
+</ul>
+<h4 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h4><p><em>注意括号和花括号的不同</em>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 默认实例化为空</span></div><div class="line"><span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; v1; </div><div class="line"><span class="comment">// 指定元素数量</span></div><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v2(<span class="number">10</span>); <span class="comment">// 10个0</span></div><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v3(<span class="number">10</span>, <span class="number">1</span>); <span class="comment">// 10个1</span></div><div class="line"><span class="comment">// 列表实例化</span></div><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &#123;<span class="number">10</span>, <span class="number">1</span>&#125;; <span class="comment">// 10和1两个元素</span></div></pre></td></tr></table></figure></p>
+<h4 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h4><p>注意：</p>
+<ul>
+<li>数组下标可操作vector的尺寸之外的元素如<code>vector[size+1] = 3</code>，但这并不会向vector新增一个元素，而且会产生越界异常<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v1(<span class="number">10</span>, <span class="number">1</span>);</div><div class="line">v1.push_back(<span class="number">2</span>); <span class="comment">// 插入</span></div><div class="line">v1[<span class="number">0</span>] = <span class="number">3</span>; <span class="comment">// 数组下标引用</span></div><div class="line">v1.size(); <span class="comment">// vector::size_type</span></div><div class="line"><span class="comment">// 比较操作需要装相同元素，且相同元素间可比较</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Introducing-Iterators"><a href="#Introducing-Iterators" class="headerlink" title="Introducing Iterators"></a>Introducing Iterators</h3><h4 id="定义-2"><a href="#定义-2" class="headerlink" title="定义"></a>定义</h4><p>string有两种iterator类型，指向某个具体字符：</p>
+<ul>
+<li>string::iterator指向的元素可读写</li>
+<li>string::const_iterator指向的元素只可以读</li>
+</ul>
+<p>vector有两种iterator类型，指向某个具体元素：</p>
+<ul>
+<li>vector::iterator</li>
+<li>vector::const_iterator</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="built_in">string</span> <span class="title">s1</span><span class="params">(<span class="string">"123"</span>)</span></span>;</div><div class="line"><span class="keyword">auto</span> i1 = s1.begin(); <span class="comment">// 指向第一个元素</span></div><div class="line"><span class="keyword">auto</span> i2 = s1.end(); <span class="comment">// 指向最后一个元素的尾部</span></div><div class="line"><span class="keyword">auto</span> i3 = s1.cbegin(); <span class="comment">// 只可读</span></div></pre></td></tr></table></figure>
+<h4 id="操作-1"><a href="#操作-1" class="headerlink" title="操作"></a>操作</h4><p>常用操作如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">vector</span> s1&#123;<span class="string">"123"</span>&#125;;</div><div class="line"><span class="keyword">auto</span> i1 = s1.begin();</div><div class="line">*i1 = <span class="string">"345"</span>; <span class="comment">// dereference，取得引用</span></div><div class="line">(*i1).size(); <span class="comment">// 调用第一个元素的成员size()</span></div><div class="line">*i1.size(); <span class="comment">// error：调用顺序是*(i1.size())</span></div><div class="line">i1++; <span class="comment">// 可进行加减运算，指向不同成员</span></div><div class="line"><span class="comment">// 比较运算符规则：出现在容器前面的元素较小</span></div></pre></td></tr></table></figure></p>
+<p>注意：在使用iterator遍历vector时不能使用push_back，它会使得之前指向它的iterator都无效</p>
+<h3 id="Arrays"><a href="#Arrays" class="headerlink" title="Arrays"></a>Arrays</h3><h4 id="定义-3"><a href="#定义-3" class="headerlink" title="定义"></a>定义</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 默认实例化</span></div><div class="line"><span class="keyword">int</span> arr[<span class="number">10</span>]; <span class="comment">// 10个int值，在函数外int值默认为0，函数内int值为undefined，与built-in类型的默认值规则相同</span></div><div class="line"><span class="comment">// 显示实例化</span></div><div class="line"><span class="keyword">int</span> arr2[<span class="number">10</span>] = &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>&#125;; <span class="comment">// 后七个元素的值同上</span></div><div class="line"><span class="comment">// 字符数组</span></div><div class="line"><span class="keyword">char</span> c1[] = <span class="string">"C++"</span>; <span class="comment">// 共4个元素，最后一个为'\0'</span></div><div class="line"><span class="comment">// 不能复制和赋值</span></div><div class="line"><span class="keyword">int</span> arr3 [] = arr; <span class="comment">// error</span></div><div class="line">arr2 = arr; <span class="comment">// error</span></div><div class="line"><span class="comment">// 复杂的定义</span></div><div class="line"><span class="keyword">int</span> *ptr[<span class="number">10</span>]; <span class="comment">// ptr是一个数组，该数组含有10个int型指针</span></div><div class="line"><span class="keyword">int</span> (*ptr)[<span class="number">10</span>]; <span class="comment">// ptr是一个指针，指向含有10个int元素的数组</span></div></pre></td></tr></table></figure>
+<h4 id="操纵数组"><a href="#操纵数组" class="headerlink" title="操纵数组"></a>操纵数组</h4><ol>
+<li>使用数组下标</li>
+<li>使用for-each，如<code>for(auto tmp : arr)或for(auto &amp;tmp : arr)</code></li>
+</ol>
+<h4 id="数组与指针"><a href="#数组与指针" class="headerlink" title="数组与指针"></a>数组与指针</h4><ul>
+<li><p>数组名指向第一个元素</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">string</span> nums[] = &#123;<span class="string">"one"</span>, <span class="string">"two"</span>, <span class="string">"three"</span>&#125;;</div><div class="line"><span class="comment">// 下面两个式子等效</span></div><div class="line"><span class="built_in">string</span> *ptr = nums;</div><div class="line">ptr = &amp;nums[<span class="number">0</span>];</div></pre></td></tr></table></figure>
+</li>
+<li><p>auto和decltype具有不同效果</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> ia[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</div><div class="line"><span class="function"><span class="keyword">auto</span> <span class="title">ia2</span><span class="params">(ia)</span></span>; <span class="comment">// 等效于&amp;ia[0]</span></div><div class="line"><span class="keyword">decltype</span>(ia) ia3 = &#123;<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>&#125;; <span class="comment">// 具有与ia一样的类型</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>指针与数组</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> arr[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</div><div class="line"><span class="keyword">int</span> *ptr = <span class="number">0</span>; <span class="comment">// 指针状态1：空指针</span></div><div class="line">ptr = arr; <span class="comment">// 指针状态2：指向某个对象</span></div><div class="line">ptr = arr[<span class="number">3</span>]; <span class="comment">// 指针状态3：指向一块内存的结束地址，指针本身有效，不能使用*号取值</span></div><div class="line">ptr = arr[<span class="number">4</span>]; <span class="comment">// 指针状态4：这是一个无效的指针，指针地址未定义，不能使用*号取值</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>begin和end函数取数组首尾</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> ia[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</div><div class="line"><span class="keyword">int</span> *begin = begin(ia);</div><div class="line"><span class="keyword">int</span> *end = end(ia);</div><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; ivec(begin(ia), end(ia)); <span class="comment">// 将ia的内容复制到ivec</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>数组指针运算</p>
+<ul>
+<li>指向相同数组的指针才可使用关系运算符；</li>
+<li>built-in数组指针下标可使用负数，如：<code>p[-2]</code>，p指向一个数组的元素；vector等library type的数组下标必须是正数；</li>
+</ul>
+</li>
+</ul>
+<h4 id="c类型字符串"><a href="#c类型字符串" class="headerlink" title="c类型字符串"></a>c类型字符串</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">string</span> s = <span class="string">"c++"</span>; <span class="comment">// 可使用c类型字符串为string类型赋值</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> *str = s; <span class="comment">// error：反之则不行，应使用s.c_str()</span></div></pre></td></tr></table></figure>
+<h3 id="多维数组"><a href="#多维数组" class="headerlink" title="多维数组"></a>多维数组</h3><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">int ia[3][4];</div><div class="line">// 指针p为类型int (*p)[4]，指向含有4个int的数组</div><div class="line">for(auto p = begin(ia); p != end(ia); ++p) &#123;</div><div class="line">    // q指向int[4]的第一个元素</div><div class="line">    for(auto q = begin(*p); q != end(*p); ++q) &#123;</div><div class="line">        cout &lt;&lt; *q &lt;&lt; '';</div><div class="line">    &#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://zhangjunjia.github.io/2015/11/23/cplusplus-primer-v5/" data-id="cj1atccmh0001ycnpsxl8b8qy" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C-C/">C/C++</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/11/21/computer-systems/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          《深入理解计算机系统》读书笔记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/12/20/maven-howto/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Maven HOWTO</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/一些感悟/">一些感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/人工智能/">人工智能</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/科技与人文/">科技与人文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程实践/">编程实践</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Eclipse/">Eclipse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HBase/">HBase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVM/">LVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SVN/">SVN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/">TCP/IP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/">Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wisdom/">Wisdom</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/信息安全/">信息安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网穿透/">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/哲学/">哲学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/李笑来/">李笑来</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机原理/">计算机原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/财商/">财商</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贯行/">贯行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随想/">随想</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10px;">AI</a> <a href="/tags/C-C/" style="font-size: 18.33px;">C/C++</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Eclipse/" style="font-size: 10px;">Eclipse</a> <a href="/tags/HBase/" style="font-size: 11.67px;">HBase</a> <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Java/" style="font-size: 11.67px;">Java</a> <a href="/tags/LVM/" style="font-size: 10px;">LVM</a> <a href="/tags/Linux/" style="font-size: 18.33px;">Linux</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Network/" style="font-size: 10px;">Network</a> <a href="/tags/SVN/" style="font-size: 11.67px;">SVN</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/TCP-IP/" style="font-size: 10px;">TCP/IP</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Wisdom/" style="font-size: 11.67px;">Wisdom</a> <a href="/tags/信息安全/" style="font-size: 10px;">信息安全</a> <a href="/tags/内网穿透/" style="font-size: 10px;">内网穿透</a> <a href="/tags/哲学/" style="font-size: 10px;">哲学</a> <a href="/tags/李笑来/" style="font-size: 15px;">李笑来</a> <a href="/tags/计算机原理/" style="font-size: 10px;">计算机原理</a> <a href="/tags/读书/" style="font-size: 20px;">读书</a> <a href="/tags/财商/" style="font-size: 11.67px;">财商</a> <a href="/tags/贯行/" style="font-size: 13.33px;">贯行</a> <a href="/tags/随想/" style="font-size: 16.67px;">随想</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/10/16/living-in-the-future/">《通往财富自由之路》第04周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/security-sense/">《通往财富自由之路》第03周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/saving-your-attention/">《通往财富自由之路》第02周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/attention/">《通往财富自由之路》第01周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/why-not-go-to-sleep/">为什么你还不去睡觉</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 张++<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

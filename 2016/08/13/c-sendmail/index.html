@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用C语言调用sendmail的一些注意点 | 张++</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文简单介绍C语言调用sendmail遇到的一些问题。">
+<meta name="keywords" content="C/C++,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用C语言调用sendmail的一些注意点">
+<meta property="og:url" content="http://zhangjunjia.github.io/2016/08/13/c-sendmail/index.html">
+<meta property="og:site_name" content="张++">
+<meta property="og:description" content="本文简单介绍C语言调用sendmail遇到的一些问题。">
+<meta property="og:image" content="http://zhangjunjia.github.io/images/pics/mail.jpg">
+<meta property="og:updated_time" content="2017-04-09T14:37:34.823Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用C语言调用sendmail的一些注意点">
+<meta name="twitter:description" content="本文简单介绍C语言调用sendmail遇到的一些问题。">
+<meta name="twitter:image" content="http://zhangjunjia.github.io/images/pics/mail.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="张++" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">张++</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">成长并帮助他人成长</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://zhangjunjia.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-c-sendmail" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/08/13/c-sendmail/" class="article-date">
+  <time datetime="2016-08-13T00:46:00.000Z" itemprop="datePublished">2016-08-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程实践/">编程实践</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用C语言调用sendmail的一些注意点
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文简单介绍C语言调用sendmail遇到的一些问题。</p>
+<a id="more"></a>
+<h2 id="sendmail原理"><a href="#sendmail原理" class="headerlink" title="sendmail原理"></a>sendmail原理</h2><p>先附上邮件发送的原理图如下，该图转自<a href="http://www.itye.org/archives/1304" target="_blank" rel="external">基础邮件原理（MUA/MTA/MDA）</a>，</p>
+<p><img src="/images/pics/mail.jpg" alt="mail"></p>
+<p>sendmail作为MTA，在DNS定位到对方的MTA地址后，将邮件发送到对端MTA。</p>
+<h2 id="使用sendmail注意"><a href="#使用sendmail注意" class="headerlink" title="使用sendmail注意"></a>使用sendmail注意</h2><p>笔者在Shell下调用sendmail的语法如下（当然，这不是唯一的调用方式，详细请<code>man sendmail</code>），</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sendmail -f&lt;sender&gt; -vt receiver &lt; mail.txt</div></pre></td></tr></table></figure>
+<p>其中，</p>
+<ul>
+<li><code>-f</code>指定发件人邮箱；</li>
+<li><code>receiver</code>指定收件人邮箱；</li>
+<li><code>-v</code>表示以调试输出的模式打印；</li>
+<li><code>-t</code>表示读取mail.txt里面的<code>To</code>和<code>Cc</code>等字段；</li>
+</ul>
+<p>举个实际的例子如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sendmail -fjayzee@jayzee.com -vt jayzee@qq.com &lt; mail.txt</div></pre></td></tr></table></figure>
+<p>mail.txt的内容，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Suject: Hello</div><div class="line"></div><div class="line">World</div></pre></td></tr></table></figure>
+<p>但是，在执行上述语句前，你需要注意以下事项，</p>
+<ul>
+<li>你的发件邮箱不需要是真实邮箱，但必须符合<code>xxx@xxx.com</code>的格式，否则会被你的收件人的邮件服务器拒绝；</li>
+<li>将你的发件邮箱添加到收件邮箱的白名单，否则极有可能被当成垃圾邮件拦截；</li>
+<li>你的mail.txt的<code>Subject</code>表示标题，紧接着是一个空行和正文，建议加上该空行，因为笔者在debian wheezy上使用sendmail发邮件时没有空行会报错，但在ubuntu又不会；</li>
+<li>配置你的/etc/hosts如下，<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1	localhost	jayzee.com</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>为什么hosts要如上配置呢？原因是在邮件发送失败时，sendmail会把邮件返回给sender，在此例子中即<code>jayzee@jayzee.com</code>，而由于配置了hosts，相当于收件人其实是<code>jayzee@127.0.0.1</code>，这就保证了在邮件发送失败时邮件会回送给本机的jayzee用户，然后便可在本机的<code>/var/mail/jayzee</code>回溯到发送失败的详细信息啦。</p>
+<p>关于为什么本机会收到邮件，stackoverflow上有一段很好的解释，</p>
+<blockquote>
+<p>Just to offer some clarification, it’s been the tradition for a long time for UNIX boxes to run a “locally configured” mailer daemon that <strong> doesn’t route messages through the Internet, but only copies messages to other users spool directories </strong> (as @John T mentioned). It is real SMTP-compliant email, it’s just not routed over the Internet because it doesn’t need to be.</p>
+</blockquote>
+<h2 id="使用C语言调用sendmail"><a href="#使用C语言调用sendmail" class="headerlink" title="使用C语言调用sendmail"></a>使用C语言调用sendmail</h2><p>使用C语言调用sendmail，</p>
+<ul>
+<li>首先，准备好mail.txt；</li>
+<li>其次，如果你想在调用结束时读取到调用信息，可考虑使用管道，如<code>popen(...)</code>；否则，使用<code>system(...)</code>就足够了。</li>
+</ul>
+<h2 id="sendmail错误处理"><a href="#sendmail错误处理" class="headerlink" title="sendmail错误处理"></a>sendmail错误处理</h2><p><code>sysexits.h</code>标识出了sendmail调用的返回值，但没有一个是标识邮件是否发送成功的。C编程时若要判断sendmail是否发送成功，只能在程序端对回显信息（使用<code>popen</code>才取得回显信息）进行分析。</p>
+<p>还有一个思路是，专门建一个用户用于发送邮件，且需要保证该用户发送邮件是同步的，这样通过检测<code>/var/mail/$USER</code>的文件状态变化（比如配置邮件发送失败才回送，这样该文件的最后修改时间就发生了变化）就能判断是否发送成功了，这里需要在调用sendmail时恰当配置其<code>-N</code>选项。</p>
+<blockquote>
+<p><code>-N dsn</code> Set delivery status notification conditions to dsn, which can be ‘never’ for no notifications or a comma separated list of the values ‘failure’ to be notified if  delivery  failed, ‘delay’ to be notified if delivery is delayed, and ‘success’ to be notified when the message is successfully delivered.</p>
+</blockquote>
+<p>至于这里为什吗不考虑邮件delay的情况，文章<a href="https://askleo.com/why_am_i_getting_a_delay_notification_on_an_email_i_sent-2/" target="_blank" rel="external">Why Am I Getting a “Delivery Status Notification (Delay)” on an Email I Sent?</a>给出解释如下，</p>
+<blockquote>
+<p>Delivery Status Notification (Delay)<br>This is an automatically generated Delivery Status Notification.<br>THIS IS A WARNING MESSAGE ONLY.<br><strong>YOU DO NOT NEED TO RESEND YOUR MESSAGE</strong>.<br>Delivery to the following recipients has been delayed.</p>
+<p>if you get this “Delivery Status Notification (Delay)” warning, there’s nothing you can really do, other than to <strong>make sure you sent it to the correct address.</strong></p>
+</blockquote>
+<h2 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> 相关头文件</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span>(网络在线) &#123;</div><div class="line">        stat1=/var/mail/user最后修改时间</div><div class="line">        system(sendmail -N failure -fuser@user.com -vt 收件人邮箱 &lt; mail.txt);</div><div class="line">        stat2=/var/mail/user最后修改时间</div><div class="line">        <span class="keyword">if</span>(stat1 != stat2) &#123;</div><div class="line">            发送失败</div><div class="line">            清空user@user.com的邮件队列避免重发</div><div class="line">        &#125; &#123;</div><div class="line">            发送成功</div><div class="line">        &#125;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        发送失败</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>360converter博客：<a href="http://www.itye.org/archives/1304" target="_blank" rel="external">基础邮件原理（MUA/MTA/MDA）</a></li>
+<li>Ask Leo：<a href="https://askleo.com/why_am_i_getting_a_delay_notification_on_an_email_i_sent-2/" target="_blank" rel="external">Why Am I Getting a “Delivery Status Notification (Delay)” on an Email I Sent?</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://zhangjunjia.github.io/2016/08/13/c-sendmail/" data-id="cj1atccp1002fycnp51gpope5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/08/05/about-sigpipe/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          关于SIGPIPE
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/08/17/tomcat-multi-virtual-host/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Multi virtual HOST of Tomcat</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/一些感悟/">一些感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/人工智能/">人工智能</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/科技与人文/">科技与人文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程实践/">编程实践</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Eclipse/">Eclipse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HBase/">HBase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVM/">LVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SVN/">SVN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/">TCP/IP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/">Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wisdom/">Wisdom</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/信息安全/">信息安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网穿透/">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/哲学/">哲学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/李笑来/">李笑来</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机原理/">计算机原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/财商/">财商</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贯行/">贯行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随想/">随想</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10px;">AI</a> <a href="/tags/C-C/" style="font-size: 18.33px;">C/C++</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Eclipse/" style="font-size: 10px;">Eclipse</a> <a href="/tags/HBase/" style="font-size: 11.67px;">HBase</a> <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Java/" style="font-size: 11.67px;">Java</a> <a href="/tags/LVM/" style="font-size: 10px;">LVM</a> <a href="/tags/Linux/" style="font-size: 18.33px;">Linux</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Network/" style="font-size: 10px;">Network</a> <a href="/tags/SVN/" style="font-size: 11.67px;">SVN</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/TCP-IP/" style="font-size: 10px;">TCP/IP</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Wisdom/" style="font-size: 11.67px;">Wisdom</a> <a href="/tags/信息安全/" style="font-size: 10px;">信息安全</a> <a href="/tags/内网穿透/" style="font-size: 10px;">内网穿透</a> <a href="/tags/哲学/" style="font-size: 10px;">哲学</a> <a href="/tags/李笑来/" style="font-size: 15px;">李笑来</a> <a href="/tags/计算机原理/" style="font-size: 10px;">计算机原理</a> <a href="/tags/读书/" style="font-size: 20px;">读书</a> <a href="/tags/财商/" style="font-size: 11.67px;">财商</a> <a href="/tags/贯行/" style="font-size: 13.33px;">贯行</a> <a href="/tags/随想/" style="font-size: 16.67px;">随想</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/10/16/living-in-the-future/">《通往财富自由之路》第04周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/security-sense/">《通往财富自由之路》第03周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/saving-your-attention/">《通往财富自由之路》第02周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/attention/">《通往财富自由之路》第01周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/why-not-go-to-sleep/">为什么你还不去睡觉</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 张++<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

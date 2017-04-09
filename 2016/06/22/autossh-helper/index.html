@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>多对一autossh隧道管理 | 张++</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？">
+<meta name="keywords" content="Linux,内网穿透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多对一autossh隧道管理">
+<meta property="og:url" content="http://zhangjunjia.github.io/2016/06/22/autossh-helper/index.html">
+<meta property="og:site_name" content="张++">
+<meta property="og:description" content="笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？">
+<meta property="og:updated_time" content="2017-04-09T14:41:00.455Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="多对一autossh隧道管理">
+<meta name="twitter:description" content="笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？">
+  
+    <link rel="alternate" href="/atom.xml" title="张++" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">张++</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">成长并帮助他人成长</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://zhangjunjia.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-autossh-helper" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/06/22/autossh-helper/" class="article-date">
+  <time datetime="2016-06-22T13:05:00.000Z" itemprop="datePublished">2016-06-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程实践/">编程实践</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      多对一autossh隧道管理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？</p>
+<a id="more"></a>
+<p>这里就需要用到autossh了，简要介绍其思路：客户安装配置autossh，主动去连接云端主机建立autossh隧道，<strong>此隧道在云端主机有一个对端端口</strong>，云端主机直接ssh此端口就会到达隧道的另一端——客户端。</p>
+<p>具体实现过程如下，注意：</p>
+<ol>
+<li>下文的bbblack是客户端用于登入云端主机的普通账户；</li>
+<li>125.94.212.178为云端主机公网IP；</li>
+</ol>
+<h2 id="客户端配置autossh"><a href="#客户端配置autossh" class="headerlink" title="客户端配置autossh"></a>客户端配置autossh</h2><ol>
+<li>编辑/etc/ssh/ssh_config，修改<code>StrictHostKeyChecking ask</code>为<code>StrictHostKeyChecking no</code>并去除其前面的注释；</li>
+<li>执行ssh-keygen得id_rsa.pub，将id_rsa.pub上传到云主机的/home/bbblack/.ssh/customer_name_authorized_keys（<strong>customer_name_authorized<em>keys为客户名称开头，加</em>上authorized_keys为后缀</strong>）；</li>
+<li>安装autossh；</li>
+<li>crontab配置每5分钟执行一次以下脚本（autossh.sh），</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#!/bin/sh</span></div><div class="line"><span class="comment"># 隧道在云主机的对端是1235端口，在客户端是22端口（ssh的默认端口）</span></div><div class="line">tokeep=1235:localhost:22</div><div class="line"><span class="comment"># 检测此连接是否存在，否则建立autossh连接</span></div><div class="line"><span class="keyword">if</span> $(/bin/ps ax|grep <span class="variable">$tokeep</span>|grep -v <span class="string">"grep"</span> &gt; /dev/null)</div><div class="line"><span class="keyword">then</span></div><div class="line">    <span class="built_in">echo</span> <span class="string">"ok"</span> &gt; /dev/null</div><div class="line"><span class="keyword">else</span></div><div class="line">    <span class="comment"># autossh本身会去检测并维持隧道的长连接</span></div><div class="line">    /usr/bin/autossh -M 1234 -NR 1235:localhost:22 bbblack@125.94.212.178 -p62638 &gt; /root/autossh.log 2&gt;&amp;1 &amp;</div><div class="line"><span class="keyword">fi</span></div><div class="line"><span class="built_in">exit</span> 0</div></pre></td></tr></table></figure>
+<h2 id="云端配置autossh"><a href="#云端配置autossh" class="headerlink" title="云端配置autossh"></a>云端配置autossh</h2><ol>
+<li>编辑/etc/ssh/ssh_config，修改<code>StrictHostKeyChecking ask</code>为<code>StrictHostKeyChecking no</code>并去除其前面的注释；</li>
+<li>编辑/etc/ssh/sshd_config，修改<code>AuthorizedKeysFile</code>配置项为<code>AuthorizedKeysFile      .ssh/authorized_keys</code>，若上文的customer_name_authorized_keys与.ssh/authorized_keys内容相同，则客户端无需输入密码通过authorized_keys就能连接上云端；</li>
+</ol>
+<h3 id="在只有一个客户的情况下"><a href="#在只有一个客户的情况下" class="headerlink" title="在只有一个客户的情况下"></a>在只有一个客户的情况下</h3><p>将上文的customer_name重命名为authorized_keys，过一会客户端就会连接上云端，使用<code>lsof -i:1235</code>可查看连接建立情况，使用<code>ssh -p1235 user_name@localhost</code>可登录到客户端（<strong>user_name为客户端的linux user name</strong>）；</p>
+<h3 id="在有多个客户的情况下"><a href="#在有多个客户的情况下" class="headerlink" title="在有多个客户的情况下"></a>在有多个客户的情况下</h3><p>最简单的一种方案是：使每条隧道的云端主机对端端口唯一，也就是每个客户的隧道互相独立，但如果客户太多，会将云端的端口耗尽。笔者想要的效果是所有客户共用一个云端对端端口，即一次只有一条隧道，一次只能远程登录到一个客户。那么问题来了？如何实现？</p>
+<p>使用下述脚本（autossh-helper.sh）即可解决上述问题，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#!/bin/sh</span></div><div class="line"></div><div class="line">filepath=<span class="variable">$1</span></div><div class="line">port1=1235</div><div class="line"></div><div class="line">[ <span class="variable">$#</span> <span class="_">-eq</span> 0 ] &amp;&amp; &#123; <span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$0</span> authorized_keys_filepath"</span>; <span class="built_in">exit</span> 999; &#125;</div><div class="line"></div><div class="line"><span class="keyword">if</span> [ <span class="_">-f</span> <span class="string">"<span class="variable">$filepath</span>"</span> ] ; <span class="keyword">then</span></div><div class="line">    <span class="comment"># kill 1235</span></div><div class="line">    pid=$(lsof -i:<span class="variable">$port1</span> -t)</div><div class="line">    <span class="built_in">echo</span> <span class="variable">$pid</span>|<span class="keyword">while</span> <span class="built_in">read</span> line</div><div class="line">    <span class="keyword">do</span></div><div class="line">        <span class="keyword">if</span> [ <span class="string">""</span> != <span class="string">"<span class="variable">$line</span>"</span> ] ; <span class="keyword">then</span></div><div class="line">            $(<span class="built_in">kill</span> <span class="variable">$line</span>)</div><div class="line">        <span class="keyword">fi</span></div><div class="line">    <span class="keyword">done</span></div><div class="line"></div><div class="line">    <span class="comment"># clear known_hosts</span></div><div class="line">    <span class="built_in">echo</span> &gt; /home/bbblack/.ssh/known_hosts</div><div class="line"></div><div class="line">    <span class="comment"># authorized_keys changed</span></div><div class="line">    cp <span class="variable">$filepath</span> /home/bbblack/.ssh/authorized_keys</div><div class="line">    <span class="built_in">echo</span> <span class="string">"done ..."</span></div><div class="line"><span class="keyword">else</span></div><div class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$filepath</span> not exists ..."</span></div><div class="line"><span class="keyword">fi</span></div><div class="line"></div><div class="line"><span class="built_in">exit</span> 0</div></pre></td></tr></table></figure>
+<p><strong>FIXME</strong><br>但是，以非root用户bbblack使用上述脚本有个问题，它需要定位出绑定在1235的pid号是多少，而1235是由sshd进程以bbblack用户在隧道建立时绑定的，这时候不管使用<code>lsof</code>还是<code>netstat</code>都无法在bbblack用户下定位出绑定在1235的pid号是多少（原因未知）。所以需要配置lsof为setuid程序（有何安全隐患？），root用户运行<code>chmod u+s /usr/bin/lsof</code>即可。</p>
+<p>接着，以bbblack账户（无需root用户）运行<code>./autossh-helper.sh customer_name_authorized_keys</code>（customer_name_authorized_keys为上文提到的文件）即可实现客户切换，其原理无非是一次只有一个客户独占ssh的authorized_keys，其他没有独占的客户由于不满足ssh登入的条件因而无法建立隧道。</p>
+<p>但是问题到这里还没有结束，云端的主机由于安全的需要一般都会配置denyhosts，denyhosts会不断检查ssh日志的失败记录，把那些连续失败多次的IP记为黑名单（ssh不可用），于是会出现这样一个现象，即使你运行了上述的autossh-helper.sh切换客户，依然还是没有客户建立隧道，这就是因为该客户所在公网IP被加入黑名单的原因。</p>
+<p>有什么解决办法呢？这时候我们的应用程序TCP端口（假定为62639，长连接）派上了用场。这里我们假设，该客户所在公网IP虽然被加入黑名单，但应用程序TCP端口（假定为62639，长连接）依然正常，因为云端和客户端需要源源不断的交互数据，此端口为长连接。若不满足此假设，则以下解决方案无效。</p>
+<p>解决方法就是，在执行autossh-helper.sh前，将与云端应用程序正常通信的客户端公网IP从黑名单解除即可。即在执行autossh-helper.sh前，必须先以<strong>root用户</strong>（因为denyhosts需要以root用户执行，这是个遗憾）执行脚本如下（public-ip-helper.sh）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#!/bin/sh</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> [ `whoami` = <span class="string">"root"</span> ]; <span class="keyword">then</span></div><div class="line">    <span class="built_in">echo</span> <span class="string">""</span> &gt; /dev/null</div><div class="line"><span class="keyword">else</span></div><div class="line">    <span class="built_in">echo</span> <span class="string">"please login as root !"</span></div><div class="line">    <span class="built_in">exit</span> 1</div><div class="line"><span class="keyword">fi</span></div><div class="line"></div><div class="line">tokill=/usr/bin/denyhosts</div><div class="line">/bin/ps ax|grep <span class="variable">$tokill</span>|grep -v <span class="string">"grep"</span>|awk <span class="string">'&#123;print $1&#125;'</span>|<span class="keyword">while</span> <span class="built_in">read</span> line</div><div class="line"><span class="keyword">do</span></div><div class="line">    <span class="built_in">kill</span> <span class="variable">$line</span></div><div class="line"><span class="keyword">done</span></div><div class="line"></div><div class="line">netstat -npt|grep 62639|cut <span class="_">-d</span> <span class="string">":"</span> <span class="_">-f</span>2|cut <span class="_">-d</span> <span class="string">":"</span> <span class="_">-f</span>1|<span class="keyword">while</span> <span class="built_in">read</span> str</div><div class="line"><span class="keyword">do</span></div><div class="line">HOST=<span class="variable">$&#123;str##* &#125;</span></div><div class="line"><span class="built_in">echo</span> <span class="variable">$HOST</span> &gt;&gt; /usr/share/denyhosts/allowed-hosts</div><div class="line"><span class="built_in">echo</span> <span class="string">'</span></div><div class="line">/etc/hosts.deny</div><div class="line">/usr/share/denyhosts/data/hosts</div><div class="line">/usr/share/denyhosts/data/hosts-restricted</div><div class="line">/usr/share/denyhosts/data/hosts-root</div><div class="line">/usr/share/denyhosts/data/hosts-valid</div><div class="line">/usr/share/denyhosts/data/users-hosts</div><div class="line">' | grep -v <span class="string">"^$"</span> | xargs sed -i <span class="string">"/<span class="variable">$&#123;HOST&#125;</span>/d"</span></div><div class="line"><span class="keyword">done</span></div><div class="line"></div><div class="line">/etc/init.d/denyhosts start</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://zhangjunjia.github.io/2016/06/22/autossh-helper/" data-id="cj1atccnv0014ycnpeewfc582" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/内网穿透/">内网穿透</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/05/22/be-the-same/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          论“避免不一致倾向”
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/06/22/svn-hooks/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">SVN hooks的使用</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/一些感悟/">一些感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/人工智能/">人工智能</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/科技与人文/">科技与人文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程实践/">编程实践</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Eclipse/">Eclipse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HBase/">HBase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVM/">LVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SVN/">SVN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/">TCP/IP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/">Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wisdom/">Wisdom</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/信息安全/">信息安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网穿透/">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/哲学/">哲学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/李笑来/">李笑来</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机原理/">计算机原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/财商/">财商</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贯行/">贯行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随想/">随想</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10px;">AI</a> <a href="/tags/C-C/" style="font-size: 18.33px;">C/C++</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Eclipse/" style="font-size: 10px;">Eclipse</a> <a href="/tags/HBase/" style="font-size: 11.67px;">HBase</a> <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Java/" style="font-size: 11.67px;">Java</a> <a href="/tags/LVM/" style="font-size: 10px;">LVM</a> <a href="/tags/Linux/" style="font-size: 18.33px;">Linux</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Network/" style="font-size: 10px;">Network</a> <a href="/tags/SVN/" style="font-size: 11.67px;">SVN</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/TCP-IP/" style="font-size: 10px;">TCP/IP</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Wisdom/" style="font-size: 11.67px;">Wisdom</a> <a href="/tags/信息安全/" style="font-size: 10px;">信息安全</a> <a href="/tags/内网穿透/" style="font-size: 10px;">内网穿透</a> <a href="/tags/哲学/" style="font-size: 10px;">哲学</a> <a href="/tags/李笑来/" style="font-size: 15px;">李笑来</a> <a href="/tags/计算机原理/" style="font-size: 10px;">计算机原理</a> <a href="/tags/读书/" style="font-size: 20px;">读书</a> <a href="/tags/财商/" style="font-size: 11.67px;">财商</a> <a href="/tags/贯行/" style="font-size: 13.33px;">贯行</a> <a href="/tags/随想/" style="font-size: 16.67px;">随想</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/10/16/living-in-the-future/">《通往财富自由之路》第04周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/security-sense/">《通往财富自由之路》第03周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/saving-your-attention/">《通往财富自由之路》第02周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/attention/">《通往财富自由之路》第01周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/why-not-go-to-sleep/">为什么你还不去睡觉</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 张++<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

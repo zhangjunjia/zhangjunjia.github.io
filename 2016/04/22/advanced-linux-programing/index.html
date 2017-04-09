@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>读《Advanced Linux Programing》 | 张++</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="《Advanced Linux Programing》读书笔记。">
+<meta name="keywords" content="C/C++,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读《Advanced Linux Programing》">
+<meta property="og:url" content="http://zhangjunjia.github.io/2016/04/22/advanced-linux-programing/index.html">
+<meta property="og:site_name" content="张++">
+<meta property="og:description" content="《Advanced Linux Programing》读书笔记。">
+<meta property="og:updated_time" content="2017-04-09T14:46:05.298Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读《Advanced Linux Programing》">
+<meta name="twitter:description" content="《Advanced Linux Programing》读书笔记。">
+  
+    <link rel="alternate" href="/atom.xml" title="张++" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">张++</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">成长并帮助他人成长</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://zhangjunjia.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-advanced-linux-programing" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/22/advanced-linux-programing/" class="article-date">
+  <time datetime="2016-04-22T11:03:00.000Z" itemprop="datePublished">2016-04-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/读书笔记/">读书笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      读《Advanced Linux Programing》
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>《Advanced Linux Programing》读书笔记。</p>
+<a id="more"></a>
+<h2 id="一些介绍"><a href="#一些介绍" class="headerlink" title="一些介绍"></a>一些介绍</h2><p>Linux Kernel</p>
+<ul>
+<li>硬件交互；</li>
+<li>内存管理；</li>
+<li>文件管理；</li>
+<li>多进程管理；</li>
+<li>共享库载入；</li>
+</ul>
+<p>GNU Project</p>
+<ul>
+<li>编辑器；</li>
+<li>编译器；</li>
+<li>Shell（/bin/bash，Bourne-Again SHell）；</li>
+</ul>
+<p>注意：</p>
+<ol>
+<li>Linux Kernel加GNU Project，构成了现在主流的Linux操作系统，所以应该称之为GNU/Linux；</li>
+<li>Linux操作系统只是UNIX的一种系统实现，其他类UNIX操作系统有FreeBSD、Solaris等；</li>
+</ol>
+<h2 id="Hello-World（快速了解）"><a href="#Hello-World（快速了解）" class="headerlink" title="Hello, World（快速了解）"></a>Hello, World（快速了解）</h2><h3 id="从文本到可执行程序"><a href="#从文本到可执行程序" class="headerlink" title="从文本到可执行程序"></a>从文本到可执行程序</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** main.c **/</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"Hello, World\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    sayHello();</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Shell下运行<code>gcc -o main main.c</code>即可得到可执行文件<code>main</code>，执行<code>./main</code>即可在控制台上看到<code>Hello, World</code>的输出。那么，它的原理是什么？从<code>main.c</code>到<code>main</code>，经历了以下步骤：</p>
+<ul>
+<li>main.c –&gt; main.i –&gt; main.s –&gt; main.o –&gt; main</li>
+<li>程序文本 + <strong>预处理器(cpp)</strong> –&gt; 被修改的源程序文本 + <strong>编译器(ccl)</strong> –&gt; 汇编文本 + <strong>汇编器(as)</strong> –&gt; 可重定向目标文件（二进制） + printf.o + <strong>链接器(ld)</strong> –&gt; main（可执行程序）</li>
+</ul>
+<p>对应到Shell下，经历了以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">gcc -E main.c -o main.i</div><div class="line">gcc -S main.i -o main.s --&gt; main.s</div><div class="line">gcc -c main.s -o main.o --&gt; main.o</div><div class="line">gcc main.o -o main --&gt; main</div><div class="line"></div><div class="line"><span class="comment"># 上面4句等价于下面一句，gcc自动进行预处理、编译、汇编和链接</span></div><div class="line">gcc main.c -o main</div></pre></td></tr></table></figure>
+<p><code>-E</code>进行预处理，将头文件插入C文件同时执行宏替换；<code>-S</code>用于生成汇编绘本；<code>-c</code>命令用于汇编；<code>-o</code>命令用于指定输出文件名称。</p>
+<h3 id="编写可用g-编译的c程序"><a href="#编写可用g-编译的c程序" class="headerlink" title="编写可用g++编译的c程序"></a>编写可用g++编译的c程序</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** main.c **/</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></div><div class="line"><span class="keyword">extern</span> <span class="string">"C"</span> &#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>;</div><div class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></div><div class="line">&#125;</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"Hello, World\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    sayHello();</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="其他常用gcc命令"><a href="#其他常用gcc命令" class="headerlink" title="其他常用gcc命令"></a>其他常用gcc命令</h3><ul>
+<li><code>-I</code>指定存放头文件的路径（相对或绝对路径）；</li>
+<li><code>-D</code>定义一个宏；</li>
+<li><code>-O</code>指定优化级别；</li>
+<li><code>-l</code>指定要链接的库；</li>
+<li><code>-L</code>指定搜索动态链接库的路径；</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 生成可执行文件main</span></div><div class="line"><span class="comment"># 从绝对路径/root/搜索头文件</span></div><div class="line"><span class="comment"># 定义宏DEBUG</span></div><div class="line"><span class="comment"># 定义优化级别为2（0&lt;1&lt;2&lt;3，0表示不优化）</span></div><div class="line"><span class="comment"># 链接数学库m</span></div><div class="line"><span class="comment"># 在/usr/local/lib下查找数学库m的动态链接库</span></div><div class="line">gcc main.c -o main -I /root/ -D DEBUG=2 -O2 -lm -L/usr/<span class="built_in">local</span>/lib</div></pre></td></tr></table></figure>
+<h3 id="如何节省编译的工作"><a href="#如何节省编译的工作" class="headerlink" title="如何节省编译的工作"></a>如何节省编译的工作</h3><ol>
+<li>写MakeFile；</li>
+<li>使用autoconf、automake和libtool；</li>
+</ol>
+<p>简单的makefile举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">main.o: main.c</div><div class="line">        gcc -c main.c -o main.o</div><div class="line"></div><div class="line">all: main</div><div class="line"></div><div class="line">main: main.o</div><div class="line">        gcc main.o -o main</div><div class="line"></div><div class="line">clean:</div><div class="line">        rm main.o main</div></pre></td></tr></table></figure>
+<p>如何使用这个makefile：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 编译（把all换成main效果一致）</span></div><div class="line"><span class="comment"># 方法1：用-f指定makefile文件</span></div><div class="line">make <span class="_">-f</span> makefile all</div><div class="line"><span class="comment"># 方法2：不指定makefile文件，默认会在当前文件夹寻找</span></div><div class="line"><span class="comment"># 按顺序寻找文件GNUmakefile--&gt;makefile--&gt;Makefile，找不到则报错</span></div><div class="line">make all</div><div class="line"></div><div class="line"><span class="comment"># 清除编译结果，以下二选一</span></div><div class="line">make clean</div><div class="line">make <span class="_">-f</span> makefile clean</div></pre></td></tr></table></figure>
+<p>makefile的基本组成如下（<strong>command必须以一个tab开始</strong>）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># target表示目标体，它位于冒号之前</div><div class="line"># dependency_files表示依赖的文件或target，它位于冒号之后</div><div class="line"># command表示达成这个目标所需执行命令</div><div class="line">target: dependency_files</div><div class="line">        command</div></pre></td></tr></table></figure>
+<p>makefile里面也可定义和调用变量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">CC=gcc</div><div class="line">EXE=main</div><div class="line"></div><div class="line">main.o: main.c</div><div class="line">        $(CC) -c main.c -o main.o</div><div class="line"></div><div class="line">all: $(EXE)</div><div class="line"></div><div class="line">$(EXE): main.o</div><div class="line">        gcc main.o -o $(EXE)</div><div class="line"></div><div class="line">clean:</div><div class="line">        rm main.o $(EXE)</div></pre></td></tr></table></figure>
+<p>也可在外部调用时传入变量（会将makefile中已存在的变量覆盖掉），命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">make EXE=mm all</div><div class="line">make EXE=mm clean</div></pre></td></tr></table></figure>
+<h3 id="使用GDB调试程序简介"><a href="#使用GDB调试程序简介" class="headerlink" title="使用GDB调试程序简介"></a>使用GDB调试程序简介</h3><p>使用<code>gdb 程序名（相对或绝对路径）</code>进入gdb：</p>
+<ol>
+<li>输入<code>break main</code>为main函数设置断点，输入<code>break main.c:5</code>为<code>main.c</code>的第5行设置断点；</li>
+<li>输入<code>i b</code>查看当前断点；</li>
+<li>输入<code>delete 1</code>删除第一个断点；</li>
+<li>输入<code>disable 1</code>停用第一个断点；</li>
+<li>输入<code>list main.c:5</code>可在gdb显示代码；</li>
+<li>输入<code>r</code>或<code>run</code>运行，这时用户将无法再输入命令，直到运行到断点时，gdb将交回命令行控制权，这时输入<code>n</code>或<code>next</code>表示运行到下一行，<code>s</code>或<code>step</code>表示进入当前行调用的函数，输入<code>return</code>返回到上一层函数；</li>
+<li>gdb交回命令行控制权时，输入<code>print 参数名</code>可查看当前作用域内的具体参数值；</li>
+<li>假如程序意外退出，这时输入<code>where</code>、<code>bt</code>或<code>backtrace</code>可以查看错误堆栈；</li>
+</ol>
+<h3 id="如何查看帮助手册"><a href="#如何查看帮助手册" class="headerlink" title="如何查看帮助手册"></a>如何查看帮助手册</h3><p>终端下输入<code>man 命令名称</code>（如<code>man printf</code>）将看到如下提示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Man: 寻找所有匹配的手册页 (set MAN_POSIXLY_CORRECT to avoid this)</div><div class="line"> * printf (1)</div><div class="line">   printf (3)</div><div class="line">   printf (1p)</div><div class="line">   printf (3p)</div><div class="line">Man: 您需要什么手册页？</div><div class="line">Man:</div></pre></td></tr></table></figure>
+<ol>
+<li>数字1表示这是一个用户命令（user commands，如<strong>echo</strong>）；</li>
+<li>数字2表示这是一个系统调用（system calls，如<strong>fork</strong>）；</li>
+<li>数字3表示这是一个标准库（stand library，如<strong>printf</strong>）；</li>
+<li>带p后缀的为POSIX标准，释义：POSIX标准定义了操作系统应该为应用程序提供的接口标准，一个POSIX兼容的操作系统编写的程序，应该可以在任何其它的POSIX操作系统（即使是来自另一个厂商）上编译执行；</li>
+</ol>
+<h2 id="编程实践"><a href="#编程实践" class="headerlink" title="编程实践"></a>编程实践</h2><h3 id="环境交互"><a href="#环境交互" class="headerlink" title="环境交互"></a>环境交互</h3><ol>
+<li>临时文件（用于暂时存放数据），使用下述命令查看具体用途<ul>
+<li><code>man mkstemp</code></li>
+<li><code>man tmpfile</code></li>
+</ul>
+</li>
+<li>环境变量（设置运行环境）<ul>
+<li>shell下<code>echo $USER</code>或<code>printenv USER</code>打印环境变量<code>USER</code>；</li>
+<li>shell下<code>export USER=jayzee</code>设置环境变量<code>USER</code>为<code>jayzee</code>；</li>
+<li>shell下<code>env</code>查询当前用户所有环境变量；</li>
+<li>Linux下调用一个C/C++程序时，该程序继承其调用者的所有环境变量，标准库<code>stdlib.h</code>的<code>getenv</code>、<code>setenv</code>和<code>unsetenv</code>用于获取、操纵环境变量；</li>
+</ul>
+</li>
+<li>shell下调用程序结束后，使用<code>echo $?</code>获取程序退出代码（0表示正常）；</li>
+<li>IO（输入输出流）<ul>
+<li>程序中，宏<code>stdin</code>表示输入流，对应int值0；宏<code>stdout</code>表示标准输出流，对应int值1；宏<code>stderr</code>表示错误输出流，对应int值2；</li>
+<li><code>stdin</code>只能是buffered的，但其buffered size可以修改；</li>
+<li><code>stderr</code>只能是unbuffered，一有错误立即输出；</li>
+<li>当程序直接在shell调用并且直接输出到控制台时，<code>stdout</code>是line-buffered的，否则是buffered的，但其buffered size可以修改，<code>man setvbuf</code>查看标准库如何设置输入输出流；</li>
+<li>程序写文件也是默认buffered，写完后应使用<code>fflush(your_file)</code>立即清空buffer写入到文件；</li>
+<li>shell命令<code>your_program &gt; output_file.txt 2&gt;&amp;1</code>表示将<code>your_program</code>的标准输出写入到文件<code>output_file.txt</code>（<code>&gt;</code>执行覆盖写，<code>&gt;&gt;</code>执行追加写），并且将错误输出流重定向到标准输出流，Linux规定文件名必须在流重定向之前；</li>
+<li>shell命令<code>program 2&gt;&amp;1 | filter</code>表示将标准输出使用管道过滤，Linux规定重定向必须在过滤器之前；</li>
+</ul>
+</li>
+<li><code>man getopt_long</code>查看<code>getopt.h</code>库如何处理程序参数（类似于<code>ls -l</code>的<code>-l</code>）；</li>
+</ol>
+<h3 id="好的编程习惯"><a href="#好的编程习惯" class="headerlink" title="好的编程习惯"></a>好的编程习惯</h3><p>使用断言assert：</p>
+<ul>
+<li>所有需确认值为true或非0的需使用<code>assert(condition)</code>；</li>
+<li>编译时指定<code>-DNDEBUG</code>可移除所有assert语句，所以<strong>千万不要把程序的重要逻辑放在assert语句中</strong>；</li>
+</ul>
+<p>处理系统调用失败：</p>
+<ul>
+<li>系统调用如<code>fork</code>失败时会返回非零值，这时宏<code>errno</code>会被设置，下次系统调用失败时又会覆盖这个宏的值；</li>
+<li><code>man strerror</code>查看如何使用<code>string.h</code>的<code>strerror</code>的具体字符串释义，细节如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">EINTR : blocking function interrupt, like sleep, read, select</div><div class="line">EPERM : Permission denied</div><div class="line">EROFS : PATH is on a read-only file system</div><div class="line">ENAMETOOLONG : PATH is too long</div><div class="line">ENOENT : PATH does not exit</div><div class="line">ENOTDIR : A component of PATH is not a directory</div><div class="line">EACCES : A component of PATH is not accessible</div><div class="line">EFAULT : PATH contains an invalid memory address.  This is probably a bug</div><div class="line">ENOMEM : Ran out of kernel memory</div></pre></td></tr></table></figure>
+<p>申请内存与释放内存：</p>
+<ul>
+<li>申请内存与释放内存的语句必须成对，即有申请内存则相应的要有释放内存；</li>
+</ul>
+<h3 id="链接程序（库：快速开发，软件复用）"><a href="#链接程序（库：快速开发，软件复用）" class="headerlink" title="链接程序（库：快速开发，软件复用）"></a>链接程序（库：快速开发，软件复用）</h3><p>以下文字部分引用自<a href="http://www.cnblogs.com/skynet/p/3372855.html" target="_blank" rel="external">C++静态库与动态库 - 吴秦 - 博客园</a>，向该作者致敬。</p>
+<p>下文用到的main.c文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">/** main.c **/</div><div class="line">int add(int x, int y) &#123;</div><div class="line">    <span class="built_in">return</span> x + y;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h4><p>静态库的特点：</p>
+<ul>
+<li>静态库对函数库的链接是放在编译时期完成的；</li>
+<li>程序在运行时与函数库再无瓜葛，移植方便；</li>
+<li>浪费空间和资源，因为所有相关的目标文件与牵涉到的函数库被链接合成一个可执行文件；</li>
+</ul>
+<p>静态库的创建：</p>
+<ul>
+<li>静态库的命名规范为lib[your_library_name].a：lib为前缀，中间是静态库名，扩展名为.a；</li>
+<li>首先将代码文件编译成目标文件.o，再通过ar工具将目标文件打包.a静态库文件；</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 假定有一个math.c文件，提供加法函数int add(int x, int y)，我们现在将其打包成静态库</span></div><div class="line">gcc -c math.c -o math.o</div><div class="line">ar -crv libmath.a math.o</div></pre></td></tr></table></figure>
+<p>使用静态库：</p>
+<ul>
+<li>在编译时指定静态库搜索路径（-L选项）、指定静态库名称（不需要lib前缀和.a后缀，-l选项）；</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -l为什么一定要放在末尾？它会去查找库的所有被引用的函数或宏等并插入到最终的可执行程序，放在末尾是为了这种依赖搜索在最后执行</span></div><div class="line">gcc main.c -o main -Lfilepath_of_your_static_library -lmath</div></pre></td></tr></table></figure>
+<p>静态库优缺点：</p>
+<ul>
+<li>优点：编译成可执行文件后与其编译时引用的静态库再无任何瓜葛；</li>
+<li>缺点：导致可执行程序体量庞大，同一个操作系统上运行的多个程序引用同一个静态库会导致内存浪费（相同的代码），导致客户的全量更新；</li>
+</ul>
+<h4 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h4><p>动态库的特点：</p>
+<ul>
+<li>动态库把对一些库函数的链接载入推迟到程序运行的时期；</li>
+<li>可以实现进程之间的资源共享（因此动态库也称为共享库）；</li>
+<li>将一些程序升级变得简单；</li>
+<li>甚至可以真正做到链接载入完全由程序员在程序代码中控制（显示调用）；</li>
+</ul>
+<p>动态库的创建：</p>
+<ul>
+<li>动态库的命名规范为lib[your_library_name].so：lib为前缀，中间是动态库名，扩展名为.so；</li>
+<li>首先将代码文件编译成目标文件.o，再通过gcc工具将目标文件打包.so动态库文件；<ul>
+<li><code>-fPIC</code>创建与地址无关的编译程序（pic，position independent code），是为了能够在多个应用程序间共享；</li>
+<li><code>-shared</code>指定生成动态链接库；</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 假定有一个math.c文件，提供加法函数int add(int x, int y)，我们现在将其打包成动态库</span></div><div class="line">gcc <span class="_">-f</span>PIC -c math.c -o math.o</div><div class="line">gcc -shared -o libmath.so math.o</div><div class="line"><span class="comment"># 上面两条命令等价于</span></div><div class="line">gcc <span class="_">-f</span>PIC -shared -o libmath.so math.c</div></pre></td></tr></table></figure>
+<p>使用动态库：</p>
+<ul>
+<li>在编译时指定动态库搜索路径（-L选项）、指定动态库名称（不需要lib前缀和.so后缀，-l选项）；</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gcc main.c -o main -Lfilepath_of_your_static_library -lmath</div></pre></td></tr></table></figure>
+<ul>
+<li>注意，运行上述生成的可执行文件时，操作系统会去一些指定路径查找并载入该动态库，如查找不到将抛出找不到动态库的异常信息，这些指定路径是：<ul>
+<li>环境变量LD_LIBRARY_PATH，如<code>LD_LIBRARY_PATH=/usr/local/lib:/opt/lib</code>；</li>
+<li>/etc/ld.so.cache文件列表，需要额外操作如下：<ul>
+<li>编辑/etc/ld.so.conf文件，加入库文件所在目录的路径；</li>
+<li>运行ldconfig ，该命令会重建/etc/ld.so.cache文件；</li>
+</ul>
+</li>
+<li>/lib/，/usr/lib目录；</li>
+</ul>
+</li>
+<li><code>-L</code>指定的库搜索路径下即有动态库也有静态库，则动态库具有较高优先级被链接；</li>
+</ul>
+<p>动态库优缺点：</p>
+<ul>
+<li>缺点：增量更新必须考虑向后兼容；</li>
+<li>优点：增量更新，避免内存浪费（同一个操作系统上运行的多个程序引用同一个动态库只需要一份共享库示例）；</li>
+</ul>
+<h4 id="链接检查辅助命令"><a href="#链接检查辅助命令" class="headerlink" title="链接检查辅助命令"></a>链接检查辅助命令</h4><p><code>nm</code>命令：打印出库中的涉及到的所有符号。库既可以是静态的也可以是动态的。nm列出的符号有很多，常见的有三种，</p>
+<ul>
+<li>一种是在库中被调用，但并没有在库中定义(表明需要其他库支持)，用U表示；</li>
+<li>一种是库中定义的函数，用T表示，这是最常见的；</li>
+<li>一种是所谓的弱态”符号，它们虽然在库中被定义，但是可能被其他库中的同名符号覆盖，用W表示；</li>
+</ul>
+<p><code>ldd</code>命令：查看一个可执行程序依赖的共享库。</p>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>本章节部分内容引用自<a href="http://www.cnblogs.com/hicjiajia/archive/2011/01/20/1940154.html" target="_blank" rel="external">Linux下Fork与Exec使用 - hicjiajia - 博客园</a>和<a href="http://www.ibm.com/developerworks/cn/linux/kernel/syscall/part3/index.html" target="_blank" rel="external">系统调用跟我学(3)</a>，向作者致敬。</p>
+<h3 id="进程查看"><a href="#进程查看" class="headerlink" title="进程查看"></a>进程查看</h3><p><code>pid</code>指进程id，<code>ppid</code>指父进程id。</p>
+<ol>
+<li>Linux所有<strong>用户进程</strong>呈树状结构，这棵用户进程树的根节点是init进程（内核启动的第一个用户级进程），init进程的<code>pid</code>为1，其ppid为0；</li>
+<li>shell下运行<code>ps -e -o pid,ppid,command</code>可查看所有用户进程的pid、ppid和command；</li>
+<li><code>unistd.h</code>提供<code>getpid()</code>和<code>getppid()</code>获取进程的ID和父ID；</li>
+</ol>
+<h3 id="进程创建"><a href="#进程创建" class="headerlink" title="进程创建"></a>进程创建</h3><h4 id="system函数：执行shell命令"><a href="#system函数：执行shell命令" class="headerlink" title="system函数：执行shell命令"></a>system函数：执行shell命令</h4><p>system函数用于在C/C++语言中执行shell命令，其API如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#include &lt;stdlib.h&gt;</span></div><div class="line">int system(const char *<span class="built_in">command</span>);</div></pre></td></tr></table></figure>
+<p>其具体实现是：</p>
+<ol>
+<li>先执行系统调用<code>fork()</code>创建子进程；</li>
+<li>再执行<code>execl(&quot;/bin/sh&quot;, &quot;sh&quot;. &quot;-c&quot;, command, (char *) 0);</code>去调用shell执行command；</li>
+</ol>
+<h4 id="fork函数，exec族函数"><a href="#fork函数，exec族函数" class="headerlink" title="fork函数，exec族函数"></a>fork函数，exec族函数</h4><h5 id="fork函数：创建子进程，进程分叉"><a href="#fork函数：创建子进程，进程分叉" class="headerlink" title="fork函数：创建子进程，进程分叉"></a>fork函数：创建子进程，进程分叉</h5><p>fork函数API如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#include &lt;unistd.h&gt;</span></div><div class="line">pid_t fork(void);</div></pre></td></tr></table></figure>
+<p>fork函数的特点：</p>
+<ul>
+<li>fork调用之后，父进程进入<code>pid&gt;0</code>的分支，子进程进入<code>pid==0</code>的分支；</li>
+<li>fork创建的子进程是父进程的一个完整拷贝，<strong>当且仅当fork之后的代码即将开始更新内存，真实的拷贝才会发生</strong>（也就是上述例子并没有发生拷贝），为什么这么设计，我们会在下面讲到；</li>
+<li>fork创建的子进程拥有一个新的进程pid号，子进程的ppid为调用fork函数的进程id；</li>
+</ul>
+<p>pid_t是一个整型变量。具体示例如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* zombie.c */</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">pid_t</span> pid;</div><div class="line">    pid=fork();</div><div class="line">    <span class="keyword">if</span>(pid&lt;<span class="number">0</span>) <span class="comment">/* 如果出错 */</span></div><div class="line">        <span class="built_in">printf</span>(<span class="string">"error occurred!\n"</span>);</div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(pid==<span class="number">0</span>) <span class="comment">/* 如果是子进程 */</span></div><div class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</div><div class="line">    <span class="keyword">else</span> <span class="comment">/* 如果是父进程 */</span></div><div class="line">        sleep(<span class="number">60</span>); <span class="comment">/* 休眠60秒，这段时间里，父进程什么也干不了 */</span></div><div class="line">    wait(<span class="literal">NULL</span>); <span class="comment">/* 收集僵尸进程 */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="exec函数族：对当前进程进行替换"><a href="#exec函数族：对当前进程进行替换" class="headerlink" title="exec函数族：对当前进程进行替换"></a>exec函数族：对当前进程进行替换</h5><p>exec并不是一个具体函数，它是以下六个函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">execl</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">const</span> <span class="keyword">char</span> *arg, ...)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">execlp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *file, <span class="keyword">const</span> <span class="keyword">char</span> *arg, ...)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">execle</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">const</span> <span class="keyword">char</span> *arg, ..., <span class="keyword">char</span> *<span class="keyword">const</span> envp[])</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">execv</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">char</span> *<span class="keyword">const</span> argv[])</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">execvp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *file, <span class="keyword">char</span> *<span class="keyword">const</span> argv[])</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">execve</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">char</span> *<span class="keyword">const</span> argv[], <span class="keyword">char</span> *<span class="keyword">const</span> envp[])</span></span>;</div></pre></td></tr></table></figure>
+<p>其中<code>execl</code>是基函数，其他5个是它的变种（区别在于传参形式不同，带v的表示参数以数组传递，带l的表示参数以陈列的方式传递）。</p>
+<p>exec函数族特点：</p>
+<ul>
+<li>只保留当前进程的pid，其他进程相关的数据段全部废弃；对系统而言，还是同一个进程号，但其实已经是另外一个程序了，即调用exec函数族的进程已“死亡”了；</li>
+<li>上面说到，fork的数据拷贝只发生在子进程更新内存时，fork调用后立即执行exec函数族使得我们能够产生一个全新的进程（<strong>这意味着当前进程的所有线程、文件描述符等都被释放</strong>），与fork调用进程再无任何瓜葛；</li>
+</ul>
+<p>举一个具体例子如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">char</span> command[<span class="number">256</span>];</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">   <span class="keyword">int</span> rtn; <span class="comment">/*子进程的返回数值*/</span></div><div class="line">   <span class="keyword">while</span>(<span class="number">1</span>) &#123;</div><div class="line">       <span class="comment">/* 从终端读取要执行的命令 */</span></div><div class="line">       <span class="built_in">printf</span>( <span class="string">"&gt;"</span> );</div><div class="line">       fgets( command, <span class="number">256</span>, <span class="built_in">stdin</span> );</div><div class="line">       command[<span class="built_in">strlen</span>(command)<span class="number">-1</span>] = <span class="number">0</span>;</div><div class="line">       <span class="keyword">if</span> ( fork() == <span class="number">0</span> ) &#123;<span class="comment">/* 子进程执行此命令 */</span></div><div class="line">          execlp( command, <span class="literal">NULL</span> );</div><div class="line">          <span class="comment">/* 如果exec函数返回，表明没有正常执行命令，打印错误信息*/</span></div><div class="line">          perror( command );</div><div class="line">          <span class="built_in">exit</span>( errno );</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">else</span> &#123;<span class="comment">/* 父进程， 等待子进程结束，并打印子进程的返回值 */</span></div><div class="line">          wait ( &amp;rtn );</div><div class="line">          <span class="built_in">printf</span>( <span class="string">" child process return %d\n"</span>, rtn );</div><div class="line">       &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="信号处理"><a href="#信号处理" class="headerlink" title="信号处理"></a>信号处理</h3><p>信号是一种异步的进程通信机制，是软件层面的中断，进程接收到线程必须进行处理，有以下三种处理方式：</p>
+<ul>
+<li>使用进程对信号的静默处理；</li>
+<li>忽略该信号；</li>
+<li>使用特定的信号处理函数进行处理；</li>
+</ul>
+<p>上述的后两种方式需要使用<code>signal()</code>函数进行处理，举例如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 忽略SIGPIPE信号</span></div><div class="line">signal ( SIGPIPE, SIG_IGN );</div><div class="line"><span class="comment">// 使用PrepareExit处理SIGINT信号</span></div><div class="line">signal ( SIGINT, (<span class="keyword">__sighandler_t</span> ) PrepareExit );</div></pre></td></tr></table></figure>
+<p>Linux的信号如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">信号值 默认处理动作 发出信号的原因</div><div class="line">SIGHUP 1 A 终端挂起或者控制进程终止</div><div class="line">SIGINT 2 A 键盘中断（如break键被按下）</div><div class="line">SIGQUIT 3 C 键盘的退出键被按下</div><div class="line">SIGILL 4 C 非法指令</div><div class="line">SIGABRT 6 C 由abort(3)发出的退出指令</div><div class="line">SIGFPE 8 C 浮点异常</div><div class="line">SIGKILL 9 AEF Kill信号</div><div class="line">SIGSEGV 11 C 无效的内存引用</div><div class="line">SIGPIPE 13 A 管道破裂: 写一个没有读端口的管道</div><div class="line">SIGALRM 14 A 由alarm(2)发出的信号</div><div class="line">SIGTERM 15 A 终止信号</div><div class="line">SIGUSR1 30,10,16 A 用户自定义信号1</div><div class="line">SIGUSR2 31,12,17 A 用户自定义信号2</div><div class="line">SIGCHLD 20,17,18 B 子进程结束信号</div><div class="line">SIGCONT 19,18,25 进程继续（曾被停止的进程）</div><div class="line">SIGSTOP 17,19,23 DEF 终止进程</div><div class="line">SIGTSTP 18,20,24 D 控制终端（tty）上按下停止键</div><div class="line">SIGTTIN 21,21,26 D 后台进程企图从控制终端读</div><div class="line">SIGTTOU 22,22,27 D 后台进程企图从控制终端写</div><div class="line"></div><div class="line">处理动作一项中的字母含义如下：</div><div class="line">A 缺省的动作是终止进程</div><div class="line">B 缺省的动作是忽略此信号，将该信号丢弃，不做处理</div><div class="line">C 缺省的动作是终止进程并进行内核映像转储（dump core），内核映像转储是指将进程数据在内存的映像和进程在内核结构中的部分内容以一定格式转储到文件系统，并且进程退出执行，这样做的好处是为程序员提供了方便，使得他们可以得到进程当时执行时的数据值，允许他们确定转储的原因，并且可以调试他们的程序</div><div class="line">D 缺省的动作是停止进程，进入停止状况以后还能重新进行下去，一般是在调试的过程中（例如ptrace系统调用）</div><div class="line">E 信号不能被捕获</div><div class="line">F 信号不能被忽略</div></pre></td></tr></table></figure>
+<p><strong>注意</strong>：<br>信号处理函数可被新产生的信号所中断，所以信号处理函数应该做尽可能少的工作；</p>
+<h3 id="进程终止"><a href="#进程终止" class="headerlink" title="进程终止"></a>进程终止</h3><h4 id="信号终止"><a href="#信号终止" class="headerlink" title="信号终止"></a>信号终止</h4><ol>
+<li><code>SIGINT</code>：CRTL+C产生；</li>
+<li><code>SIGTERM</code>：shell下<code>kill pid</code>产生；</li>
+<li><code>abort()</code>：发送一个<code>SIGABRT</code>信号给自己；</li>
+<li><code>SIGKILL</code>：强制退出信号，shell下<code>kill -9 pid</code>产生；</li>
+</ol>
+<p>当进程终止时，shell调用<code>echo $?</code>可取得该进程的exit code，</p>
+<ul>
+<li>如果该进程由信号终止，exit code为128加上信号值；</li>
+<li>调用<code>exit(int exit_code)</code>函数退出，exit_code的范围需在0到128之间；</li>
+</ul>
+<p>如何给进程发送指定信号，</p>
+<ul>
+<li>在shell下使用<code>kill -s SIGNAL_NAME pid</code>，可以给进程pid发送SIGNAL_NAME信号；</li>
+<li>程序使用<code>kill(pid, SIGNAL_NAME)</code>函数；</li>
+</ul>
+<h4 id="wait"><a href="#wait" class="headerlink" title="wait"></a>wait</h4><p>Unix的进程终止时，一些资源（如进程pid、进程exit code、收到的信号、占用CPU时间等）并不会被立即释放（堆栈等内存立即释放），死亡进程的父进程必须调用<code>wait</code>函数对进程进行“收尸”，即释放进程的pid和exit code等资源。</p>
+<p><code>wait</code>函数的API定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">pid_t</span> wait(<span class="keyword">int</span> *status);</div></pre></td></tr></table></figure>
+<p>一些说明：</p>
+<ul>
+<li><code>wait</code>函数是阻塞式的，在子进程未结束时将阻塞；</li>
+<li>如果<code>pid_t</code>为-1，表明<code>wait</code>调用失败，这是因为调用进程没有子进程导致；否则，表明收集子进程“死亡”信息成功，<code>pid_t</code>的值为“死亡”进程pid；</li>
+<li><code>status</code>是一个指针，如果这个指针为空，表明我们不关心进程的“死亡”信息细节，只是发起了回收这个动作；否则，status将包含进程“死亡”的一些信息；</li>
+<li>调用<code>WIFEXITED(status)</code>，若返回值回0表明进程异常退出（如信号导致退出），这时调用<code>WTERMSIG(status)</code>将得到使进程死亡的信号int值；否则表示程序正常退出，这时候调用<code>WEXITSTATUS(status)</code>可获取“死亡”进程的exit code（如“死亡”进程调用<code>exit(7)</code>退出，则<code>WEXITSTATUS(status)</code>的结果为7）；</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* wait2.c */</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/wait.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line">main()</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> status;</div><div class="line">    <span class="keyword">pid_t</span> pc,pr;</div><div class="line">    pc=fork();</div><div class="line">    <span class="keyword">if</span>(pc&lt;<span class="number">0</span>)     <span class="comment">/* 如果出错 */</span></div><div class="line">        <span class="built_in">printf</span>(<span class="string">"error ocurred!\n"</span>);</div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(pc==<span class="number">0</span>)&#123; <span class="comment">/* 子进程 */</span></div><div class="line">        <span class="built_in">printf</span>(<span class="string">"This is child process with pid of %d.\n"</span>,getpid());</div><div class="line">        <span class="built_in">exit</span>(<span class="number">3</span>);    <span class="comment">/* 子进程返回3 */</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span>&#123;       <span class="comment">/* 父进程 */</span></div><div class="line">        pr=wait(&amp;status);</div><div class="line">        <span class="keyword">if</span>(WIFEXITED(status))&#123;  <span class="comment">/* 如果WIFEXITED返回非零值 */</span></div><div class="line">            <span class="built_in">printf</span>(<span class="string">"the child process %d exit normally.\n"</span>,pr);</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"the return code is %d.\n"</span>,WEXITSTATUS(status));</div><div class="line">        &#125;<span class="keyword">else</span>           <span class="comment">/* 如果WIFEXITED返回零，这时pr存储死亡进程pid */</span></div><div class="line">            <span class="built_in">printf</span>(<span class="string">"the child process %d exit abnormally with signal number %d.\n"</span>,pr,WTERMSIG(status));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="僵尸进程"><a href="#僵尸进程" class="headerlink" title="僵尸进程"></a>僵尸进程</h4><p>如果子进程死亡，父进程却没有调用<code>wait</code>对其进行“收尸”，子进程就会变成一个僵尸进程，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ ps -ax</div><div class="line">  PID TTY      STAT   TIME COMMAND</div><div class="line"> 1177 pts/0    S      0:00 -bash</div><div class="line"> 1577 pts/0    S      0:00 ./zombie</div><div class="line"> 1578 pts/0    Z      0:00 [zombie &lt;defunct&gt;]</div><div class="line"> 1579 pts/0    R      0:00 ps -ax</div></pre></td></tr></table></figure>
+<p>若STAT为Z则表明则是一个僵尸进程，关于僵尸进程，</p>
+<ul>
+<li>在父进程退出时，init进程会自动对其下的所有僵尸子进程进行清理；</li>
+<li>子进程意外死亡时，父进程会受到一个SIGCHLD信号，父进程可以注册这个信号的处理函数进行“收尸”；</li>
+<li><code>wait3</code>和<code>wait4</code>函数为异步的，可以周期调用这两个函数执行回收；</li>
+</ul>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><h3 id="线程创建"><a href="#线程创建" class="headerlink" title="线程创建"></a>线程创建</h3><p><strong>线程创建</strong>：<code>int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+void *(*start_routine) (void *), void *arg);</code></p>
+<ul>
+<li><code>pthread_create</code>的返回值为0表示创建线程成功；</li>
+<li><code>thread</code>是指向<code>pthread_t</code>的指针；</li>
+<li><code>pthread_attr_t</code>在下一个例子介绍；</li>
+<li><code>start_routine</code>是一个无形参且无返回值的函数指针；</li>
+<li><code>arg</code>是上面提到的函数指针所接收的参数；</li>
+</ul>
+<p><strong>线程回收</strong>：<code>int pthread_join(pthread_t thread, void **retval);</code></p>
+<ul>
+<li><code>retval</code>实际上是一个指向整型指针的指针，它存放的是线程调用<code>exit</code>或<code>pthread_exit</code>的退出值；</li>
+<li><code>When a joinable thread terminates, its memory resources (thread descriptor and stack) are not deallocated until another thread performs pthread_join on it. Therefore, pthread_join must be called  once  for each joinable thread created to avoid memory leaks.</code></li>
+<li>这是一个阻塞式的方法，当监控到有线程结束时才返回；</li>
+</ul>
+<p><strong>线程退出</strong>：<code>void pthread_exit(void *retval);</code></p>
+<ul>
+<li><code>retval</code>实际是一个整型指针，在退出时标识线程的退出值；</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">int</span> code = <span class="number">11</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">void</span> *args)</span> </span>&#123;</div><div class="line">    <span class="keyword">char</span> *str = (<span class="keyword">char</span> *) args;</div><div class="line">    sleep(<span class="number">5</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"Hello, %s!\n"</span>, str);</div><div class="line">    pthread_exit(&amp;code);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">pthread_t</span> thread;</div><div class="line">    <span class="keyword">int</span> status = pthread_create(&amp;thread, <span class="literal">NULL</span>, (<span class="keyword">void</span> *)hello, (<span class="keyword">void</span> *) <span class="string">"Jayzee"</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread create status : %d\n"</span>, status);</div><div class="line">    <span class="keyword">int</span> *exit_code = <span class="number">0</span>;</div><div class="line">    status = pthread_join(thread, (<span class="keyword">void</span> *) &amp;exit_code);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread join status : %d\n"</span>, status);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread exit code : %d\n"</span>, *exit_code);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<p>下面的例子在<code>pthread_create</code>时用到了<code>pthread_attr_t</code>，必须经历下面四个过程</p>
+<ol>
+<li>先实例化<code>pthread_attr_t</code>；</li>
+<li>再设置<code>pthread_attr_t</code>；</li>
+<li>在线程创建时使用该<code>pthread_attr_t</code>；</li>
+<li>线程创建完后销毁<code>pthread_attr_t</code>；</li>
+</ol>
+<p>注意：</p>
+<ol>
+<li>创建线程时设置其为detach态，意味着我们不关心它的返回值，只是进行线程相关资源回收；</li>
+<li>也可创建线程时不指定detach态，在线程创建后可使用<code>int pthread_detach(pthread_t thread);</code>设置其为detach态；</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">int</span> code = <span class="number">11</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">void</span> *args)</span> </span>&#123;</div><div class="line">    <span class="keyword">char</span> *str = (<span class="keyword">char</span> *) args;</div><div class="line">    sleep(<span class="number">5</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"Hello, %s!\n"</span>, str);</div><div class="line">    pthread_exit(&amp;code);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">pthread_t</span> thread;</div><div class="line">    <span class="keyword">pthread_attr_t</span> attr;</div><div class="line">    pthread_attr_init (&amp;attr);</div><div class="line">    pthread_attr_setdetachstate (&amp;attr, PTHREAD_CREATE_DETACHED);</div><div class="line">    <span class="keyword">int</span> status = pthread_create (&amp;thread, &amp;attr, (<span class="keyword">void</span> *)hello, (<span class="keyword">void</span> *) <span class="string">"Jayzee"</span>);</div><div class="line">    pthread_attr_destroy (&amp;attr);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread create status : %d\n"</span>, status);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="线程取消"><a href="#线程取消" class="headerlink" title="线程取消"></a>线程取消</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int pthread_setcancelstate(int state, int *oldstate);</div><div class="line">int pthread_setcanceltype(int type, int *oldtype);</div><div class="line">int pthread_cancel(pthread_t thread);</div></pre></td></tr></table></figure>
+<ul>
+<li><code>pthread_setcancelstate</code>在运行时设置线程的状态<code>state</code>，并取得其之前的状态<code>oldstate</code>；</li>
+<li><code>pthread_setcanceltype</code>在运行时设置线程的类型<code>type</code>，并取得其之前的类型<code>oldtype</code>；</li>
+<li><code>pthread_cancel</code>用于取消线程的执行；</li>
+</ul>
+<p>注意，</p>
+<ol>
+<li>type：<code>PTHREAD_CANCEL_DEFERRED</code>或<code>PTHREAD_CANCEL_ASYNCHRONOUS</code></li>
+<li>state：<code>PTHREAD_CANCEL_ENABLE</code>或<code>PTHREAD_CANCEL_DISABLE</code></li>
+<li>type和state作用于<code>pthread_cancel</code>：<ul>
+<li>当state为<code>PTHREAD_CANCEL_DISABLE</code>时，设置的type和调用<code>pthread_cancel</code>不会对线程造成任何影响；</li>
+<li>否则，当设置的type为<code>PTHREAD_CANCEL_DEFERRED</code>时，为非阻塞取消（等待达到取消的条件，如释放锁）；当设置的type为<code>PTHREAD_CANCEL_ASYNCHRONOUS</code>时为异步取消（即线程立即被取消，但不同操作系统有可能实现不同，理应处理释放锁）；</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">int</span> code = <span class="number">11</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">void</span> *args)</span> </span>&#123;</div><div class="line">    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &amp;last_state); </div><div class="line">    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &amp;last_type);</div><div class="line">    <span class="keyword">char</span> *str = (<span class="keyword">char</span> *) args;</div><div class="line">    sleep(<span class="number">5</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"Hello, %s!\n"</span>, str);</div><div class="line">    pthread_exit(&amp;code);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">pthread_t</span> thread;</div><div class="line">    <span class="keyword">int</span> status = pthread_create(&amp;thread, <span class="literal">NULL</span>, (<span class="keyword">void</span> *)hello, (<span class="keyword">void</span> *) <span class="string">"Jayzee"</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread create status : %d\n"</span>, status);</div><div class="line">    <span class="keyword">int</span> *exit_code = <span class="number">0</span>;</div><div class="line">    status = pthread_join(thread, (<span class="keyword">void</span> *) &amp;exit_code);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread join status : %d\n"</span>, status);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"thread exit code : %d\n"</span>, *exit_code);</div><div class="line">    pthread_cancel(thread);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="线程特定数据"><a href="#线程特定数据" class="headerlink" title="线程特定数据"></a>线程特定数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));</div><div class="line">int pthread_setspecific(pthread_key_t key, const void *value);</div><div class="line">void *pthread_getspecific(pthread_key_t key);</div></pre></td></tr></table></figure>
+<ol>
+<li>使用<code>pthread_key_create</code>创建<code>key</code>，<code>destructor</code>为线程结束时用于析构的函数指针，一个进程内的多个线程可以共用一个<code>key</code>；</li>
+<li><code>pthread_setspecific</code>为线程设定key-value，<code>pthread_getspecific</code>根据key获得value；</li>
+<li>当线程结束时，若<code>pthread_getspecific</code>的内容不为空，且<code>destructor</code>不为空，则<code>pthread_getspecific</code>的内容将作为<code>destructor</code>的参数来执行析构函数；</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;malloc.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="comment">/* The key used to associate a log file pointer with each thread. */</span></div><div class="line"><span class="keyword">static</span> <span class="keyword">pthread_key_t</span> thread_log_key;</div><div class="line"></div><div class="line"><span class="comment">/* Write MESSAGE to the log file for the current thread. */</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_to_thread_log</span> <span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* message)</span> </span>&#123;</div><div class="line">    FILE* thread_log = (FILE*) pthread_getspecific (thread_log_key);</div><div class="line">    <span class="built_in">fprintf</span> (thread_log, <span class="string">"%s\n"</span>, message);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/* Close the log file pointer THREAD_LOG. */</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">close_thread_log</span> <span class="params">(<span class="keyword">void</span>* thread_log)</span> </span>&#123;</div><div class="line">    fclose ((FILE*) thread_log);    </div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span>* <span class="title">thread_function</span> <span class="params">(<span class="keyword">void</span>* args)</span> </span>&#123;</div><div class="line">    <span class="keyword">char</span> thread_log_filename[<span class="number">20</span>];</div><div class="line">    FILE* thread_log;</div><div class="line">    <span class="comment">/* Generate the filename for this thread’s log file. */</span></div><div class="line">    <span class="built_in">sprintf</span> (thread_log_filename, <span class="string">"thread%d.log"</span>, (<span class="keyword">int</span>) pthread_self ());</div><div class="line">    <span class="comment">/* Open the log file. */</span></div><div class="line">    thread_log = fopen (thread_log_filename, <span class="string">"w"</span>);</div><div class="line">    <span class="comment">/* Store the file pointer in thread-specific data under thread_log_key. */</span></div><div class="line">    pthread_setspecific (thread_log_key, thread_log);</div><div class="line">    write_to_thread_log (<span class="string">"Thread starting."</span>);</div><div class="line">    <span class="comment">/* Do work here... */</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span> <span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">pthread_t</span> threads[<span class="number">5</span>];</div><div class="line">    <span class="comment">/* Create a key to associate thread log file pointers in</span></div><div class="line">    thread-specific data. Use close_thread_log to clean up the file</div><div class="line">    pointers. */</div><div class="line">    pthread_key_create (&amp;thread_log_key, close_thread_log);</div><div class="line">    <span class="comment">/* Create threads to do the work. */</span></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)</div><div class="line">        pthread_create (&amp;(threads[i]), <span class="literal">NULL</span>, thread_function, <span class="literal">NULL</span>);</div><div class="line">    <span class="comment">/* Wait for all threads to finish. */</span></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)</div><div class="line">        pthread_join (threads[i], <span class="literal">NULL</span>);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">void pthread_cleanup_push(void (*routine)(void *), void *arg);</div><div class="line">void pthread_cleanup_pop(int execute);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>pthread_cleanup_push</code>在线程运行时为线程压栈清理函数；</li>
+<li><code>pthread_cleanup_pop</code>从栈弹出一个清理函数，如果<code>execute</code>不为0则执行这个清理函数；</li>
+<li>线程结束时，所有压栈的清理函数会自动被弹出栈进行执行；</li>
+<li>当在线程内使用longjump前，应手动调用<code>pthread_cleanup_pop</code>执行清理；</li>
+</ol>
+<h3 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h3><h4 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">int pthread_mutex_destroy(pthread_mutex_t *mutex);</div><div class="line">int pthread_mutex_init(pthread_mutex_t *restrict mutex,</div><div class="line">    const pthread_mutexattr_t *restrict attr);</div><div class="line">pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;</div></pre></td></tr></table></figure>
+<ol>
+<li><code>pthread_mutex_destroy</code>销毁互斥锁，<code>pthread_mutex_init</code>创建互斥锁；</li>
+<li><code>pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;</code>表示定义并默认实例化一个互斥锁；</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int pthread_mutex_lock(pthread_mutex_t *mutex);</div><div class="line">int pthread_mutex_trylock(pthread_mutex_t *mutex);</div><div class="line">int pthread_mutex_unlock(pthread_mutex_t *mutex);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>pthread_mutex_lock</code>为阻塞锁，<code>pthread_mutex_trylock</code>为非阻塞锁（获取不到锁）则立即返回，<code>pthread_mutex_unlock</code>为释放锁；</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">pthread_mutexattr_t</span> attr;</div><div class="line">    <span class="keyword">pthread_mutex_t</span> mutex;</div><div class="line">    pthread_mutexattr_init (&amp;attr);</div><div class="line">    <span class="comment">// 带错误检查的互斥锁</span></div><div class="line">    pthread_mutexattr_setkind_np (&amp;attr, PTHREAD_MUTEX_ERRORCHECK_NP);</div><div class="line">    pthread_mutex_init (&amp;mutex, &amp;attr);</div><div class="line">    pthread_mutex_lock(&amp;mutex);</div><div class="line">    <span class="comment">/** do some work **/</span></div><div class="line">    pthread_mutex_unlock(&amp;mutex);</div><div class="line">    pthread_mutexattr_destroy (&amp;attr);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int sem_init(sem_t *sem, int pshared, unsigned int value);</div><div class="line">int sem_post(sem_t *sem);</div><div class="line">int sem_wait(sem_t *sem);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>sem_init</code>实例化信号量<code>sem</code>，<code>pshared</code>为0表示进程内共享（非0为进程间共享），<code>value</code>为初始容量值（默认容量值为0）；</li>
+<li><code>sem_wait</code>将容量值减一，<code>sem_wait</code>之后若容量值小于0则线程阻塞；<code>sem_post</code>将容量值加一；</li>
+<li>假设容量值为负，一次<code>sem_post</code>只能唤醒一个线程；</li>
+<li><code>sem_wait</code>和<code>sem_post</code>是线程安全的；</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;semaphore.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">sem_t</span> semaphore;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">threadfunc</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (; i&lt;<span class="number">10</span>; i++) &#123;</div><div class="line">        <span class="comment">// 实际上不会这么使用，这里仅是展示</span></div><div class="line">        sem_wait(&amp;semaphore);</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"Hello from da thread!\n"</span>);</div><div class="line">        sem_post(&amp;semaphore);</div><div class="line">        sleep(<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</div><div class="line">    <span class="comment">// 实例化</span></div><div class="line">    sem_init(&amp;semaphore, <span class="number">0</span>, <span class="number">1</span>);</div><div class="line">    </div><div class="line">    <span class="keyword">pthread_t</span> *mythread;    </div><div class="line">    mythread = (<span class="keyword">pthread_t</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(*mythread));</div><div class="line">    </div><div class="line">    <span class="comment">// 启动线程</span></div><div class="line">    <span class="built_in">printf</span>(<span class="string">"Starting thread, semaphore is unlocked.\n"</span>);</div><div class="line">    pthread_create(mythread, <span class="literal">NULL</span>, (<span class="keyword">void</span>*)threadfunc, <span class="literal">NULL</span>);</div><div class="line">    pthread_join(mythread, <span class="literal">NULL</span>);</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="条件值"><a href="#条件值" class="headerlink" title="条件值"></a>条件值</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">int pthread_cond_init(pthread_cond_t *restrict cond,</div><div class="line">    const pthread_condattr_t *restrict attr);</div><div class="line">pthread_cond_t cond = PTHREAD_COND_INITIALIZER;</div><div class="line">int pthread_cond_signal(pthread_cond_t *cond);</div><div class="line">int pthread_cond_wait(pthread_cond_t *restrict cond,</div><div class="line">   pthread_mutex_t *restrict mutex);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>pthread_cond_t cond = PTHREAD_COND_INITIALIZER;</code>等价于<code>pthread_cond_init(&amp;pthread_cond_t, NULL);</code></li>
+<li>当调用<code>pthread_cond_signal</code>或<code>pthread_cond_wait</code>时，必须获得锁；</li>
+<li>调用<code>pthread_cond_wait</code>时，自动释放锁，直到被<code>pthread_cond_signal</code>唤醒时，才重新自动获得锁；</li>
+<li><code>pthread_cond_timedwait</code>可批量唤醒等待的线程；</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</div><div class="line"><span class="keyword">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</div><div class="line"><span class="keyword">int</span> condition = <span class="number">0</span>;</div><div class="line"><span class="keyword">int</span> count = <span class="number">0</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">consume</span><span class="params">( <span class="keyword">void</span> )</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">while</span>( <span class="number">1</span> )</div><div class="line">    &#123;</div><div class="line">        pthread_mutex_lock( &amp;mutex );</div><div class="line">        <span class="keyword">while</span>( condition == <span class="number">0</span> )</div><div class="line">            pthread_cond_wait( &amp;cond, &amp;mutex );</div><div class="line">        <span class="built_in">printf</span>( <span class="string">"Consumed %d\n"</span>, count );</div><div class="line">        condition = <span class="number">0</span>;</div><div class="line">        pthread_cond_signal( &amp;cond );        </div><div class="line">        pthread_mutex_unlock( &amp;mutex );</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span>( <span class="number">0</span> );</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span>* <span class="title">produce</span><span class="params">( <span class="keyword">void</span> * arg )</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">while</span>( <span class="number">1</span> )</div><div class="line">    &#123;</div><div class="line">        pthread_mutex_lock( &amp;mutex );</div><div class="line">        <span class="keyword">while</span>( condition == <span class="number">1</span> )</div><div class="line">            pthread_cond_wait( &amp;cond, &amp;mutex );</div><div class="line">        <span class="built_in">printf</span>( <span class="string">"Produced %d\n"</span>, count++ );</div><div class="line">        condition = <span class="number">1</span>;</div><div class="line">        pthread_cond_signal( &amp;cond );        </div><div class="line">        pthread_mutex_unlock( &amp;mutex );</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span>( <span class="number">0</span> );</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">( <span class="keyword">void</span> )</span></span></div><div class="line">&#123;</div><div class="line">    pthread_create( <span class="literal">NULL</span>, <span class="literal">NULL</span>, &amp;produce, <span class="literal">NULL</span> );</div><div class="line">    <span class="keyword">return</span> consume();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="线程实现"><a href="#线程实现" class="headerlink" title="线程实现"></a>线程实现</h3><p>Linux的线程实现是系统调用<code>clone()</code>，它创建一个与父进程共用资源的子进程。</p>
+<h2 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h2><h3 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#include &lt;sys/ipc.h&gt;</div><div class="line">#include &lt;sys/shm.h&gt;</div><div class="line">int shmget(key_t key, size_t size, int shmflg);</div><div class="line">void *shmat(int shmid, const void *shmaddr, int shmflg);</div><div class="line">int shmdt(const void *shmaddr);</div><div class="line">int shmctl(int shmid, int cmd, struct shmid_ds *buf);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>shmget</code>申请共享内存；</li>
+<li><code>shmat</code>取得已申请的共享内存，共享内存使用者计数器加1；</li>
+<li><code>shmdt</code>断开已申请的共享内存，共享内存使用者计数器减1，如果计时器减到0，这块共享内存会被系统标注并删除；</li>
+<li><code>shmctl</code>对共享内存的标识信息进行设置；</li>
+</ol>
+<h3 id="进程信号量"><a href="#进程信号量" class="headerlink" title="进程信号量"></a>进程信号量</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#include &lt;sys/types.h&gt;</div><div class="line">#include &lt;sys/ipc.h&gt;</div><div class="line">#include &lt;sys/sem.h&gt;</div><div class="line">int semget(key_t key, int nsems, int semflg);</div><div class="line">int semctl(int semid, int semnum, int cmd, ...);</div><div class="line">int semop(int semid, struct sembuf *sops, size_t nsops);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>semget</code>用于申请信号量；</li>
+<li><code>semctl</code>用于释放或实例化信号量；</li>
+<li><code>semop</code>用于执行wait或post；</li>
+</ol>
+<h3 id="映射到内存"><a href="#映射到内存" class="headerlink" title="映射到内存"></a>映射到内存</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#include &lt;sys/mman.h&gt;</div><div class="line">void *mmap(void *addr, size_t length, int prot, int flags,</div><div class="line">    int fd, off_t offset);</div></pre></td></tr></table></figure>
+<p><code>mmap</code>是一种内存映射文件的方法，即将一个文件或者其它对象映射到进程的地址空间，实现文件磁盘地址和进程虚拟地址空间中一段虚拟地址的一一对映关系。实现这样的映射关系后，进程就可以采用指针的方式读写操作这一段内存，而系统会自动回写脏页面到对应的文件磁盘上，即完成了对文件的操作而不必再调用read,write等系统调用函数。相反，内核空间对这段区域的修改也直接反映用户空间，从而可以实现不同进程间的文件共享。</p>
+<h3 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#include &lt;unistd.h&gt;</div><div class="line">int pipe(int pipefd[2]);</div></pre></td></tr></table></figure>
+<p><code>pipe</code>的一端写，由内核缓存，直到另一端将其读出。</p>
+<h3 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#include &lt;sys/types.h&gt;</div><div class="line">#include &lt;sys/socket.h&gt;</div><div class="line">int socket(int domain, int type, int protocol);</div><div class="line">int close(int fd);</div><div class="line">int connect(int sockfd, const struct sockaddr *addr,</div><div class="line">    socklen_t addrlen);</div><div class="line">int bind(int sockfd, const struct sockaddr *addr,</div><div class="line">    socklen_t addrlen);</div><div class="line">int listen(int sockfd, int backlog);</div><div class="line">int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);</div></pre></td></tr></table></figure>
+<ol>
+<li><code>socket</code>创建一个socket；</li>
+<li><code>close</code>关闭一个socket；</li>
+<li><code>connect</code>建立两个socket的连接；</li>
+<li><code>bind</code>将socket绑定到地址和端口；</li>
+<li><code>listen</code>配置socket接受连接的条件；</li>
+<li><code>accept</code>接收一个socket连接并为其创建一个socket；</li>
+</ol>
+<h2 id="设备"><a href="#设备" class="headerlink" title="设备"></a>设备</h2><h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#include &lt;sys/types.h&gt;</div><div class="line">#include &lt;sys/stat.h&gt;</div><div class="line">#include &lt;fcntl.h&gt;</div><div class="line">#include &lt;unistd.h&gt;</div><div class="line">int mknod(const char *pathname, mode_t mode, dev_t dev);</div></pre></td></tr></table></figure>
+<p><code>mknod</code>用于创建一个设备。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#include &lt;sys/ioctl.h&gt;</div><div class="line">int ioctl(int d, unsigned long request, ...);</div></pre></td></tr></table></figure>
+<p><code>ioctl</code>用于控制设备，常用于驱动编程。</p>
+<h3 id="特殊设备"><a href="#特殊设备" class="headerlink" title="特殊设备"></a>特殊设备</h3><p><code>/dev/null</code>是一个内容为空的设备，将IO流定向到<code>/dev/null</code>意味着丢弃其内容；</p>
+<p><code>/dev/zero</code>是一个无限长的文件；</p>
+<p><code>/dev/random</code>可用于产生随机数；</p>
+<p><code>/dev/tty*</code>是串行终端设备，如串口；</p>
+<p><code>pty</code>是伪终端，接受键盘的输入并显示到运行它的终端界面；</p>
+<p><code>pty</code>的实现涉及到两个概念：</p>
+<ul>
+<li><code>ptmx</code>：被连接的master主机；</li>
+<li><code>pts</code>：发起向master主机连接的slave主机<code>pts</code>，我们常用的SSH登录就意外着在master主机建立一个<code>pts</code>进程；</li>
+</ul>
+<h2 id="常用-proc简介"><a href="#常用-proc简介" class="headerlink" title="常用/proc简介"></a>常用/proc简介</h2><p><code>/proc/cpuinfo</code>查看cpu信息；</p>
+<p><code>/proc/meminfo</code>查看内存信息；</p>
+<p><code>/proc/self</code>查看自身信息；</p>
+<p><code>/proc/pid_number</code>查看pid为pid_number的进程信息；</p>
+<p><code>/proc/loadavg</code>查看负载信息；</p>
+<p><code>/proc/uptime</code>查看启动时间；</p>
+<p><code>/proc/interrupts</code>查看中断情况；</p>
+<h2 id="常用系统调用"><a href="#常用系统调用" class="headerlink" title="常用系统调用"></a>常用系统调用</h2><p><code>strace</code>查看系统调用情况；</p>
+<p><code>access</code>检测是否具备读写权限；<br><code>fcntl</code>操纵文件描述符；</p>
+<p><code>fsync</code>和<code>fdatasync</code>将缓冲区的文件改动同步到实际文件；</p>
+<p><code>getrlimit</code>取得系统的资源限定情况；</p>
+<p><code>getrusage</code>取得系统资源使用情况；</p>
+<p><code>gettimeofday</code>取得系统时间；</p>
+<p><code>mlock</code>锁住一块内存；</p>
+<p><code>mprotect</code>保护一块内存；</p>
+<h2 id="用户与用户组"><a href="#用户与用户组" class="headerlink" title="用户与用户组"></a>用户与用户组</h2><h3 id="用户与用户组ID"><a href="#用户与用户组ID" class="headerlink" title="用户与用户组ID"></a>用户与用户组ID</h3><p>每个用户名对应到一个用户ID，每个用户ID可从属于多个用户组ID。Shell下输入<code>id</code>得到如下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># uid为0表示root用户</div><div class="line">uid=0(root) gid=0(root) groups=0(root),1001(nagcmd)</div></pre></td></tr></table></figure>
+<h3 id="文件与用户（组）的关系"><a href="#文件与用户（组）的关系" class="headerlink" title="文件与用户（组）的关系"></a>文件与用户（组）的关系</h3><p><code>ls -l APL.txt</code>后得到如下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-rw-r--r-- 1 Jayzee None   1237 五月 18 12:19 APL.txt</div></pre></td></tr></table></figure>
+<p><code>-rw-r--r--</code>解释：</p>
+<ul>
+<li>第一个字符<code>-</code>表示这是一个文件，<code>d</code>表示这是一个文件夹；</li>
+<li>2至4字符<code>rw-</code>表示拥有者<code>Jayzee</code>的权限，顺序为：读（r）、写（w）、执行（x），可读写但不可执行；</li>
+<li>5至7字符<code>r--</code>表示所属组<code>None</code>的权限；</li>
+<li>8至10字符<code>r--</code>表示组外其他用户的权限；</li>
+</ul>
+<p><code>man chmod</code>查看如何更改文件的权限；<br><code>man chown</code>查看如何更改文件的拥有者和所属组；</p>
+<p><strong>特殊</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drwxrwxrwt   1 root root 26416 5月  18 21:53 tmp</div></pre></td></tr></table></figure>
+<p>只适用于文件夹：当文件夹的所属组或组外的执行（x）被设置为（t）时，表示当且仅当你是该文件夹内文件的创建者，才可以删除该文件；（正常情况下如果该文件夹内文件的权限是对于组或组外可读写，不需要是文件的创建者也可删除的），这里的<code>t</code>称为sticky bits。</p>
+<h3 id="真实的用户ID和有效的用户ID"><a href="#真实的用户ID和有效的用户ID" class="headerlink" title="真实的用户ID和有效的用户ID"></a>真实的用户ID和有效的用户ID</h3><p>定义<code>euid</code>为有效用户id（effective），<code>uid</code>为真实用户id（real）；</p>
+<p><code>man 2 getuid</code>查看如何使用C函数获取uid；<br><code>man 2 geteuid</code>查看如何使用C函数获取euid；</p>
+<p>为什么要引入euid？</p>
+<ol>
+<li>当用户发出对文件的操作时，Linux Kernel根据用户的euid检查用户是否具备权限；</li>
+<li>euid可被修改，uid不可被修改；</li>
+<li>euid被修改代表着用户的切换，uid不被修改表示最初登入系统的uid不变；</li>
+</ol>
+<p>用户登录系统时用户id发生什么变化？</p>
+<ol>
+<li>Linux的登录进程检查登入者输入的账号密码是否正确；</li>
+<li>若正确，使用<code>exec</code>为其创建一个User Shell（pts）；</li>
+<li>Linux的登录进程设置这个User Shell的euid和uid为同一个值，即该用户的uid（只有euid为0的User Shell可设置euid和uid）；</li>
+</ol>
+<p>设置说明：</p>
+<ol>
+<li>当我们设置<code>euid = uid</code>时，表示返回到最初登录用户的Shell；</li>
+<li>当我们设置<code>uid = euid</code>时，表示Linux的登录进程将euid与uid同步，该登录用户与Linux的登录进程（root）再无联系；</li>
+</ol>
+<p><code>su</code>命令的原理：</p>
+<ol>
+<li><code>/bin/su</code>的拥有者为root，其执行项不是（x）而是（s），当文件拥有者的执行项不是（x）而是（s）时，此文件可被执行，且执行文件时调用<code>geteuid</code>函数返回的是该可执行文件拥有者的uid而不是调用者的euid；</li>
+<li>Linux利用此技术实现普通用户到root用户时，uid不变，而euid变为0；</li>
+<li>当调用<code>su</code>时，调用者原User Shell阻塞，Kernel创建一个新User Shell给调用者使用；</li>
+</ol>
+<p>注：组ID也分真实和有效，与用户ID类同，故不展开叙述；</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://zhangjunjia.github.io/2016/04/22/advanced-linux-programing/" data-id="cj1atccnh000pycnppysqbook" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/16/little-dog-money/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          读《小狗钱钱》
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/05/05/svn-that-i-used/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">SVN嵌套权限管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/一些感悟/">一些感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/人工智能/">人工智能</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/科技与人文/">科技与人文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程实践/">编程实践</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/">AI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Eclipse/">Eclipse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HBase/">HBase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVM/">LVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SVN/">SVN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/">TCP/IP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/">Tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wisdom/">Wisdom</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/信息安全/">信息安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内网穿透/">内网穿透</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/哲学/">哲学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/李笑来/">李笑来</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/计算机原理/">计算机原理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/财商/">财商</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/贯行/">贯行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随想/">随想</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 10px;">AI</a> <a href="/tags/C-C/" style="font-size: 18.33px;">C/C++</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Eclipse/" style="font-size: 10px;">Eclipse</a> <a href="/tags/HBase/" style="font-size: 11.67px;">HBase</a> <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Java/" style="font-size: 11.67px;">Java</a> <a href="/tags/LVM/" style="font-size: 10px;">LVM</a> <a href="/tags/Linux/" style="font-size: 18.33px;">Linux</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Network/" style="font-size: 10px;">Network</a> <a href="/tags/SVN/" style="font-size: 11.67px;">SVN</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/TCP-IP/" style="font-size: 10px;">TCP/IP</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Wisdom/" style="font-size: 11.67px;">Wisdom</a> <a href="/tags/信息安全/" style="font-size: 10px;">信息安全</a> <a href="/tags/内网穿透/" style="font-size: 10px;">内网穿透</a> <a href="/tags/哲学/" style="font-size: 10px;">哲学</a> <a href="/tags/李笑来/" style="font-size: 15px;">李笑来</a> <a href="/tags/计算机原理/" style="font-size: 10px;">计算机原理</a> <a href="/tags/读书/" style="font-size: 20px;">读书</a> <a href="/tags/财商/" style="font-size: 11.67px;">财商</a> <a href="/tags/贯行/" style="font-size: 13.33px;">贯行</a> <a href="/tags/随想/" style="font-size: 16.67px;">随想</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/10/16/living-in-the-future/">《通往财富自由之路》第04周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/security-sense/">《通往财富自由之路》第03周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/09/11/saving-your-attention/">《通往财富自由之路》第02周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/attention/">《通往财富自由之路》第01周读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2016/08/28/why-not-go-to-sleep/">为什么你还不去睡觉</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 张++<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
