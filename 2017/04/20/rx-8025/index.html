@@ -94,7 +94,7 @@
 <meta property="og:url" content="http://zhangjunjia.github.io/2017/04/20/rx-8025/index.html">
 <meta property="og:site_name" content="张++的成长日志">
 <meta property="og:description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
-<meta property="og:updated_time" content="2017-04-25T12:30:46.970Z">
+<meta property="og:updated_time" content="2017-04-25T12:32:38.162Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟">
 <meta name="twitter:description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
@@ -394,7 +394,7 @@
 <li>参考<a href="https://datko.net/2013/11/03/bbb_i2c/" target="_blank" rel="external">BeagleBone Black I2C References</a>设置i2c1（即bash下执行<code>echo BB-I2C1 &gt; /sys/devices/bone_capemgr.9/slots</code>）</li>
 </ol>
 <p>通过文章可知rx8025芯片的默认slave address是0x32，在代码<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/rtc-8025.c" target="_blank" rel="external">rtc-8025.c</a>可见。</p>
-<h3 id="i2c-dev"><a href="#i2c-dev" class="headerlink" title="i2c-dev"></a>i2c-dev</h3><p>笔者使用i2c-dev工具操作i2c设备与rx8025芯片进行通信。关于i2c-dev的详细实现见<a href="https://www.kernel.org/doc/Documentation/i2c/dev-interface" target="_blank" rel="external">i2c-dev-interface</a>的<strong>Implementation details</strong>章节。简要描述下：操作i2c设备的驱动由内核负责，通过上文的设置将i2c设备映射为一个系统文件，就能在用户空间下对i2c设备进行读写编程，触发内核控制i2c设备的系统调用，SCL和SDL的控制完全由内核驱动接管。</p>
+<h3 id="i2c-dev"><a href="#i2c-dev" class="headerlink" title="i2c-dev"></a>i2c-dev</h3><p>笔者使用i2c-dev工具操作i2c设备与rx8025芯片进行通信。关于i2c-dev的详细实现见<a href="https://www.kernel.org/doc/Documentation/i2c/dev-interface" target="_blank" rel="external">i2c-dev-interface</a>的<strong>Implementation details</strong>章节。简要描述下：操作i2c设备的驱动由内核负责，通过上文的设置将i2c设备映射为一个系统文件，就能在用户空间下对i2c设备进行读写编程，实质是内核操作i2c设备的系统调用，SCL和SDL的控制完全由内核驱动接管。</p>
 <h3 id="rx8025t和rx8025sa的差别"><a href="#rx8025t和rx8025sa的差别" class="headerlink" title="rx8025t和rx8025sa的差别"></a>rx8025t和rx8025sa的差别</h3><p>rx8025t的说明书见<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/rx8025_cn.pdf" target="_blank" rel="external">rx8025_cn</a>，rx8025sa的说明书见<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/RX8025SA.pdf" target="_blank" rel="external">RX8025SA</a>。下面从编程的角度列举其不同点，</p>
 <ul>
 <li><strong>EEPROM</strong>：rx8025t的寄存器为EEPROM，这意味着每次读写rx8025t后，其PC指针将增加1，越限时回到0，rx8025sa则不是；</li>
