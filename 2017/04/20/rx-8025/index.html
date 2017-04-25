@@ -87,17 +87,17 @@
 
 
 
-<meta name="description" content="成长日志/程序猿/JayzeeZhang/Blogger/Life learner">
+<meta name="description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
 <meta name="keywords">
 <meta property="og:type" content="article">
-<meta property="og:title" content="rx-8025">
+<meta property="og:title" content="在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟">
 <meta property="og:url" content="http://zhangjunjia.github.io/2017/04/20/rx-8025/index.html">
 <meta property="og:site_name" content="张++的成长日志">
-<meta property="og:description" content="成长日志/程序猿/JayzeeZhang/Blogger/Life learner">
-<meta property="og:updated_time" content="2017-04-20T10:42:49.416Z">
+<meta property="og:description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
+<meta property="og:updated_time" content="2017-04-25T12:30:46.970Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="rx-8025">
-<meta name="twitter:description" content="成长日志/程序猿/JayzeeZhang/Blogger/Life learner">
+<meta name="twitter:title" content="在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟">
+<meta name="twitter:description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
 
 
 
@@ -131,7 +131,7 @@
 
 
 
-  <title> rx-8025 | 张++的成长日志 </title>
+  <title> 在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟 | 张++的成长日志 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -319,7 +319,7 @@
             
             
               
-                rx-8025
+                在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟
               
             
           </h1>
@@ -352,7 +352,7 @@
 
           
           
-             <span id="/2017/04/20/rx-8025/" class="leancloud_visitors" data-flag-title="rx-8025">
+             <span id="/2017/04/20/rx-8025/" class="leancloud_visitors" data-flag-title="在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -381,7 +381,34 @@
       
 
       
-        
+        <p>简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。</p>
+<a id="more"></a>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>注意，</p>
+<ul>
+<li>目前仅支持rx8025t和rx8025sa；</li>
+<li>目前仅支持i2c1（P9_17和P9_18，默认未启用）；</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">git <span class="built_in">clone</span> https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025.git</div><div class="line"><span class="built_in">cd</span> beaglebone_black_bbblack_rx8025</div><div class="line">gcc rtc-8025.c -o rtc-8025</div><div class="line"><span class="comment">## set bbblack os time to rx8025</span></div><div class="line">./rtc-8025 <span class="built_in">set</span></div><div class="line"><span class="comment">## get rx8025time and set to os</span></div><div class="line">./rtc-8025 get</div></pre></td></tr></table></figure>
+<h2 id="原理简介"><a href="#原理简介" class="headerlink" title="原理简介"></a>原理简介</h2><h3 id="beaglebone的准备"><a href="#beaglebone的准备" class="headerlink" title="beaglebone的准备"></a>beaglebone的准备</h3><ol>
+<li>搭配好rx8025外电路，笔者选用的是i2c1口；</li>
+<li>参考<a href="https://datko.net/2013/11/03/bbb_i2c/" target="_blank" rel="external">BeagleBone Black I2C References</a>设置i2c1（即bash下执行<code>echo BB-I2C1 &gt; /sys/devices/bone_capemgr.9/slots</code>）</li>
+</ol>
+<p>通过文章可知rx8025芯片的默认slave address是0x32，在代码<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/rtc-8025.c" target="_blank" rel="external">rtc-8025.c</a>可见。</p>
+<h3 id="i2c-dev"><a href="#i2c-dev" class="headerlink" title="i2c-dev"></a>i2c-dev</h3><p>笔者使用i2c-dev工具操作i2c设备与rx8025芯片进行通信。关于i2c-dev的详细实现见<a href="https://www.kernel.org/doc/Documentation/i2c/dev-interface" target="_blank" rel="external">i2c-dev-interface</a>的<strong>Implementation details</strong>章节。简要描述下：操作i2c设备的驱动由内核负责，通过上文的设置将i2c设备映射为一个系统文件，就能在用户空间下对i2c设备进行读写编程，触发内核控制i2c设备的系统调用，SCL和SDL的控制完全由内核驱动接管。</p>
+<h3 id="rx8025t和rx8025sa的差别"><a href="#rx8025t和rx8025sa的差别" class="headerlink" title="rx8025t和rx8025sa的差别"></a>rx8025t和rx8025sa的差别</h3><p>rx8025t的说明书见<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/rx8025_cn.pdf" target="_blank" rel="external">rx8025_cn</a>，rx8025sa的说明书见<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/RX8025SA.pdf" target="_blank" rel="external">RX8025SA</a>。下面从编程的角度列举其不同点，</p>
+<ul>
+<li><strong>EEPROM</strong>：rx8025t的寄存器为EEPROM，这意味着每次读写rx8025t后，其PC指针将增加1，越限时回到0，rx8025sa则不是；</li>
+<li><strong>read操作结果不同</strong>：rx8025sa在使用<code>read</code>函数读取时，属于情况<code>Read method from address Fh, with no specified start address for read opreation</code>（说明书第26页），因此<code>read</code>函数返回结果的第一个字节其实是0x0F寄存器的内容，而rx8025t的第一个字节是秒寄存器；</li>
+<li><strong>未就绪位不同</strong>：未就绪位为1表征芯片处于初始化状态或需要程序初始化芯片，此状态下寄存器的内容无意义，rx8025t的未就绪位为VLF，而rx8025sa为PON；</li>
+<li><strong>小时表示不同</strong>：rx8025t默认使用24小时制，rx8025sa支持12/24小时制；</li>
+<li><strong>写操作的不同</strong>：根据说明书时序图章节，rx8025t通过<code>write</code>函数写的第一个字节是寄存器的开始地址，而rx8025sa则是寄存器的开始地址加上传输模式。</li>
+</ul>
+<h3 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h3><p>为什么读取rx8025t时，通过<code>read</code>函数读取到的第一个字节是秒寄存器，从时序图的角度如何解释？</p>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ol>
+<li><a href="https://datko.net/2013/11/03/bbb_i2c/" target="_blank" rel="external">BeagleBone Black I2C References</a></li>
+<li><a href="https://www.kernel.org/doc/Documentation/i2c/dev-interface" target="_blank" rel="external">i2c-dev-interface</a></li>
+</ol>
+
       
     </div>
 
@@ -499,8 +526,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://tva1.sinaimg.cn/crop.0.0.720.720.180/7eccdf13jw8eg7bhtbp9yj20k00k0wg5.jpg"
@@ -562,6 +598,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用"><span class="nav-number">1.</span> <span class="nav-text">如何使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理简介"><span class="nav-number">2.</span> <span class="nav-text">原理简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beaglebone的准备"><span class="nav-number">2.1.</span> <span class="nav-text">beaglebone的准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#i2c-dev"><span class="nav-number">2.2.</span> <span class="nav-text">i2c-dev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rx8025t和rx8025sa的差别"><span class="nav-number">2.3.</span> <span class="nav-text">rx8025t和rx8025sa的差别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TODO"><span class="nav-number">2.4.</span> <span class="nav-text">TODO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">3.</span> <span class="nav-text">reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
