@@ -87,17 +87,17 @@
 
 
 
-<meta name="description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。 目标生产计划的构成为，  计划开始时间 计划结束时间 生产哪些产品，如：A20件，B30件，C20件，D100件  最优生产计划的构成为，  t1：开始生产产品P1 t2：开始生产产品P2 t3：开始生产产品P3 ……  如何求解 成本 = 峰期">
+<meta name="description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。">
 <meta name="keywords" content="动态规划">
 <meta property="og:type" content="article">
 <meta property="og:title" content="最优生产计划">
 <meta property="og:url" content="http://zhangjunjia.github.io/2017/05/09/power-adjustment/index.html">
 <meta property="og:site_name" content="张++的成长日志">
-<meta property="og:description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。 目标生产计划的构成为，  计划开始时间 计划结束时间 生产哪些产品，如：A20件，B30件，C20件，D100件  最优生产计划的构成为，  t1：开始生产产品P1 t2：开始生产产品P2 t3：开始生产产品P3 ……  如何求解 成本 = 峰期">
-<meta property="og:updated_time" content="2017-05-15T13:19:38.972Z">
+<meta property="og:description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。">
+<meta property="og:updated_time" content="2017-05-17T04:12:42.314Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="最优生产计划">
-<meta name="twitter:description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。 目标生产计划的构成为，  计划开始时间 计划结束时间 生产哪些产品，如：A20件，B30件，C20件，D100件  最优生产计划的构成为，  t1：开始生产产品P1 t2：开始生产产品P2 t3：开始生产产品P3 ……  如何求解 成本 = 峰期">
+<meta name="twitter:description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。">
 
 
 
@@ -404,6 +404,7 @@
 
       
         <h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。</p>
+<a id="more"></a>
 <p>目标生产计划的构成为，</p>
 <ul>
 <li>计划开始时间</li>
@@ -426,9 +427,14 @@
 <p>这个问题实质是一个动态规划问题，</p>
 <ol>
 <li>将「下班/休息时间」从计划时间挖去，得「N段」可用的时间槽；</li>
-<li>将生产的总件数看成「M张」选票，投给上述的N段时间槽（候选人），剔除不满足时间约束的「生产安排」；</li>
-<li>对每个时间槽获得的选票（多个产品）再次进行最优化求解，顺序安排「产品+换料时间」到时间槽，将时间槽内剩余时间切块，以投票的方式填充到时间槽内产品与产品间的间隔；</li>
+<li>将生产的总件数看成「M张」选票，投给上述的「N段」时间槽（候选人），假设共有「X种」投票结果；</li>
+<li>对计划生产的产品序列进行全排列，假设共有「Y种」排列；</li>
+<li>问题转变为从X*Y种排班方式选取最优排班，<ol>
+<li>判断该排班方式是否满足时间槽的时间约束，不满足则剔除；</li>
+<li>安排「产品+换料时间」到时间槽，将时间槽内剩余时间切块，以投票的方式填充到时间槽内产品与产品间的间隔，求该时间槽最优解；</li>
 <li>求解每个时间槽的最优解，累加得一次生产安排的最优解，再从多次生产安排选取成本最小的，即为所求。</li>
+</ol>
+</li>
 </ol>
 
       
@@ -471,6 +477,10 @@
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/24/deliberate-practice/" rel="next" title="deliberate-practice">
+                <i class="fa fa-chevron-left"></i> deliberate-practice
+              </a>
             
           </div>
 
@@ -575,7 +585,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">41</span>
+                <span class="site-state-item-count">43</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -597,7 +607,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
