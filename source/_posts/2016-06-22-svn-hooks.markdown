@@ -1,0 +1,38 @@
+---
+layout: post
+title: SVN hooks的使用
+date: '2016-06-22 21:05'
+comments: true
+categories: ['编程实践']  
+tags: ['SVN']
+---
+
+笔者想要在下属提交SVN代码时收到邮件，查了一下，使用SVN hooks即可做到，简要记录如下：
+
+<!--more-->
+
+进入你的SVN项目的hooks文件夹下，将看到如下文件：
+
+```
+-rwxrwsr-x 1 www-data subversion   2198 6月  22 21:01 post-commit.tmpl
+-rwxrwsr-x 1 www-data subversion   1638 5月   5  2015 post-lock.tmpl
+-rwxrwsr-x 1 www-data subversion   2289 5月   5  2015 post-revprop-change.tmpl
+-rwxrwsr-x 1 www-data subversion   1567 5月   5  2015 post-unlock.tmpl
+-rwxrwsr-x 1 www-data subversion   3426 5月   5  2015 pre-commit.tmpl
+-rwxrwsr-x 1 www-data subversion   2434 5月   5  2015 pre-lock.tmpl
+-rwxrwsr-x 1 www-data subversion   2786 5月   5  2015 pre-revprop-change.tmpl
+-rwxrwsr-x 1 www-data subversion   2122 5月   5  2015 pre-unlock.tmpl
+-rwxrwsr-x 1 www-data subversion   3163 5月   5  2015 start-commit.tmpl
+```
+
+只需要简单执行命令`mv post-commit.tmpl post-commit`（即将post-commit的后缀去掉），就能实现提交代码时触发执行post-commit脚本，笔者的post-commit内容如下：
+
+```bash
+## 设置中文编码
+export LANG=zh_CN.UTF-8
+## 设置为nohup、丢弃错误流标准流输出、以后台进程运行
+nohup /usr/java/jdk/bin/java -jar /home/svn/myproject/hooks/inv.jar > /dev/null 2>&1 &
+exit 0
+```
+
+注意，若上述不设置为nohup+后台进程，**SVN提交时会阻塞直到此jar包执行完毕**，但发送邮件需要时间，阻塞显然是不合理的。至于笔者的inv.jar包为何物，请移步[SvnPostCommit](https://github.com/JayzeeZhang/SvnPostCommit)。
