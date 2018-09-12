@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文介绍tomcat如何设置multi vitual host。">
+<meta name="keywords" content="Tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Multi virtual HOST of Tomcat">
+<meta property="og:url" content="https://zhangjunjia.github.io/2016/08/17/tomcat-multi-virtual-host/index.html">
+<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:description" content="本文介绍tomcat如何设置multi vitual host。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-04-09T14:45:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Multi virtual HOST of Tomcat">
+<meta name="twitter:description" content="本文介绍tomcat如何设置multi vitual host。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2016/08/17/tomcat-multi-virtual-host/"/>
+
+
+
+
+
+  <title>Multi virtual HOST of Tomcat | 张俊佳的网络日志</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的网络日志</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay hungry stay foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/08/17/tomcat-multi-virtual-host/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的网络日志">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Multi virtual HOST of Tomcat</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-17T17:51:00+08:00">
+                2016-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文介绍tomcat如何设置multi vitual host。</p>
+<a id="more"></a>
+<h2 id="why-and-how-does-it-work"><a href="#why-and-how-does-it-work" class="headerlink" title="why and how does it work"></a>why and how does it work</h2><p>注：以下的全部域名是为了举例虚构，出于一些考虑，笔者不打算公布真实域名。</p>
+<p>笔者有个域名为<a href="http://www.gx.com" target="_blank" rel="noopener">gx.com</a>，指向个人主页。同时，该域名下有个资源<a href="http://gx.com/product" target="_blank" rel="noopener">gx.com/product</a>，指向笔者的产品界面。某天从同事那了解到还可以设置二级域名，于是，我想把我的产品界面链接<a href="http://gx.com/product" target="_blank" rel="noopener">gx.com/product</a>改为<a href="http://product.gx.com" target="_blank" rel="noopener">product.gx.com</a>，用二级域名的方式来指向（如何创建二级域名请自行搜索）。</p>
+<p>笔者的个人主页和产品界面都部署在同一主机的同一个Tomcat容器下（80端口），查了下资料，通过配置Tomcat就可以实现我的上述要求。且先不说如何配置，其工作原理是什么呢？Tomcat在80端口监听HTTP连接，它是如何判断一个HTTP请求到底是要请求<a href="http://www.gx.com" target="_blank" rel="noopener">gx.com</a>的资源，还是要请求<a href="http://product.gx.com" target="_blank" rel="noopener">product.gx.com</a>的资源呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.gx.com</span><br><span class="line">Proxy-Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 6.2) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line">Accept-Encoding: gzip,deflate,sdch</span><br><span class="line">Accept-Language: en-US,en;q=0.8</span><br></pre></td></tr></table></figure>
+<p>原来是通过报文的Header来区分的。至于请求转发的原理，请参考<a href="http://www.ibm.com/developerworks/cn/java/j-lo-tomcat1/" target="_blank" rel="noopener">Tomcat 系统架构与设计模式，第 1 部分: 工作原理</a>。</p>
+<h2 id="how"><a href="#how" class="headerlink" title="how"></a>how</h2><p>下面讲解如何配置，先贴上笔者的最终配置。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Engine</span> <span class="attr">defaultHost</span>=<span class="string">"www.gx.com"</span> <span class="attr">name</span>=<span class="string">"Catalina"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">&lt;!--For clustering, please take a look at documentation at:</span></span><br><span class="line"><span class="comment">          /docs/cluster-howto.html  (simple how to)</span></span><br><span class="line"><span class="comment">          /docs/config/cluster.html (reference documentation) --&gt;</span></span><br><span class="line">      <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">      &lt;Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/&gt;</span></span><br><span class="line"><span class="comment">      --&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">&lt;!-- Use the LockOutRealm to prevent attempts to guess user passwords</span></span><br><span class="line"><span class="comment">           via a brute-force attack --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">Realm</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.realm.LockOutRealm"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- This Realm uses the UserDatabase configured in the global JNDI</span></span><br><span class="line"><span class="comment">             resources under the key "UserDatabase".  Any edits</span></span><br><span class="line"><span class="comment">             that are performed against this UserDatabase are immediately</span></span><br><span class="line"><span class="comment">             available for use by the Realm.  --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Realm</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.realm.UserDatabaseRealm"</span> <span class="attr">resourceName</span>=<span class="string">"UserDatabase"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">Realm</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">Host</span> <span class="attr">appBase</span>=<span class="string">"primaryapps"</span> <span class="attr">autoDeploy</span>=<span class="string">"true"</span> <span class="attr">name</span>=<span class="string">"product.gx.com"</span> <span class="attr">unpackWARs</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.AccessLogValve"</span> <span class="attr">directory</span>=<span class="string">"logs"</span> <span class="attr">pattern</span>=<span class="string">"%h %l %u %t &amp;quot;%r&amp;quot; %s %b"</span> <span class="attr">prefix</span>=<span class="string">"cloud_access_log"</span> <span class="attr">suffix</span>=<span class="string">".txt"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">Host</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">Host</span> <span class="attr">appBase</span>=<span class="string">"webapps"</span> <span class="attr">autoDeploy</span>=<span class="string">"true"</span> <span class="attr">name</span>=<span class="string">"www.gx.com"</span> <span class="attr">unpackWARs</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Context</span> <span class="attr">path</span>=<span class="string">""</span> <span class="attr">docBase</span>=<span class="string">"guanxing"</span> <span class="attr">debug</span>=<span class="string">"0"</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- Access log processes all example.</span></span><br><span class="line"><span class="comment">             Documentation at: /docs/config/valve.html</span></span><br><span class="line"><span class="comment">             <span class="doctag">Note:</span> The pattern used is equivalent to using pattern="common" --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Valve</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.AccessLogValve"</span> <span class="attr">directory</span>=<span class="string">"logs"</span> <span class="attr">pattern</span>=<span class="string">"%h %l %u %t &amp;quot;%r&amp;quot; %s %b"</span> <span class="attr">prefix</span>=<span class="string">"localhost_access_log"</span> <span class="attr">suffix</span>=<span class="string">".txt"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;/<span class="name">Host</span>&gt;</span></span><br><span class="line">      ......</span><br><span class="line"><span class="tag">&lt;/<span class="name">Engine</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>第01行：<code>defaultHost</code>必须指向其中一个Host的name，即为域名；</li>
+<li>第20行：域名<a href="http://product.gx.com" target="_blank" rel="noopener">product.gx.com</a>的配置，这里我没有配置Context标签，按照官网的说明，它会自动去寻找<code>&lt;tomcat_home&gt;/&lt;appBase&gt;/ROOT</code>（见附件1）作为此域名的容器应用（本文为<code>&lt;tomcat_home&gt;/primaryapps/ROOT</code>）；</li>
+<li>第24行：域名<a href="http://www.gx.com" target="_blank" rel="noopener">gx.com</a>的配置；</li>
+<li>第25行：域名<a href="http://www.gx.com" target="_blank" rel="noopener">gx.com</a>的容器应用为<code>&lt;tomcat_home&gt;/webapps/guanxing</code>；</li>
+</ul>
+<hr>
+<p><strong>附件1</strong></p>
+<blockquote>
+</blockquote>
+<p>When autoDeploy or deployOnStartup operations are performed by a Host, the name and context path of the web application are derived from the name(s) of the file(s) that define(s) the web application. Consequently, the context path may not be defined in a META-INF/context.xml embedded in the application and there is a close relationship between the context name, context path, context version and the base file name (the name minus any .war or .xml extension) of the file.</p>
+<blockquote>
+</blockquote>
+<p>If no version is specified then the context name is always the same as the context path. <strong>If the context path is the empty string them the base name will be ROOT (always in upper case) </strong> otherwise the base name will be the context path with the leading ‘/‘ removed and any remaining ‘/‘ characters replaced with ‘#’.</p>
+<blockquote>
+</blockquote>
+<p>If a version is specified then the context path remains unchanged and both the context name and the base name have the string ‘##’ appended to them followed by the version identifier.</p>
+<blockquote>
+</blockquote>
+<p>Some examples of these naming conventions are given below.</p>
+<blockquote>
+</blockquote>
+<p><a href="http://tomcat.apache.org/tomcat-7.0-doc/config/context.html" target="_blank" rel="noopener">http://tomcat.apache.org/tomcat-7.0-doc/config/context.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/13/c-sendmail/" rel="next" title="使用C语言调用sendmail的一些注意点">
+                <i class="fa fa-chevron-left"></i> 使用C语言调用sendmail的一些注意点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/28/why-not-go-to-sleep/" rel="prev" title="为什么你还不去睡觉">
+                为什么你还不去睡觉 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#why-and-how-does-it-work"><span class="nav-number">1.</span> <span class="nav-text">why and how does it work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how"><span class="nav-number">2.</span> <span class="nav-text">how</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

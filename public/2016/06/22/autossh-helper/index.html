@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,内网穿透," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？">
+<meta name="keywords" content="Linux,内网穿透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多对一autossh隧道管理">
+<meta property="og:url" content="https://zhangjunjia.github.io/2016/06/22/autossh-helper/index.html">
+<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:description" content="笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-04-09T14:41:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="多对一autossh隧道管理">
+<meta name="twitter:description" content="笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2016/06/22/autossh-helper/"/>
+
+
+
+
+
+  <title>多对一autossh隧道管理 | 张俊佳的网络日志</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的网络日志</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay hungry stay foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/06/22/autossh-helper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的网络日志">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">多对一autossh隧道管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-06-22T21:05:00+08:00">
+                2016-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>笔者的云端主机开放了两个端口，一个为SSH端口（假定为62638），一个为应用程序TCP端口（假定为62639，长连接），现有多个客户端连接到应用程序TCP端口进行数据通信，但假如我想通过云主机远程到某一个客户进行调试，该如何实现呢？</p>
+<a id="more"></a>
+<p>这里就需要用到autossh了，简要介绍其思路：客户安装配置autossh，主动去连接云端主机建立autossh隧道，<strong>此隧道在云端主机有一个对端端口</strong>，云端主机直接ssh此端口就会到达隧道的另一端——客户端。</p>
+<p>具体实现过程如下，注意：</p>
+<ol>
+<li>下文的bbblack是客户端用于登入云端主机的普通账户；</li>
+<li>125.94.212.178为云端主机公网IP；</li>
+</ol>
+<h2 id="客户端配置autossh"><a href="#客户端配置autossh" class="headerlink" title="客户端配置autossh"></a>客户端配置autossh</h2><ol>
+<li>编辑/etc/ssh/ssh_config，修改<code>StrictHostKeyChecking ask</code>为<code>StrictHostKeyChecking no</code>并去除其前面的注释；</li>
+<li>执行ssh-keygen得id_rsa.pub，将id_rsa.pub上传到云主机的/home/bbblack/.ssh/customer_name_authorized_keys（<strong>customer_name_authorized_keys为客户名称开头，加_上authorized_keys为后缀</strong>）；</li>
+<li>安装autossh；</li>
+<li>crontab配置每5分钟执行一次以下脚本（autossh.sh），</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="comment"># 隧道在云主机的对端是1235端口，在客户端是22端口（ssh的默认端口）</span></span><br><span class="line">tokeep=1235:localhost:22</span><br><span class="line"><span class="comment"># 检测此连接是否存在，否则建立autossh连接</span></span><br><span class="line"><span class="keyword">if</span> $(/bin/ps ax|grep <span class="variable">$tokeep</span>|grep -v <span class="string">"grep"</span> &gt; /dev/null)</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"ok"</span> &gt; /dev/null</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="comment"># autossh本身会去检测并维持隧道的长连接</span></span><br><span class="line">    /usr/bin/autossh -M 1234 -NR 1235:localhost:22 bbblack@125.94.212.178 -p62638 &gt; /root/autossh.log 2&gt;&amp;1 &amp;</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+<h2 id="云端配置autossh"><a href="#云端配置autossh" class="headerlink" title="云端配置autossh"></a>云端配置autossh</h2><ol>
+<li>编辑/etc/ssh/ssh_config，修改<code>StrictHostKeyChecking ask</code>为<code>StrictHostKeyChecking no</code>并去除其前面的注释；</li>
+<li>编辑/etc/ssh/sshd_config，修改<code>AuthorizedKeysFile</code>配置项为<code>AuthorizedKeysFile      .ssh/authorized_keys</code>，若上文的customer_name_authorized_keys与.ssh/authorized_keys内容相同，则客户端无需输入密码通过authorized_keys就能连接上云端；</li>
+</ol>
+<h3 id="在只有一个客户的情况下"><a href="#在只有一个客户的情况下" class="headerlink" title="在只有一个客户的情况下"></a>在只有一个客户的情况下</h3><p>将上文的customer_name重命名为authorized_keys，过一会客户端就会连接上云端，使用<code>lsof -i:1235</code>可查看连接建立情况，使用<code>ssh -p1235 user_name@localhost</code>可登录到客户端（<strong>user_name为客户端的linux user name</strong>）；</p>
+<h3 id="在有多个客户的情况下"><a href="#在有多个客户的情况下" class="headerlink" title="在有多个客户的情况下"></a>在有多个客户的情况下</h3><p>最简单的一种方案是：使每条隧道的云端主机对端端口唯一，也就是每个客户的隧道互相独立，但如果客户太多，会将云端的端口耗尽。笔者想要的效果是所有客户共用一个云端对端端口，即一次只有一条隧道，一次只能远程登录到一个客户。那么问题来了？如何实现？</p>
+<p>使用下述脚本（autossh-helper.sh）即可解决上述问题，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">filepath=<span class="variable">$1</span></span><br><span class="line">port1=1235</span><br><span class="line"></span><br><span class="line">[ <span class="variable">$#</span> -eq 0 ] &amp;&amp; &#123; <span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$0</span> authorized_keys_filepath"</span>; <span class="built_in">exit</span> 999; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ -f <span class="string">"<span class="variable">$filepath</span>"</span> ] ; <span class="keyword">then</span></span><br><span class="line">    <span class="comment"># kill 1235</span></span><br><span class="line">    pid=$(lsof -i:<span class="variable">$port1</span> -t)</span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$pid</span>|<span class="keyword">while</span> <span class="built_in">read</span> line</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">if</span> [ <span class="string">""</span> != <span class="string">"<span class="variable">$line</span>"</span> ] ; <span class="keyword">then</span></span><br><span class="line">            $(<span class="built_in">kill</span> <span class="variable">$line</span>)</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># clear known_hosts</span></span><br><span class="line">    <span class="built_in">echo</span> &gt; /home/bbblack/.ssh/known_hosts</span><br><span class="line"></span><br><span class="line">    <span class="comment"># authorized_keys changed</span></span><br><span class="line">    cp <span class="variable">$filepath</span> /home/bbblack/.ssh/authorized_keys</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"done ..."</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$filepath</span> not exists ..."</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+<p><strong>FIXME</strong><br>但是，以非root用户bbblack使用上述脚本有个问题，它需要定位出绑定在1235的pid号是多少，而1235是由sshd进程以bbblack用户在隧道建立时绑定的，这时候不管使用<code>lsof</code>还是<code>netstat</code>都无法在bbblack用户下定位出绑定在1235的pid号是多少（原因未知）。所以需要配置lsof为setuid程序（有何安全隐患？），root用户运行<code>chmod u+s /usr/bin/lsof</code>即可。</p>
+<p>接着，以bbblack账户（无需root用户）运行<code>./autossh-helper.sh customer_name_authorized_keys</code>（customer_name_authorized_keys为上文提到的文件）即可实现客户切换，其原理无非是一次只有一个客户独占ssh的authorized_keys，其他没有独占的客户由于不满足ssh登入的条件因而无法建立隧道。</p>
+<p>但是问题到这里还没有结束，云端的主机由于安全的需要一般都会配置denyhosts，denyhosts会不断检查ssh日志的失败记录，把那些连续失败多次的IP记为黑名单（ssh不可用），于是会出现这样一个现象，即使你运行了上述的autossh-helper.sh切换客户，依然还是没有客户建立隧道，这就是因为该客户所在公网IP被加入黑名单的原因。</p>
+<p>有什么解决办法呢？这时候我们的应用程序TCP端口（假定为62639，长连接）派上了用场。这里我们假设，该客户所在公网IP虽然被加入黑名单，但应用程序TCP端口（假定为62639，长连接）依然正常，因为云端和客户端需要源源不断的交互数据，此端口为长连接。若不满足此假设，则以下解决方案无效。</p>
+<p>解决方法就是，在执行autossh-helper.sh前，将与云端应用程序正常通信的客户端公网IP从黑名单解除即可。即在执行autossh-helper.sh前，必须先以<strong>root用户</strong>（因为denyhosts需要以root用户执行，这是个遗憾）执行脚本如下（public-ip-helper.sh）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ `whoami` = <span class="string">"root"</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">""</span> &gt; /dev/null</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"please login as root !"</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">tokill=/usr/bin/denyhosts</span><br><span class="line">/bin/ps ax|grep <span class="variable">$tokill</span>|grep -v <span class="string">"grep"</span>|awk <span class="string">'&#123;print $1&#125;'</span>|<span class="keyword">while</span> <span class="built_in">read</span> line</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">kill</span> <span class="variable">$line</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">netstat -npt|grep 62639|cut -d <span class="string">":"</span> -f2|cut -d <span class="string">":"</span> -f1|<span class="keyword">while</span> <span class="built_in">read</span> str</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">HOST=<span class="variable">$&#123;str##* &#125;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$HOST</span> &gt;&gt; /usr/share/denyhosts/allowed-hosts</span><br><span class="line"><span class="built_in">echo</span> <span class="string">'</span></span><br><span class="line"><span class="string">/etc/hosts.deny</span></span><br><span class="line"><span class="string">/usr/share/denyhosts/data/hosts</span></span><br><span class="line"><span class="string">/usr/share/denyhosts/data/hosts-restricted</span></span><br><span class="line"><span class="string">/usr/share/denyhosts/data/hosts-root</span></span><br><span class="line"><span class="string">/usr/share/denyhosts/data/hosts-valid</span></span><br><span class="line"><span class="string">/usr/share/denyhosts/data/users-hosts</span></span><br><span class="line"><span class="string">'</span> | grep -v <span class="string">"^$"</span> | xargs sed -i <span class="string">"/<span class="variable">$&#123;HOST&#125;</span>/d"</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">/etc/init.d/denyhosts start</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/内网穿透/" rel="tag"># 内网穿透</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/11/hbase-incremental-backup/" rel="next" title="HBase增量备份数据">
+                <i class="fa fa-chevron-left"></i> HBase增量备份数据
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/22/svn-hooks/" rel="prev" title="SVN hooks的使用">
+                SVN hooks的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端配置autossh"><span class="nav-number">1.</span> <span class="nav-text">客户端配置autossh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#云端配置autossh"><span class="nav-number">2.</span> <span class="nav-text">云端配置autossh</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在只有一个客户的情况下"><span class="nav-number">2.1.</span> <span class="nav-text">在只有一个客户的情况下</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在有多个客户的情况下"><span class="nav-number">2.2.</span> <span class="nav-text">在有多个客户的情况下</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

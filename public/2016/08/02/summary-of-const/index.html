@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C/C++," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="C/C++都有const关键字？它有什么用途以及用来干嘛呢？">
+<meta name="keywords" content="C&#x2F;C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C&#x2F;C++的const">
+<meta property="og:url" content="https://zhangjunjia.github.io/2016/08/02/summary-of-const/index.html">
+<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:description" content="C/C++都有const关键字？它有什么用途以及用来干嘛呢？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-04-09T14:46:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C&#x2F;C++的const">
+<meta name="twitter:description" content="C/C++都有const关键字？它有什么用途以及用来干嘛呢？">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2016/08/02/summary-of-const/"/>
+
+
+
+
+
+  <title>C/C++的const | 张俊佳的网络日志</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的网络日志</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay hungry stay foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/08/02/summary-of-const/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的网络日志">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C/C++的const</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-02T09:04:00+08:00">
+                2016-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>C/C++都有const关键字？它有什么用途以及用来干嘛呢？</p>
+<a id="more"></a>
+<h2 id="const-variable"><a href="#const-variable" class="headerlink" title="const variable"></a>const variable</h2><p>const修饰variable，意味着<strong>该变量不可修改</strong>，即变量是readonly的，这一点C和C++相同。例子如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> a = <span class="number">0</span>; <span class="comment">// 等价于：int const a = 0;</span></span><br><span class="line">    a = <span class="number">1</span>; <span class="comment">// error：a是readonly的，不可修改</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>考虑到指针也是variable，上述特点对指针也适用，称为const pointer，const pointer的<strong>dereference（*号取值）不受影响</strong>。例子如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span> * int_ptr;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">0</span>, b = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">const</span> int_ptr ip = &amp;a; <span class="comment">// 等价于：int_ptr const ip = &amp;a;</span></span><br><span class="line">    ip = &amp;b; <span class="comment">// error：ip是readonly的，其值（标识地址）不可修改</span></span><br><span class="line">    *ip = <span class="number">2</span>; <span class="comment">// 不影响指针的dereference</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假如不想使用typedef的方式表示上述的const pointer，则必须写成如下形式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> * <span class="keyword">const</span> ptr = &amp;a;</span><br><span class="line"><span class="keyword">int</span> <span class="keyword">const</span> * ptr = &amp;a; <span class="comment">// error：这表示指向const int的指针</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> * ptr = &amp;a; <span class="comment">// error：这表示指向const int的指针</span></span><br></pre></td></tr></table></figure>
+<p>const variable的特点如下：</p>
+<ol>
+<li>声明和定义必须在同一个地方（声明变量时实例化）；</li>
+<li>const variable不可修改；</li>
+<li>const和type类型可以互换（指针不使用typedef的方式定义时需要格外注意）；</li>
+</ol>
+<h2 id="pointer-to-const-variable"><a href="#pointer-to-const-variable" class="headerlink" title="pointer to const variable"></a>pointer to const variable</h2><p>指针指向const variable，意味着<strong>不能通过指针去修改指针指向的内存</strong>，即指针指向的内存是readonly的，但<strong>指针本身的值修改不受影响（即可以重新绑定地址）</strong>，这一点C和C++也相同，例子如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span> * <span class="keyword">const</span> int_cst_ptr; <span class="comment">// const pointer</span></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span> <span class="keyword">const</span> int_cst; <span class="comment">// const int</span></span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> *b = &amp;a;</span><br><span class="line">    int_cst_ptr *ptr1 = &amp;b;</span><br><span class="line">    int_cst *ptr2 = &amp;a;</span><br><span class="line">    *ptr1 = <span class="literal">NULL</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    *ptr2 = <span class="number">1</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    ptr1 = <span class="literal">NULL</span>; <span class="comment">// 指针本身的值修改不受影响（即可以重新绑定地址）</span></span><br><span class="line">    ptr2 = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设不使用typedef，上述例子需写成：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> *b = &amp;a;</span><br><span class="line">    <span class="keyword">int</span> * <span class="keyword">const</span> *ptr1 = &amp;b; <span class="comment">// 从右到左：ptr1 is a pointer to const pointer to int</span></span><br><span class="line">    <span class="keyword">int</span> <span class="keyword">const</span> *ptr2 = &amp;a;</span><br><span class="line">    *ptr1 = <span class="literal">NULL</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    *ptr2 = <span class="number">1</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    ptr1 = <span class="literal">NULL</span>; <span class="comment">// 指针本身的值修改不受影响（即可以重新绑定地址）</span></span><br><span class="line">    ptr2 = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>pointer to const variable的特点：</p>
+<ol>
+<li>指针指向内存不可修改；</li>
+<li>指针本身的值（代表的地址）可以修改；</li>
+</ol>
+<p>举一个复杂点的例子，即有指针又有数组的情况：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(; i&lt;argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"argv[%d] : %s\n"</span>, i, argv[i]);</span><br><span class="line">        argv[i] = <span class="string">"a"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// char *const argv2[] = argv;</span></span><br><span class="line">    <span class="keyword">char</span> *<span class="keyword">const</span> argv3[] = &#123;<span class="string">"a"</span>, <span class="string">"b"</span>&#125;;</span><br><span class="line">    <span class="comment">// argv3[0] = "test";</span></span><br><span class="line">    <span class="keyword">char</span> *<span class="keyword">const</span> argv4[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">char</span> *str = argv4[<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"str: %s\n"</span>, str);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"strlen(str): %d\n"</span>, <span class="built_in">strlen</span>(str));</span><br><span class="line">    *str = <span class="string">'a'</span>;</span><br><span class="line">    *(str+<span class="number">1</span>) = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"str: %s\n"</span>, str);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码可正常编译，被注释掉的行是因为其会在编译时出错。在x86的Linux下运行得到的结果为，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">argv[0] : ./a.out</span><br><span class="line">str: ,ݳ▒</span><br><span class="line">strlen(str): 4</span><br><span class="line">str: a</span><br></pre></td></tr></table></figure>
+<p>而在x64的Linux下运行得到的结果为，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">argv[0] : ./a.out</span><br><span class="line">str: AWA▒▒AVI▒▒AUI▒▒ATL▒%h</span><br><span class="line">strlen(str): 23</span><br><span class="line">段错误</span><br></pre></td></tr></table></figure>
+<p>关于该代码的几点说明如下，</p>
+<ol>
+<li><code>char *const argv2[] = argv;</code>之所以被注释是因为不能够将一个数组赋值给另外一个数组；</li>
+<li><code>char *const argv3[] = {&quot;a&quot;, &quot;b&quot;};</code>定义并显示实例化了argv3，argv3是一个数组，它包含2个char * const（const pointer to char）元素，因此argv3[0]的指针值不可修改；</li>
+<li>在两个平台下运行结果不同说明若不显示实例化数组内容，数组的内容是不可预料的，对数组内容的修改结果也是不可预料的；</li>
+</ol>
+<h2 id="const-pointer-to-const-variable"><a href="#const-pointer-to-const-variable" class="headerlink" title="const pointer to const variable"></a>const pointer to const variable</h2><p>const pointer指向const variable，这意外着<strong>指针本身值（代表的地址）不可修改</strong>，同时<strong>指针指向的内存也不可修改</strong>，这点C和C++也相同。例子如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span> * <span class="keyword">const</span> int_cst_ptr; <span class="comment">// const pointer</span></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">int</span> <span class="keyword">const</span> int_cst; <span class="comment">// const int</span></span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> *b = &amp;a;</span><br><span class="line">    int_cst_ptr * <span class="keyword">const</span> ptr1 = &amp;b;</span><br><span class="line">    int_cst * <span class="keyword">const</span> ptr2 = &amp;a;</span><br><span class="line">    *ptr1 = <span class="literal">NULL</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    *ptr2 = <span class="number">1</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    ptr1 = <span class="literal">NULL</span>; <span class="comment">// error：const pointer，指针本身值不可修改</span></span><br><span class="line">    ptr2 = <span class="literal">NULL</span>; <span class="comment">// error：const pointer，指针本身值不可修改</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设不使用typedef，上述例子需写成：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> *b = &amp;a;</span><br><span class="line">    <span class="keyword">int</span> * <span class="keyword">const</span> * <span class="keyword">const</span> ptr1 = &amp;b; <span class="comment">// 这时候表达式越来越复杂</span></span><br><span class="line">    <span class="keyword">int</span> <span class="keyword">const</span> * <span class="keyword">const</span> ptr2 = &amp;a;</span><br><span class="line">    *ptr1 = <span class="literal">NULL</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    *ptr2 = <span class="number">1</span>; <span class="comment">// error：pointer to const，指针指向内存readonly</span></span><br><span class="line">    ptr1 = <span class="literal">NULL</span>; <span class="comment">// error：const pointer，指针本身值不可修改</span></span><br><span class="line">    ptr2 = <span class="literal">NULL</span>; <span class="comment">// error：const pointer，指针本身值不可修改</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>const pointer to const variable的特点：</p>
+<ol>
+<li>指针本身值（代表的地址）不可修改；</li>
+<li>指针指向的内存也不可修改；</li>
+</ol>
+<h2 id="linkage"><a href="#linkage" class="headerlink" title="linkage"></a>linkage</h2><p>有以下代码文件：</p>
+<p>头文件linkage.h，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <span class="keyword">int</span> counter;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_counter</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+<p>c文件linkage.c，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdio.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"linkage.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_counter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"counter: %d\n"</span>, counter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>c文件main.c，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"linkage.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> counter = <span class="number">12</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    print_counter();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行下述语句，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gcc -c linkage.cpp -o linkage.o</span><br><span class="line">gcc -c main.cpp -o main.o</span><br><span class="line">gcc linkage.o main.o -o main</span><br><span class="line">./main</span><br></pre></td></tr></table></figure>
+<p>得到的输出是预期的值：12。</p>
+<p>将上述的linkage.c文件重命名为linkage.cpp，main.c重命名为main.cpp，执行下述语句，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">g++ -c linkage.cpp -o linkage.o</span><br><span class="line">g++ -c main.cpp -o main.o</span><br><span class="line">g++ linkage.o main.o -o main</span><br><span class="line">./main</span><br></pre></td></tr></table></figure>
+<p>得到的输出却是：0。</p>
+<p>回想一下在C语言里面使用全局变量的注意点，</p>
+<ol>
+<li>在一个头文件声明该变量，即上述代码的<code>extern const int counter;</code>，它的作用是告诉编译器，我有这么一个类型的变量存在；</li>
+<li>在一个C文件定义该变量，即上述代码的<code>const int counter = 12;</code>，它的作用是为该全局变量申请存储；</li>
+<li>在其他需要此全局变量的C文件，include步骤1提到的头文件，全局变量得以共享；</li>
+</ol>
+<p>对于C语言，const全局变量与非const变量一样，都是全局共享的，C++ Primer将此称为<strong>external linkage</strong>；<br>但对于C++，const全局变量确是local to file的（作用域仅限于文件内），问题就处在于<code>const int counter = 12;</code>这一行代码，在C++里这意味着定义了一个const int变量，但仅限于文件内部使用，C++ Primer将此称为<strong>internal linkage</strong>。</p>
+<p>那么，如何在C++共享const全局变量呢？方法很简单，将步骤2的定义代码修改为<code>extern const int counter = 12;</code>即可。</p>
+<h2 id="top-level-const和low-level-const"><a href="#top-level-const和low-level-const" class="headerlink" title="top-level const和low-level const"></a>top-level const和low-level const</h2><p>C++里面，将const variable称为<strong>top-level const</strong>，将pointer to const variable称为<strong>low-level const</strong>，而且还规定，</p>
+<ol>
+<li>const variable赋值给普通variable或pointer to const variable时，top-level const的const被忽略，等同于普通变量间赋值；</li>
+<li>pointer to const variable赋值给普通variable或const variable时，low-level const的const不能被忽略；</li>
+</ol>
+<p>有以下main.cpp文件，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> b = a; <span class="comment">// const int --&gt; int, top to normal</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> c = b; <span class="comment">// int --&gt; const int, normal to top</span></span><br><span class="line">    <span class="keyword">int</span> * <span class="keyword">const</span> ptr = &amp;a; <span class="comment">// const int * --&gt; int * const, low to top</span></span><br><span class="line">    <span class="keyword">int</span> * ptr2 = &amp;a; <span class="comment">// const int * --&gt; int *, low to normal</span></span><br><span class="line">    <span class="keyword">int</span> * ptr3 = ptr; <span class="comment">// int * const --&gt; int *, top to normal</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> * ptr4 = ptr; <span class="comment">// int * const --&gt; const int *, top to low</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行<code>g++ main.c</code>，得到的输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">main.cpp: In function ‘int main()’:</span><br><span class="line">main.cpp:5:24: error: invalid conversion from ‘const int*’ to ‘int*’ [-fpermissive]</span><br><span class="line">     int * const ptr = &amp;a; // const int * --&gt; int * const, low to top</span><br><span class="line">                        ^</span><br><span class="line">main.cpp:6:19: error: invalid conversion from ‘const int*’ to ‘int*’ [-fpermissive]</span><br><span class="line">     int * ptr2 = &amp;a; // const int * --&gt; int *, low to normal</span><br><span class="line">                   ^</span><br></pre></td></tr></table></figure>
+<p>这说明在C++里面，low-level const赋值或强转给其他类型时，const是不能被忽略的，否则会在编译时报错。</p>
+<p>将上述代码保存为main.c后执行<code>gcc main.c</code>，得到的输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">main.c: In function ‘main’:</span><br><span class="line">main.c:4:23: warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]</span><br><span class="line">     int * const ptr = &amp;a; // const int * --&gt; int * const, low to top</span><br><span class="line">                       ^</span><br><span class="line">main.c:5:18: warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]</span><br><span class="line">     int * ptr2 = &amp;a; // const int * --&gt; int *, low to normal</span><br><span class="line">                  ^</span><br></pre></td></tr></table></figure>
+<p>这说明在C里面，并没有严格规定top-level const和low-level const，但是对于low-level const的情况，还是会有warning，因此必须小心使用，同时必须注意编译器的所有warning。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/02/qa-of-unp/" rel="next" title="《UNP卷1》的一些问题">
+                <i class="fa fa-chevron-left"></i> 《UNP卷1》的一些问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/05/about-sigpipe/" rel="prev" title="关于SIGPIPE">
+                关于SIGPIPE <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#const-variable"><span class="nav-number">1.</span> <span class="nav-text">const variable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pointer-to-const-variable"><span class="nav-number">2.</span> <span class="nav-text">pointer to const variable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#const-pointer-to-const-variable"><span class="nav-number">3.</span> <span class="nav-text">const pointer to const variable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linkage"><span class="nav-number">4.</span> <span class="nav-text">linkage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#top-level-const和low-level-const"><span class="nav-number">5.</span> <span class="nav-text">top-level const和low-level const</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
