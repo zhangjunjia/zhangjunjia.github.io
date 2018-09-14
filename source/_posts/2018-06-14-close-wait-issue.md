@@ -1,5 +1,5 @@
 ---
-title: java mina close_wait issue
+title: Java Mina close_wait issue
 date: 2018-06-14 11:02:06
 tags: ['Java', 'Mina', 'TCP/IP']
 ---

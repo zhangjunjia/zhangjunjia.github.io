@@ -4,5 +4,165 @@ date: 2018-09-12 23:03:39
 tags: ['Java']
 ---
 
-记录一次使用JMC(Java Mission Controll)和JFR(Java Flight Record)以及JProfile检测Java应用异常的过程。
+本文记录使用JMC（Java Mission Controll）、JFR（Java Flight Record）以及JProfile诊断Java应用不可用（OutOfMemroy）的过程。
+
 <!--more-->
+
+# 术语说明
+
+- **搜计程序**：搜索与计算引擎服务程序。
+- **接口服务（function）**：搜计程序通过dubbo和http暴露出来的服务，调用此接口服务可获取相关数据，搜计程序有多个接口服务，接口服务的别名为function。接口服务的名称及调用入参，由客户通过搜计程序的管理界面设定。
+- **调用者**：调用搜计程序接口服务的进程，如Web系统。
+- **调用请求**：调用者对搜计程序提供的接口服务进行一次RPC调用称为一次调用请求。
+- **执行步骤（procedure）**：接口服务被调用后，通常需要在后台执行一次或多次计算过程，每个计算过程称为一个执行步骤，别名为procedure。接口服务最终返回的结果，依赖于各执行步骤结果的聚合。执行步骤的内部细节（查询的字段、是否联表等），由客户通过搜计程序的管理界面设定。
+- **Limit参数**：当数据无限多时，理论上来讲function以及procedure返回的数据可能无限多，因此必须对返回结果的行数进行限定。此限定参数称为limit参数，格式一般为limit offset, number。Offset表示前多少条结果需要被忽略，number表示忽略了offset条结果后需要取的结果数量。
+
+# 现象描述
+
+搜计程序出现了OutOfMemoryError、调用者请求无响应以及调用请求耗时较长等问题。
+
+## JVM表现
+
+8月29至9月1，搜计程序部署在192.168.8.181服务器用于自定义项目自测时，发生了多次的OutOfMemoryError，截取部分信息如下：
+
+> java.lang.OutOfMemoryError: GC overhead limit exceeded
+> ![OutOfMemoryError](https://upload-images.jianshu.io/upload_images/908013-c8f117f516a65b13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+## OS表现
+
+搜计程序在181服务器的最大堆内存（Xmx）为8G，通过监测发现，程序在濒临OutOfMemoryError时，实用memory为8G，实用+swap的memory为9G。程序在OutOfMemoryError前，有接近1G的内存被swap到了硬盘，表明程序本身所需内存不断增大，同时OS可用内存不足。
+
+## 调用者表现
+
+Web系统等调用搜计程序接口服务的进程，出现了调用接口服务无返回数据，以及调用接口服务后需要等待长时间才有返回数据的情况。
+
+# 原因分析
+
+通过Java Flight Recoder对181服务器的搜计程序进行1小时的采样，得到以下信息，基于这些信息可推测出搜计程序OutOfMemoryError以及无响应的原因。
+
+## CPU及分析
+
+![图01 程序OutOfMemoryError前的CPU使用率](https://upload-images.jianshu.io/upload_images/908013-f1818b6df1ed7cde.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+通过图01分析发现，程序OutOfMemoryError前，有一段时间CPU使用率急剧上升，随后下降一段时间，然后又急剧上升。且CPU使用率的急剧上升，是由JVM用户线程导致的（图01蓝色部分）。
+
+![图02 程序OutOfMemoryError前的热点线程和热点方法分析](https://upload-images.jianshu.io/upload_images/908013-bf16c33bc18214cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+通过图02分析发现，程序OutOfMemoryError前，存在大量的上下文切换，CPU时间主要分配给了调用请求响应线程（dubbo）。
+
+基于以上信息，推测搜计程序的OutOfMemoryError可能和大量的调用请求有关。
+
+## 内存分析
+
+![图03 程序OutOfMemoryError前的内存使用情况](https://upload-images.jianshu.io/upload_images/908013-5efeb251f0e1d0ff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+如图03所示，堆内存的低谷节节攀升。在程序退出前（红框处），即使是GC后，也接近有3G的大小。通过dump内存分析后发现，搜计程序大部分内存基本分布在程序的mergeData方法，而mergeData是由调用请求触发的。
+
+基于以上信息以及**3.4 内存泄漏分析**，可以断定搜计程序的OutOfMemoryError是由调用请求导致的。
+
+## GC分析
+
+![图04 程序OutOfMemoryError前young gc和full gc监控](https://upload-images.jianshu.io/upload_images/908013-aa21c2efa6b34d8b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+如果04所示，通过监控搜计程序的gc次数和时间发现：程序full gc的次数（252），远大于young gc的次数（9）；同时full gc的时间（750秒），远大于young gc的时间（3.2秒）。当程序长时间处于GC状态时，调用请求对应的用户线程将长时间处于阻塞状态，得不到响应，这是程序变慢最直接的原因。大部分用户线程处于阻塞状态如图05所示。
+
+![图 05 Park表示线程处于阻塞状态](https://upload-images.jianshu.io/upload_images/908013-895ff0ce488a1b77.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![图06 程序OutOfMemoryError前发生了一次时间特别长的FULL GC](https://upload-images.jianshu.io/upload_images/908013-d46a4c99cb50be72.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+图06所示，程序OutOfMemoryError前发生了一次时间特别长的FULL GC，且仅回收了400M的内存。这是JVM出现“GC overhead limit exceeded”的根本原因。表明了GC时间太长，但回收的内存太少。
+
+当Full GC后，JVM依然没有足够内存提供给应用线程时，JVM就会抛出OutOfMemoryError。基于以上信息，可得出程序OutOfMemoryError的根本原因是大量调用请求导致的JVM内存不足。而大量请求之所以会导致JVM内存不足，**主要原因在于部分调用请求在每个执行步骤申请了大量的堆内存，如日志查询等调用请求**。如果频繁的、并发的调用日志查询请求，搜计程序短时间内就会产生OutOfMemoryError。
+
+## 内存泄漏分析
+
+![图07 搜计程序0ld gen长时间监控](https://upload-images.jianshu.io/upload_images/908013-420a4fe84546771e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+使用3个调用者线程，对搜计程序进行长达三天的不间断调用，但限定每次调用请求仅获取少量数据。图07为这期间的old gen内存使用情况，经历gc后old gen的内存基本持稳在0.07GB。这表明搜计程序在请求不多、请求数据量不大的情况下，JVM内存回收正常，程序本身没有存在内存泄漏。
+
+# 解决方案
+
+基于以上分析，归结得出程序OutOfMemoryError的主要原因：部分调用请求的执行步骤，申请了大量内存耗尽JVM可用内存导致的程序问题。
+
+![图08 一次调用请求](https://upload-images.jianshu.io/upload_images/908013-c40d62c5a3363ed3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+如图08所示，为一次导致OutOfMemoryError调用请求的示例。S1和S2表示执行步骤，S1和S2汇总后得到最终结果返回给调用者。且S1和S2所需的内存较多，超过了JVM的可用内存，Full GC后便会导致OutOfMemoryError。
+
+针对此问题，大致整理有以下解决方案。
+
+## 重新审视产品需求
+
+从新审视产品需求，为何有请求大量数据的调用请求，需考虑：
+
+1） 这些调用请求是否是必要的，如果不必要则去除；
+
+2） 减少调用请求的执行步骤数量（尽可能不要联表查询，减少执行步骤的滞留内存）；
+
+3） 减少执行步骤命中的结果数量（多加一些查询参数的制约）。
+
+以上，需要和产品需求制定者和调用者进行沟通讨论。
+
+## 在现有程序进行维护
+
+### 常规策略
+
+**1）废除全连接**
+
+左连接和内连接已经足以应对业务需要，是否还需要有全连接的支持。
+
+**2）查询结果重用（带超时）**
+
+- 对于查询大量数据的调用请求，应将接口服务产生的结果缓存到硬盘（带过期时间，过期自动清除），下次若请求相同数据，则直接查询缓存结果并返回；
+
+- 对于查询大量数据的调用请求，若有两个调用请求同时请求相同的数据，则后到的连接等待先到的连接查询完成，复用先到的连接产生的结果返回给调用者。
+
+（这种做法的代价是一定程度上牺牲了数据的实时性，即命中缓存时，可能某些真实数据已经产生了变化）
+
+**3）限定请求数量**
+
+限定调用请求的最大并发数量，防止调用请求过多，超出搜计程序的负载能力。
+
+**4）调用请求必须要有默认limit参数**
+
+假设数据库的数据有无限多行，调用请求不允许一次请求超过一定行数（假设是10000行）。首先，搜计程序一次提供太多行的数据作为返回结果，会导致堆内存暴增；其次，调用者获取这么多行的数据，也会导致内存暴增。正确的做法应该是调用者分多次调用，每次仅获取一定量的数据。
+
+**5）及时释放执行步骤申请的内存若未被后续执行步骤引用**
+
+假设一次调用请求需经历15个执行步骤，部分较前的执行步骤到了第10个执行步骤时，可能已经没有后续执行步骤对其有引用关系，此时应将该未被引用的执行步骤的内容置为null，告知JVM这块内存是可以回收的。
+
+### 用IO换取内存的策略
+
+![图09 将S1步骤的数据获取转为链式IO](https://upload-images.jianshu.io/upload_images/908013-691e2044b371dc40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+如图09所示，S1为一个需用到大量堆内存的执行步骤。原有的做法是一次性将S1需要用到的全部数据都从数据库查出，并加载到内存。一种改进措施是，**分多次查询数据，逐次将部分结果加载入内存**。
+
+例如，如上图所示，先加载n1到内存中，进行必要计算后，将n1计算产生的结果缓存到硬盘，并在内存记录n1计算产生的结果的相关索引信息。
+
+紧接着，加载n2到内存中，重复前述步骤，直至全部数据查询完毕。此时，便将S1的全部计算执行完毕，且在内存中记录了少量的、必要的关于各个分步骤的索引信息，这些索引信息包括了结果缓存在硬盘什么位置、有多少行等。
+
+这个做法的代价是：
+
+1） 若有大量数据的调用请求时，将产生大量的顺序读和顺序写IO，给硬盘带来巨大负载，因此必须使用独立的硬盘，而不是和其他应用程序公用。另外，出于性能考虑，独立的硬盘最好是固态硬盘。
+
+2） 由于存在频繁的写，硬盘的寿命将比普通用途缩短很多；
+
+3） 由于采用了分小步骤执行，一定程度丧失了数据的实时性，如执行n2的计算时，很可能n1的数据在数据库中已经被修改了；
+
+4） **开发的复杂度难以预估**。聚合函数、计算函数、其他高级函数，以及两个执行步骤产生的结果的联表和分组，全部受到影响，这些逻辑基本都需要修改，以支持这种IO换取内存的策略。
+
+5）**如若查询命中的数据量是与日俱增的，此方案将造成长时间写IO，最终能为程序新的性能瓶颈。**
+
+## 彻底重构
+
+目前搜计程序执行多个执行步骤，并汇总得到最终结果的过程无比复杂，相当于实现了一个自用的SQL的执行引擎。同事建议可以引入Kylin，以替代现有的执行引擎。
+
+Kylin是一套旨在对Hadoop环境下分析流程进行加速、且能够与SQL兼容性工具顺利协作的解决方案，Kylin成功将SQL接口与多维分析机制（OLAP）引入Hadoop，旨在对规模极为庞大的数据集加以支持。
+
+对于Kylin能否替代现有解决方案，还需要做进一步的研究。代价是，若此方案可行，原执行引擎需要全部推翻重写。
+
+## 增大内存
+
+物理上，增大机器内存，搜计程序所需内存远大于8G。至于具体需要增大到多少，需根据并发量、请求数据量进行制定。建议大小是32G。
+
