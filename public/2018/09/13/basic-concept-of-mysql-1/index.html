@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="动态规划," />
+  <meta name="keywords" content="MySQL," />
 
 
 
@@ -79,18 +79,20 @@
 
 
 
-<meta name="description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。">
-<meta name="keywords" content="动态规划">
+<meta name="description" content="MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。">
+<meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
-<meta property="og:title" content="最优生产计划">
-<meta property="og:url" content="https://zhangjunjia.github.io/2017/05/09/power-adjustment/index.html">
+<meta property="og:title" content="MySQL基础回顾01 | 表连接与Group By">
+<meta property="og:url" content="https://zhangjunjia.github.io/2018/09/13/basic-concept-of-mysql-1/index.html">
 <meta property="og:site_name" content="张俊佳的网络日志">
-<meta property="og:description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。">
+<meta property="og:description" content="MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-05-17T04:12:42.000Z">
+<meta property="og:image" content="https://note.youdao.com/yws/res/74/4BA9A3876ECE410B8CF884F84E929FA5">
+<meta property="og:updated_time" content="2018-09-20T15:54:53.266Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="最优生产计划">
-<meta name="twitter:description" content="目标已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。">
+<meta name="twitter:title" content="MySQL基础回顾01 | 表连接与Group By">
+<meta name="twitter:description" content="MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。">
+<meta name="twitter:image" content="https://note.youdao.com/yws/res/74/4BA9A3876ECE410B8CF884F84E929FA5">
 
 
 
@@ -120,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://zhangjunjia.github.io/2017/05/09/power-adjustment/"/>
+  <link rel="canonical" href="https://zhangjunjia.github.io/2018/09/13/basic-concept-of-mysql-1/"/>
 
 
 
 
 
-  <title>最优生产计划 | 张俊佳的网络日志</title>
+  <title>MySQL基础回顾01 | 表连接与Group By | 张俊佳的网络日志</title>
   
 
 
@@ -233,7 +235,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2017/05/09/power-adjustment/">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2018/09/13/basic-concept-of-mysql-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张俊佳">
@@ -250,7 +252,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">最优生产计划</h1>
+          <h1 class="post-title" itemprop="name headline">MySQL基础回顾01 | 表连接与Group By</h1>
         
 
         <div class="post-meta">
@@ -262,8 +264,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-09T17:25:16+08:00">
-                2017-05-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-13T20:00:03+08:00">
+                2018-09-13
               </time>
             
 
@@ -272,28 +274,6 @@
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -322,39 +302,286 @@
       
 
       
-        <h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>已知各类生产产品的生产时间及负荷曲线（负荷曲线对时间的积分即电量），输入「目标生产计划」，计算后输出「最优生产计划」，使得按该计划进行生产成本最优。</p>
+        <p>MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。</p>
 <a id="more"></a>
-<p>目标生产计划的构成为，</p>
+<h2 id="表连接"><a href="#表连接" class="headerlink" title="表连接"></a>表连接</h2><p>User表信息如下：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+<p>Org表信息如下：</p>
+<table>
+<thead>
+<tr>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>15</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<h3 id="表连接语法"><a href="#表连接语法" class="headerlink" title="表连接语法"></a>表连接语法</h3><p>表连接的语法为：<code>A [left|right|inner|full] join B on A.x = B.y</code>。<code>[]</code>内的选项4选一，不填写时默认表示表示<code>inner</code>。4个选项的含义如下：</p>
 <ul>
-<li>计划开始时间</li>
-<li>计划结束时间</li>
-<li>生产哪些产品，如：A20件，B30件，C20件，D100件</li>
+<li>inner：内连接</li>
+<li>left：左连接</li>
+<li>right：右连接</li>
+<li>full：全连接</li>
 </ul>
-<p>最优生产计划的构成为，</p>
+<h3 id="表连接解释"><a href="#表连接解释" class="headerlink" title="表连接解释"></a>表连接解释</h3><p>下图为表连接的文氏图表示，中间蓝色部分表示<code>A.x = B.y</code>的A表与B表的行记录，即A的x字段与B的y字段相等，x与y称为连接字段。习惯上，我们把join左边的表称为左表，其右边的表称为右表，在本例中A是左表，B是右表。</p>
+<p><img src="https://note.youdao.com/yws/res/74/4BA9A3876ECE410B8CF884F84E929FA5" alt="image"></p>
+<p>对于join，可以理解为把A的所有列和B的所有列并在一起。以上面的表格为例，A表和B表的列并在一起变成了：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid(user表)</th>
+<th>orgid(org表)</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>此时由于orgid字段重名，我们需通过select挑出需要的字段。以上面的表格为例，可编写SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid,</span><br><span class="line">    u.username,</span><br><span class="line">    u.orgid,</span><br><span class="line">    o.orgname</span><br><span class="line">FROM</span><br><span class="line">    user u join org o</span><br><span class="line">ON</span><br><span class="line">    u.orgid = o.orgid</span><br></pre></td></tr></table></figure>
+<p>（TODO）<br>inner join时，A表（左表）的所有行原封不动的保留，B表（右表）的情况见下方解释。如上文的文氏图，A表由左白色和蓝色两部分组成，</p>
 <ul>
-<li>t1：开始生产产品P1</li>
-<li>t2：开始生产产品P2</li>
-<li>t3：开始生产产品P3</li>
-<li>……</li>
+<li>蓝色部分：B表的所有行原封不动的保留；</li>
+<li>右白色部分：B表的所有行的值全部显示为NULL；</li>
 </ul>
-<h2 id="如何求解"><a href="#如何求解" class="headerlink" title="如何求解"></a>如何求解</h2><blockquote>
-<p>成本 = 峰期电费单价 <em> 峰期电量 + 平期电费单价 </em> 平期电量 + 谷期电费单价 * 谷期电量</p>
-<p>注：这里的峰平谷指的是一天的不同时段，高峰期和低谷期的电费单价是不一样的。</p>
-</blockquote>
-<p>最优生产计划即成本最小的生产计划，安排生产计划需要考虑的约束有，</p>
-<p><code>各产品生产时间+换料时间+下班/休息时间 &lt;= (计划结束时间 - 计划开始时间)</code> </p>
-<p>这个问题实质是一个动态规划问题，</p>
-<ol>
-<li>将「下班/休息时间」从计划时间挖去，得「N段」可用的时间槽；</li>
-<li>将生产的总件数看成「M张」选票，投给上述的「N段」时间槽（候选人），假设共有「X种」投票结果；</li>
-<li>对计划生产的产品序列进行全排列，假设共有「Y种」排列；</li>
-<li>问题转变为从X*Y种排班方式选取最优排班，<ol>
-<li>判断该排班方式是否满足时间槽的时间约束，不满足则剔除；</li>
-<li>安排「产品+换料时间」到时间槽，将时间槽内剩余时间切块，以投票的方式填充到时间槽内产品与产品间的间隔，求该时间槽最优解；</li>
-<li>求解每个时间槽的最优解，累加得一次生产安排的最优解，再从多次生产安排选取成本最小的，即为所求。</li>
-</ol>
-</li>
-</ol>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+</tbody>
+</table>
+<p>right join时，与right join刚好相反，B表（右表）的所有行原封不动的保留，A表（左表）仅有与B表orgid重叠的行原封不动的保留。</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>NULL</td>
+<td>15</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<p>inner join，仅保留A表与B表orgid重叠的行。</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+</tbody>
+</table>
+<p>full join，用集合运算可理解为<code>(left join) + (right join) - (inner join)</code>。</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>NULL</td>
+<td>15</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<h2 id="笛卡尔积Cross-Join"><a href="#笛卡尔积Cross-Join" class="headerlink" title="笛卡尔积Cross Join"></a>笛卡尔积Cross Join</h2><p>这是一种特殊的Join，以上文的user表cross join org表为例，全连接SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid,</span><br><span class="line">    u.username,</span><br><span class="line">    u.orgid,</span><br><span class="line">    o.orgname</span><br><span class="line">FROM</span><br><span class="line">    user u cross join org o -- 注：cross join可用逗号表示</span><br></pre></td></tr></table></figure>
+<p>得到的结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>skj</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>skj</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<p>也就说，在cross join不设定where条件的情况下，得到的结果是一个笛卡尔积，总行数等于左表的行数乘以B表的行数。在指定where条件的情况下，下文的SQL等同于inner join。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid,</span><br><span class="line">    u.username,</span><br><span class="line">    u.orgid,</span><br><span class="line">    o.orgname</span><br><span class="line">FROM</span><br><span class="line">    user u, org o -- 注：cross join可用逗号表示</span><br><span class="line">WHERE</span><br><span class="line">    u.orgid = o.orgid</span><br></pre></td></tr></table></figure>
+<h2 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h2><p>（未完待续）</p>
 
       
     </div>
@@ -372,7 +599,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/动态规划/" rel="tag"># 动态规划</a>
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
           
         </div>
       
@@ -385,8 +612,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/04/puzzle-of-c-pointer/" rel="next" title="C语言指针与数组">
-                <i class="fa fa-chevron-left"></i> C语言指针与数组
+              <a href="/2018/09/12/use-jmc-jfr-jprofile/" rel="next" title="使用JMC+JFR+JProfile检测Java程序异常">
+                <i class="fa fa-chevron-left"></i> 使用JMC+JFR+JProfile检测Java程序异常
               </a>
             
           </div>
@@ -394,10 +621,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/24/deliberate-practice/" rel="prev" title="我理解的刻意练习">
-                我理解的刻意练习 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -529,7 +752,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#目标"><span class="nav-number">1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何求解"><span class="nav-number">2.</span> <span class="nav-text">如何求解</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#表连接"><span class="nav-number">1.</span> <span class="nav-text">表连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#表连接语法"><span class="nav-number">1.1.</span> <span class="nav-text">表连接语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表连接解释"><span class="nav-number">1.2.</span> <span class="nav-text">表连接解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#笛卡尔积Cross-Join"><span class="nav-number">2.</span> <span class="nav-text">笛卡尔积Cross Join</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#group-by"><span class="nav-number">3.</span> <span class="nav-text">group by</span></a></li></ol></div>
             
 
           </div>
