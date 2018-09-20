@@ -1,5 +1,5 @@
 ---
-title: too many open files in java
+title: Too many open files in java
 date: 2018-06-16 17:00:05
 tags: ['Java']
 ---
