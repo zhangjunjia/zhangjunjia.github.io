@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="贯行," />
+  <meta name="keywords" content="TCP/IP," />
 
 
 
@@ -79,18 +79,22 @@
 
 
 
-<meta name="description" content="软件研发和软件开发是有区别的。">
-<meta name="keywords" content="贯行">
+<meta name="description" content="简单总结几个个人觉得较为重要的TCP状态。">
+<meta name="keywords" content="TCP&#x2F;IP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="2015年3月至2016年3月工作总结">
-<meta property="og:url" content="https://zhangjunjia.github.io/2016/05/11/2015-work-summary/index.html">
+<meta property="og:title" content="TCP状态转移总结">
+<meta property="og:url" content="https://zhangjunjia.github.io/2018/09/20/tcp-state/index.html">
 <meta property="og:site_name" content="张俊佳的网络日志">
-<meta property="og:description" content="软件研发和软件开发是有区别的。">
+<meta property="og:description" content="简单总结几个个人觉得较为重要的TCP状态。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-04-09T14:42:01.000Z">
+<meta property="og:image" content="https://note.youdao.com/yws/res/237/7A35A233CFFB4300B270BD80A6F11630">
+<meta property="og:image" content="https://note.youdao.com/yws/res/236/74029596F0914D4090B4525E8F99ECFA">
+<meta property="og:image" content="https://note.youdao.com/yws/res/235/34E16DC8754248928FAECAB7D4583ED1">
+<meta property="og:updated_time" content="2018-09-20T16:01:59.381Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="2015年3月至2016年3月工作总结">
-<meta name="twitter:description" content="软件研发和软件开发是有区别的。">
+<meta name="twitter:title" content="TCP状态转移总结">
+<meta name="twitter:description" content="简单总结几个个人觉得较为重要的TCP状态。">
+<meta name="twitter:image" content="https://note.youdao.com/yws/res/237/7A35A233CFFB4300B270BD80A6F11630">
 
 
 
@@ -120,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="https://zhangjunjia.github.io/2016/05/11/2015-work-summary/"/>
+  <link rel="canonical" href="https://zhangjunjia.github.io/2018/09/20/tcp-state/"/>
 
 
 
 
 
-  <title>2015年3月至2016年3月工作总结 | 张俊佳的网络日志</title>
+  <title>TCP状态转移总结 | 张俊佳的网络日志</title>
   
 
 
@@ -233,7 +237,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/05/11/2015-work-summary/">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2018/09/20/tcp-state/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张俊佳">
@@ -250,7 +254,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">2015年3月至2016年3月工作总结</h1>
+          <h1 class="post-title" itemprop="name headline">TCP状态转移总结</h1>
         
 
         <div class="post-meta">
@@ -262,8 +266,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-11T21:16:00+08:00">
-                2016-05-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-20T23:57:43+08:00">
+                2018-09-20
               </time>
             
 
@@ -272,28 +276,6 @@
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/一些感悟/" itemprop="url" rel="index">
-                    <span itemprop="name">一些感悟</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -322,31 +304,33 @@
       
 
       
-        <p>软件研发和软件开发是有区别的。</p>
+        <p>简单总结几个个人觉得较为重要的TCP状态。</p>
 <a id="more"></a>
-<p>研发需要技术攻关，它更关注的是软件的基础设施建设（如解决什么样的问题、选用怎样的技术解决问题、整体软件如何架构）；开发需要解决实际问题，最终把产品实现出来（如通信程序如何实现）。过去一年，我的主要工作是云平台的开发，其中包含自己开发以及相互协作去开发，我把这两者各开一个章节来讲，最后再加一章“未来规划”作为结束。</p>
-<p>一、具体开发</p>
-<p>具体开发过程中，总结起来无外乎刘老师常说的一句话：大处落墨，小处着笔。</p>
-<p>（一）“大处落墨”在具体开发中等同于软件架构。</p>
-<p>一个糟糕的软件架构花费的人力成本将非常之高。必须先弄清楚软件的模块有哪些，它们相互间的联系是什么，相互间的影响是什么。没有架构的开发意味着完全靠试错来发现和解决问题，最终形成的也是一个脆弱的产品，随时可能会崩溃，维护之前陈森填写的程序就有此感觉。</p>
-<p>（二）“小处着笔”在具体开发中等同于实现及验证。</p>
-<p>首先，在大框架已经清楚的情况下，如何确保每一行代码不会出错？这时候必须引入编码规范以及代码复查。编码规范迫使你遵循一个良好的编程习惯，不犯下一些低级的错误；代码复查（人力以及机器）可以发现并报告软件可能存在的质量问题。<br>其次，在所有代码都完成的情况下，如何确保它真的是对的？这时候必须引入测试。但是一共有多少情况需要验证？这个问题反馈到具体开发就是必须充分考虑所有可能的情况并逐一进行验证。</p>
-<p>二、相互协作</p>
-<p>主要谈谈实际协作的一些体会。</p>
-<p>（一）理解、下放、处理和验证需求。<br>首先，理解来自上游的需求，我也曾犯下许多错误。例如：不清楚为什么要这样做然后自己想当然，遗漏一些细节而后偏离主题，确认需求的过程中没有主线思维导致表述不清引发歧义。</p>
-<p>其次，对于下放需求，一是必须交代清楚为什么要这么做，在不明白背景的情况下什么错误都可能发生；二是必须清楚下游的能力所在，清楚谁适合做什么以及如何让他做到。<br>紧接着，处理需求一定要有时间限制，而且这个时间绝不能给的刚刚好让执行者舒舒服服，否则执行者本身不会有大的进步，企业人力成本也将非常之高（员工的工作产出一定是大于他的工资收入的）。</p>
-<p>最后，必须对需求完成情况加以验证，而且最好是执行者本身具备这种验证能力。</p>
-<p>（二）如何让错误产生价值。</p>
-<p>犯了错误的当下再去责备已没有任何意义，而是应该想办法去解决问题。错误的积极意义在于如何不犯同类型的错误，以及从此少犯错误。相同类型的错误要予以批评，新的错误要做出反思。</p>
-<p>（三）改变一个人非常之难。</p>
-<p>我曾想要去改变DYF使他变得更积极却发现于事无补，但当我转而想如何提升他的能力来做更多事情，事情变得简单多了。</p>
-<p>（四）与同事协作，职责一定要分明。</p>
-<p>刚开始与LZQ协助确实有不少苦恼，因为我俩的职责没有一个明确的界定，经常遇到一个问题是到底这个事情归谁管？虽然后面我知道刘老师以及林总可以帮我做这个界定，但长远来讲必须把我俩各自的工作定义清楚才行。</p>
-<p>（五）给予的重要性。</p>
-<p>一味的向下索取将导致非常糟糕的结果：下游人员没有进步，失去工作激情，甚至离职。必须在管理的过程去给予一些东西：让对方学习新的东西，做更难的事情，传授一些做事情的基本方法，授课培训等。只有这样，当你真正需要他满负荷运行的时候才能调动得起来。</p>
-<p>三、未来规划</p>
-<p>拳头产品（云平台）必须花心思去打磨好（站在软件的角度）。云平台的下一个里程碑是今年年底做到：稳定、安全、交互便捷、简洁美。稳定指程序不会崩溃，安全指能承受得起外部的攻击，交互便捷指如何让使用者更容易得到他想要的信息，简洁美则是要有统一的美化标准。</p>
-<p>另外，研发才是软件团队的真正核心竞争力，而且研发也能给我带来更多乐趣。接下来我想尽可能的朝研发靠拢，这也意味着我要学习更多和承受更多。但是要兼顾一个事情，我必须学习和思考如何把下面的人带好，使他们都成为比我还优秀的开发者。</p>
+<p><img src="https://note.youdao.com/yws/res/237/7A35A233CFFB4300B270BD80A6F11630" alt="image"></p>
+<p>名词定义：</p>
+<ul>
+<li>客户端：发起connect操作的端</li>
+<li>服务端：发起bind操作的端</li>
+<li>主动关闭端：主动发起四次挥手端</li>
+<li>被动关闭端：被动接收四次挥手FIN报文端</li>
+</ul>
+<h2 id="CLOSED"><a href="#CLOSED" class="headerlink" title="CLOSED"></a>CLOSED</h2><ul>
+<li>客户端发送SYN后进入SYN_SENT，若超时未收到ACK，则进入CLOSED</li>
+<li>被动关闭端接收到FIN后，发送ACK后进入CLOSE_WAIT，等待应用可进入CLOSED状态后，发送FIN后进入LAST_ACK状态，等待并接收到主动关闭端的ACK后进入CLOSED状态</li>
+<li>主动关闭端接收到FIN后，进入TIME_WAIT，等待2MSL时间后，进入CLOSED状态</li>
+<li>通过设置SO_LINGER可干预内核对于socket close动作的静默处理</li>
+</ul>
+<h2 id="CLOSE-WAIT"><a href="#CLOSE-WAIT" class="headerlink" title="CLOSE_WAIT"></a>CLOSE_WAIT</h2><p>若程序有大量socket进入此状态，则意味着被动关闭端大量的连接在收到FIN后，程序没有主动将socket close掉。对应到Java的Mina或Netty框架，应该在IDLE或者EXCEPTION_CAUGHT时，主动将socket进行close。</p>
+<h2 id="FIN-WAIT"><a href="#FIN-WAIT" class="headerlink" title="FIN_WAIT"></a>FIN_WAIT</h2><ul>
+<li>FIN_WAIT-1是主动关闭端发送FIN后进入的状态</li>
+<li>主动关闭端若收到被动关闭端ACK，则进入FIN_WAIT-2</li>
+</ul>
+<p><img src="https://note.youdao.com/yws/res/236/74029596F0914D4090B4525E8F99ECFA" alt="image"></p>
+<h2 id="服务端的SYN-RCVD与ESTABLISHED"><a href="#服务端的SYN-RCVD与ESTABLISHED" class="headerlink" title="服务端的SYN_RCVD与ESTABLISHED"></a>服务端的SYN_RCVD与ESTABLISHED</h2><ul>
+<li>服务端处于SYN_RCVD的Socket存在于服务端的半连接队列中，队列数量配置内核参数tcp_max_syn_backlog。臭名昭著的SYN Flood攻击便是利用TCP服务端的SYN_RCVD状态进行攻击的（服务端静默重发ACK五次），半连接队列满了之后，静默处理是拒绝接受新的SYN，攻击者由此达到了拒绝服务攻击的目的，可通过Linux的SYNcookie防范此攻击（此时tcp_max_syn_backlog值无效）</li>
+<li>服务端处于ESTABLISHED的Socket存在于服务端的全连接队列，队列数量配置内核参数backlog，队列满了将拒绝接受accept新连接，可配置内核参数设置队列满之后静默丢弃客户端的ACK还是发送回一个RST</li>
+</ul>
+<p><img src="https://note.youdao.com/yws/res/235/34E16DC8754248928FAECAB7D4583ED1" alt="image"></p>
 
       
     </div>
@@ -364,7 +348,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/贯行/" rel="tag"># 贯行</a>
+            <a href="/tags/TCP-IP/" rel="tag"># TCP/IP</a>
           
         </div>
       
@@ -377,8 +361,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/05/09/lvm-that-i-used/" rel="next" title="LVM用到的一些特性">
-                <i class="fa fa-chevron-left"></i> LVM用到的一些特性
+              <a href="/2018/09/13/basic-concept-of-mysql-1/" rel="next" title="MySQL基础回顾01 | 表连接与Group By">
+                <i class="fa fa-chevron-left"></i> MySQL基础回顾01 | 表连接与Group By
               </a>
             
           </div>
@@ -386,10 +370,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/05/11/hbase-incremental-backup/" rel="prev" title="HBase增量备份数据">
-                HBase增量备份数据 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -441,8 +421,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -502,6 +491,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CLOSED"><span class="nav-number">1.</span> <span class="nav-text">CLOSED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CLOSE-WAIT"><span class="nav-number">2.</span> <span class="nav-text">CLOSE_WAIT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FIN-WAIT"><span class="nav-number">3.</span> <span class="nav-text">FIN_WAIT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端的SYN-RCVD与ESTABLISHED"><span class="nav-number">4.</span> <span class="nav-text">服务端的SYN_RCVD与ESTABLISHED</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

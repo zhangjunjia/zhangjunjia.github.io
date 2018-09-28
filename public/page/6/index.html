@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="贯行," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -79,18 +79,16 @@
 
 
 
-<meta name="description" content="软件研发和软件开发是有区别的。">
-<meta name="keywords" content="贯行">
-<meta property="og:type" content="article">
-<meta property="og:title" content="2015年3月至2016年3月工作总结">
-<meta property="og:url" content="https://zhangjunjia.github.io/2016/05/11/2015-work-summary/index.html">
+<meta name="description" content="程序猿/JayzeeZhang/Blogger/Life learner">
+<meta property="og:type" content="website">
+<meta property="og:title" content="张俊佳的网络日志">
+<meta property="og:url" content="https://zhangjunjia.github.io/page/6/index.html">
 <meta property="og:site_name" content="张俊佳的网络日志">
-<meta property="og:description" content="软件研发和软件开发是有区别的。">
+<meta property="og:description" content="程序猿/JayzeeZhang/Blogger/Life learner">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-04-09T14:42:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="2015年3月至2016年3月工作总结">
-<meta name="twitter:description" content="软件研发和软件开发是有区别的。">
+<meta name="twitter:title" content="张俊佳的网络日志">
+<meta name="twitter:description" content="程序猿/JayzeeZhang/Blogger/Life learner">
 
 
 
@@ -120,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="https://zhangjunjia.github.io/2016/05/11/2015-work-summary/"/>
+  <link rel="canonical" href="https://zhangjunjia.github.io/page/6/"/>
 
 
 
 
 
-  <title>2015年3月至2016年3月工作总结 | 张俊佳的网络日志</title>
+  <title>张俊佳的网络日志</title>
   
 
 
@@ -145,7 +143,8 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left 
+  page-home">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -218,9 +217,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-expand">
     
+      
 
   
 
@@ -233,7 +232,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/05/11/2015-work-summary/">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2015/10/27/multi-agent/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张俊佳">
@@ -250,7 +249,9 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">2015年3月至2016年3月工作总结</h1>
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2015/10/27/multi-agent/" itemprop="url">Multi-Agent Systems简介</a></h1>
         
 
         <div class="post-meta">
@@ -262,8 +263,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-11T21:16:00+08:00">
-                2016-05-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-27T08:50:00+08:00">
+                2015-10-27
               </time>
             
 
@@ -285,8 +286,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/一些感悟/" itemprop="url" rel="index">
-                    <span itemprop="name">一些感悟</span>
+                  <a href="/categories/人工智能/" itemprop="url" rel="index">
+                    <span itemprop="name">人工智能</span>
                   </a>
                 </span>
 
@@ -322,32 +323,16 @@
       
 
       
-        <p>软件研发和软件开发是有区别的。</p>
-<a id="more"></a>
-<p>研发需要技术攻关，它更关注的是软件的基础设施建设（如解决什么样的问题、选用怎样的技术解决问题、整体软件如何架构）；开发需要解决实际问题，最终把产品实现出来（如通信程序如何实现）。过去一年，我的主要工作是云平台的开发，其中包含自己开发以及相互协作去开发，我把这两者各开一个章节来讲，最后再加一章“未来规划”作为结束。</p>
-<p>一、具体开发</p>
-<p>具体开发过程中，总结起来无外乎刘老师常说的一句话：大处落墨，小处着笔。</p>
-<p>（一）“大处落墨”在具体开发中等同于软件架构。</p>
-<p>一个糟糕的软件架构花费的人力成本将非常之高。必须先弄清楚软件的模块有哪些，它们相互间的联系是什么，相互间的影响是什么。没有架构的开发意味着完全靠试错来发现和解决问题，最终形成的也是一个脆弱的产品，随时可能会崩溃，维护之前陈森填写的程序就有此感觉。</p>
-<p>（二）“小处着笔”在具体开发中等同于实现及验证。</p>
-<p>首先，在大框架已经清楚的情况下，如何确保每一行代码不会出错？这时候必须引入编码规范以及代码复查。编码规范迫使你遵循一个良好的编程习惯，不犯下一些低级的错误；代码复查（人力以及机器）可以发现并报告软件可能存在的质量问题。<br>其次，在所有代码都完成的情况下，如何确保它真的是对的？这时候必须引入测试。但是一共有多少情况需要验证？这个问题反馈到具体开发就是必须充分考虑所有可能的情况并逐一进行验证。</p>
-<p>二、相互协作</p>
-<p>主要谈谈实际协作的一些体会。</p>
-<p>（一）理解、下放、处理和验证需求。<br>首先，理解来自上游的需求，我也曾犯下许多错误。例如：不清楚为什么要这样做然后自己想当然，遗漏一些细节而后偏离主题，确认需求的过程中没有主线思维导致表述不清引发歧义。</p>
-<p>其次，对于下放需求，一是必须交代清楚为什么要这么做，在不明白背景的情况下什么错误都可能发生；二是必须清楚下游的能力所在，清楚谁适合做什么以及如何让他做到。<br>紧接着，处理需求一定要有时间限制，而且这个时间绝不能给的刚刚好让执行者舒舒服服，否则执行者本身不会有大的进步，企业人力成本也将非常之高（员工的工作产出一定是大于他的工资收入的）。</p>
-<p>最后，必须对需求完成情况加以验证，而且最好是执行者本身具备这种验证能力。</p>
-<p>（二）如何让错误产生价值。</p>
-<p>犯了错误的当下再去责备已没有任何意义，而是应该想办法去解决问题。错误的积极意义在于如何不犯同类型的错误，以及从此少犯错误。相同类型的错误要予以批评，新的错误要做出反思。</p>
-<p>（三）改变一个人非常之难。</p>
-<p>我曾想要去改变DYF使他变得更积极却发现于事无补，但当我转而想如何提升他的能力来做更多事情，事情变得简单多了。</p>
-<p>（四）与同事协作，职责一定要分明。</p>
-<p>刚开始与LZQ协助确实有不少苦恼，因为我俩的职责没有一个明确的界定，经常遇到一个问题是到底这个事情归谁管？虽然后面我知道刘老师以及林总可以帮我做这个界定，但长远来讲必须把我俩各自的工作定义清楚才行。</p>
-<p>（五）给予的重要性。</p>
-<p>一味的向下索取将导致非常糟糕的结果：下游人员没有进步，失去工作激情，甚至离职。必须在管理的过程去给予一些东西：让对方学习新的东西，做更难的事情，传授一些做事情的基本方法，授课培训等。只有这样，当你真正需要他满负荷运行的时候才能调动得起来。</p>
-<p>三、未来规划</p>
-<p>拳头产品（云平台）必须花心思去打磨好（站在软件的角度）。云平台的下一个里程碑是今年年底做到：稳定、安全、交互便捷、简洁美。稳定指程序不会崩溃，安全指能承受得起外部的攻击，交互便捷指如何让使用者更容易得到他想要的信息，简洁美则是要有统一的美化标准。</p>
-<p>另外，研发才是软件团队的真正核心竞争力，而且研发也能给我带来更多乐趣。接下来我想尽可能的朝研发靠拢，这也意味着我要学习更多和承受更多。但是要兼顾一个事情，我必须学习和思考如何把下面的人带好，使他们都成为比我还优秀的开发者。</p>
-
+        
+          <p>本文简单介绍Multi-Agent Systems这项技术。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/10/27/multi-agent/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
       
     </div>
     
@@ -362,40 +347,14 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/贯行/" rel="tag"># 贯行</a>
-          
-        </div>
+
+      
+
       
 
       
       
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2016/05/09/lvm-that-i-used/" rel="next" title="LVM用到的一些特性">
-                <i class="fa fa-chevron-left"></i> LVM用到的一些特性
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/05/11/hbase-incremental-backup/" rel="prev" title="HBase增量备份数据">
-                HBase增量备份数据 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
+        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -405,11 +364,14 @@
   </article>
 
 
+    
+  </section>
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span>
+  </nav>
+
 
 
           </div>
@@ -417,10 +379,6 @@
 
 
           
-
-  
-
-
 
         </div>
         
@@ -635,10 +593,6 @@
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
 
   
 

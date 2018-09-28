@@ -46,25 +46,16 @@ orgid|orgname
 userid|username|orgid(user表)|orgid(org表)|orgname
 ---|---|---|---|---
 
-此时由于orgid字段重名，我们需通过select挑出需要的字段。以上面的表格为例，可编写SQL如下：
+此时由于orgid字段重名，我们需通过select挑出需要的字段。以上面的表格为例，可编写SQL如下挑出所需字段：
 
 ```
-SELECT 
-    u.userid,
-    u.username,
-    u.orgid,
-    o.orgname
-FROM
-    user u join org o
-ON
-    u.orgid = o.orgid
+SELECT u.userid, u.username, u.orgid, o.orgname FROM user u join org o ON u.orgid = o.orgid
 ```
 
-（TODO）
-inner join时，A表（左表）的所有行原封不动的保留，B表（右表）的情况见下方解释。如上文的文氏图，A表由左白色和蓝色两部分组成，
+left join时，A表（左表）的所有行原封不动的保留，B表（右表）的行保留情况如下，
 
-- 蓝色部分：B表的所有行原封不动的保留；
-- 右白色部分：B表的所有行的值全部显示为NULL；
+- 上午文氏图的蓝色部分：B表的所有行原封不动的保留；
+- 上午文氏图的右白色部分：B表的所有行的值全部显示为NULL；
 
 userid|username|orgid|orgname
 ---|---|---|---
@@ -139,3 +130,44 @@ WHERE
 ```
 
 ## group by
+
+`group by`的语义是把行进行分组，如：
+
+```
+SELECT 
+    u.userid,
+    u.username,
+    u.orgid,
+    o.orgname
+FROM
+    user u cross join org o
+GROUP BY u.userid
+```
+
+以上SQL，会把userid相同的分成一个组，然后仅保留组内的第一条记录，得到的结果为：
+
+userid|username|orgid|orgname
+---|---|---|---
+1|jay|10|gdut
+2|tom|11|gdut
+3|shelly|12|gdut
+
+基于`group by`分组的特性，一般其会配置聚合函数使用，如count()和avg()等函数。修改SQL如下：
+
+```
+SELECT 
+    u.userid, count(*)
+FROM
+    user u cross join org o
+GROUP BY u.userid
+```
+
+将得到结果：
+
+userid|count
+---|---
+1|3
+2|3
+3|3
+
+`group by`后跟一个字段，表示一维分组，如果跟两个字段则为二维分组，三个字段及以上以此类推。以二重`group by`为例，`group by a, b`可以通俗的理解为：**所有a字段值相同，同时b字段值相同的行，会被分到同一组**。
