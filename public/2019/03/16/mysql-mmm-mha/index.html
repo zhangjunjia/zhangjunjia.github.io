@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文简单介绍MySQL的两个high availability方案，MMM和MHA。">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql mmm和mha对比">
+<meta property="og:url" content="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/index.html">
+<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:description" content="本文简单介绍MySQL的两个high availability方案，MMM和MHA。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-d074f3493901aafc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-cdaf92ca2a23058e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-78b8c51cc0fb18a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-03-16T08:53:05.277Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql mmm和mha对比">
+<meta name="twitter:description" content="本文简单介绍MySQL的两个high availability方案，MMM和MHA。">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/908013-d074f3493901aafc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/"/>
+
+
+
+
+
+  <title>mysql mmm和mha对比 | 张俊佳的网络日志</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的网络日志</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay hungry stay foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2019/03/16/mysql-mmm-mha/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的网络日志">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">mysql mmm和mha对比</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-16T16:50:39+08:00">
+                2019-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文简单介绍MySQL的两个high availability方案，MMM和MHA。</p>
+<a id="more"></a>
+<h2 id="MMM"><a href="#MMM" class="headerlink" title="MMM"></a>MMM</h2><p><img src="https://upload-images.jianshu.io/upload_images/908013-d074f3493901aafc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>MMM(Master-Master replication managerfor Mysql)的基本组成如下，</p>
+<ul>
+<li>主节点master1：承载写流量</li>
+<li>备主节点master2：replicate主节点master1的写流量，在主节点故障时被monitor提升为主节点，出于与master1数据强一致的考虑，replicate模式一般配置为semi-sync</li>
+<li>从节点slave1：replicate主节点master1的写流量，为使得master1的写足够快，一般将replicate模式设为异步</li>
+<li>从节点salve2：类似于slave1</li>
+<li>mmm-agent：以上3个节点都需部署的代理，与monitor进行通信</li>
+<li>mmm-mon：即monitor，与各mmm-agent通信探测其健康情况，并决策是否要切换主节点或从节点</li>
+<li>wvip：提供写的虚拟IP，映射到当前活跃的主节点master1</li>
+<li>rvip：提供读的虚拟IP，至少有一个，映射到slave1或slave2</li>
+</ul>
+<p>MMM的主节点切换过程如下：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/908013-cdaf92ca2a23058e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<ul>
+<li>master1的mmm-agent与mmm-mon长期通信失败</li>
+<li>mmm-mon请求master1的agent，移除VIP</li>
+<li>mmm-mon请求master2的agent，绑定VIP</li>
+<li>mmm-mon请求slave节点的agent，连接到新master进行replicate</li>
+</ul>
+<p>从节点的故障切换类似于上面的过程。</p>
+<p>优点如下，</p>
+<ul>
+<li>读写分离</li>
+<li>fail自动切换</li>
+</ul>
+<p>缺点如下，</p>
+<ul>
+<li>mmm-mon存在单点故障</li>
+<li>mmm-agent对网络抖动敏感，可能引起频繁切换</li>
+<li>可能引起master脑裂（见下文解释）</li>
+<li>多了一个冗余的master节点</li>
+<li>需要比较多的VIP数量</li>
+<li>方案基于VIP，VIP是基于ARP协议，因此所有节点必须处于同一局域网</li>
+<li>主节点提升需要一定时间</li>
+<li>写后即时读难以保持一致性（master同步过来的数据可能还在relay log未被应用）</li>
+</ul>
+<h2 id="MHA"><a href="#MHA" class="headerlink" title="MHA"></a>MHA</h2><p>MHA(Master High Availability)不同于MMM，它主要保障的是master的高可用。官方的MHA建议至少要有1主2从，淘宝TMHA则支持1主1从。其基本组成如下，</p>
+<ul>
+<li>master：主节点，承载写流量</li>
+<li>slave：从节点，replicate主节点数据，承载读流量</li>
+<li>wvip：提供写的虚拟IP，映射到主节点</li>
+<li>rvip：提供读的虚拟IP，如果只有一个从节点不需要</li>
+<li>manager：与master、slave通信，负责切换主节点。注意，manager通过ssh的方式远程执行主、从节点上的脚本，需要提前将manager节点的ssh公钥放置到主、从节点；另外，manager通过mysql-client的方式去探测主、从节点的可用性，因此主、从库上也要预先为manager节点分配账户与授权</li>
+</ul>
+<p>master提升主节点的流程如下，</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/908013-78b8c51cc0fb18a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<ul>
+<li>从宕机崩溃的master保存二进制日志事件（binlog events）;</li>
+<li>识别含有最新更新的slave；</li>
+<li>应用差异的中继日志（relay log）到其他的slave；</li>
+<li>应用从master保存的二进制日志事件（binlog events）；</li>
+<li>移除旧master的VIP地址，提升一个slave为新的master；</li>
+<li>使其他的slave连接新的master进行复制；</li>
+<li>在新的master启动vip地址，保证前端请求可以发送到新的master</li>
+</ul>
+<p>优点如下，</p>
+<ul>
+<li>相比MMM不需要冗余的master节点</li>
+<li>读写分离</li>
+<li>自动提升主节点</li>
+</ul>
+<p>缺点如下，</p>
+<ul>
+<li>manager节点单点故障</li>
+<li>可能引起master脑裂（见下文解释）</li>
+<li>使用了VIP，同样有内网限制</li>
+<li>主节点切换需要一定时间</li>
+<li>写后即时读难以保持一致性</li>
+<li>需要支持SSH私钥验证的方式登录</li>
+</ul>
+<h2 id="扩展知识：VIP与脑裂"><a href="#扩展知识：VIP与脑裂" class="headerlink" title="扩展知识：VIP与脑裂"></a>扩展知识：VIP与脑裂</h2><p>VIP的工作原理是，</p>
+<ul>
+<li>为当期主机配置一个虚拟网卡，如eth0:0，该网卡绑定了唯一的MAC地址和虚拟IP地址VIP</li>
+<li>局域网内的主机欲与该VIP通信时，先通过ARP协议取到该VIP对应的MAC地址，再将VIP与MAC地址的对应关系缓存在其主机上</li>
+<li>后续通信时，使用上一步骤取到的MAC作为报文的MAC地址</li>
+</ul>
+<p>VIP切换的原理是，</p>
+<ul>
+<li>将旧master绑定的虚拟网卡注销掉</li>
+<li>在新的master注册新的虚拟网卡（产生了新的MAC地址）</li>
+<li>通知局域网节点更新VIP与MAC的对应关系，后续通信采用新MAC地址</li>
+</ul>
+<p>脑裂的原因，在于旧master节点没有正常将VIP摘掉，这时局域网机器通过ARP获取VIP的MAC时，就可能取到旧的MAC地址，导致与旧master通信。什么情况会出现这种情况呢？旧master由于上层交换机故障，未与manager节点正常通信，此时VIP是没有摘除掉的，过了一段时间上层交换机恢复了就会导致此问题。</p>
+<p>参考文献</p>
+<ul>
+<li><a href="https://github.blog/2018-06-20-mysql-high-availability-at-github/" target="_blank" rel="noopener">https://github.blog/2018-06-20-mysql-high-availability-at-github/</a></li>
+<li><a href="https://dzone.com/articles/choosing-mysql-high-availability-solutions" target="_blank" rel="noopener">https://dzone.com/articles/choosing-mysql-high-availability-solutions</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1056162" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1056162</a></li>
+<li><a href="http://www.fblinux.com/?p=1044" target="_blank" rel="noopener">http://www.fblinux.com/?p=1044</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/20/tcp-state/" rel="next" title="TCP状态转移总结">
+                <i class="fa fa-chevron-left"></i> TCP状态转移总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MMM"><span class="nav-number">1.</span> <span class="nav-text">MMM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MHA"><span class="nav-number">2.</span> <span class="nav-text">MHA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展知识：VIP与脑裂"><span class="nav-number">3.</span> <span class="nav-text">扩展知识：VIP与脑裂</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
