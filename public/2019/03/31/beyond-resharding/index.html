@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,数据库,Redis,HDFS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。">
+<meta name="keywords" content="MySQL,数据库,Redis,HDFS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis Cluster &amp; HDFS &amp; ClustrixDB Reshard&#x2F;Rebalance">
+<meta property="og:url" content="https://zhangjunjia.github.io/2019/03/31/beyond-resharding/index.html">
+<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:description" content="对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-5fd20229d2f1436e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-c502daf7d8453894.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-03-31T14:20:14.680Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis Cluster &amp; HDFS &amp; ClustrixDB Reshard&#x2F;Rebalance">
+<meta name="twitter:description" content="对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2019/03/31/beyond-resharding/"/>
+
+
+
+
+
+  <title>Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance | 张俊佳的网络日志</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的网络日志</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay hungry stay foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2019/03/31/beyond-resharding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的网络日志">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-31T22:12:14+08:00">
+                2019-03-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。</p>
+<a id="more"></a>
+<h2 id="Redis-Cluster-Reshard"><a href="#Redis-Cluster-Reshard" class="headerlink" title="Redis Cluster Reshard"></a>Redis Cluster Reshard</h2><p>细节参考自<a href="https://redis.io/topics/cluster-spec" target="_blank" rel="noopener">Redis Cluster Spec</a>的<strong>Redirection and resharding</strong>章节。下图表示数据slot原先在Original节点，被迁移到New节点需要经历的过程。<br>（注：slot的介绍见<a href="https://redis.io/topics/cluster-spec" target="_blank" rel="noopener">Redis Cluster Spec</a>）</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="redis cluster reshard"></p>
+<ul>
+<li>新增了New节点——Redis Instance（也可能是本来就存在的一个redis实例）；</li>
+<li>Original上待迁移slot被设置为importing状态，New上欲接受slot被设置为migrating状态。对该slot的读写请求仍然从original节点进来，但是当original不存在请求中包含的key时，请求将被转发给new节点，original已存在该key则请求仍由original受理；</li>
+<li>将original节点已有的key逐个迁移到new节点，每个key在迁移过程是原子性的（会对该key进行加锁）；</li>
+<li>key全部迁移完成后，通过gossip协议通知集群中的其他节点更新metadata，以后该slot节点的请求将由new节点负责。</li>
+</ul>
+<p>Redis Cluster可以做到online resharding，代价是迁移旧key的过程会对每个key进行加锁，加锁时间与key的值正相关。另外，其resharding是需要手动触发的。</p>
+<h2 id="HDFS-rebalance"><a href="#HDFS-rebalance" class="headerlink" title="HDFS rebalance"></a>HDFS rebalance</h2><p>细节参考自<a href="https://issues.apache.org/jira/browse/HADOOP-1652" target="_blank" rel="noopener">hdfs rebalance JIRA需求</a>的<strong>RebalanceDesign6.pdf</strong>，大概过程如下图所示。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/908013-5fd20229d2f1436e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="hdfs rebalance"></p>
+<ul>
+<li>先向namenode取得各datanode的数据报告，根据规则确定source节点和destination节点；</li>
+<li>获取source节点的部分block的metadata（元数据）；</li>
+<li>对于每个要迁移的block，找到离destination节点最近的含有该block replica的proxy节点（不一定是source节点），向其发送copy到destination的指令；</li>
+<li>proxy节点把block数据传到destination；</li>
+<li>destination接受完block数据后，通知namenode更新block的metadata，并原路返回block已迁移完成的信号；</li>
+<li>重复执行上述步骤，将每一个block迁移到destination。</li>
+</ul>
+<p>hdfs rebalance同样需要手动触发，相比redis cluster，其整个迁移的过程是offline的——必须在safe mode模式下进行。</p>
+<h2 id="ClustrixDB-rebalance"><a href="#ClustrixDB-rebalance" class="headerlink" title="ClustrixDB rebalance"></a>ClustrixDB rebalance</h2><p>ClustrixDB是一个闭源的数据库——目的是解决MySQL难以scale的问题，其中一篇<a href="http://docs.clustrix.com/display/CLXDOC/Rebalancer" target="_blank" rel="noopener">Rebalancer设计文档</a>详细的阐述了数据迁移的过程。这里的迁移场景指的是类似于上文Redis Cluster的slot迁移，是将某个replica从一个结点迁移到另外一个结点，下图描述了replica从Node 4迁移到Node 1的过程。</p>
+<p>注：</p>
+<ul>
+<li>ClustrixDB sharding后的数据分片，由一个slice和多个replica组成（类比一主多备）；</li>
+<li>下文的queue可以类比MySQL的binlog，不同的是它除了存储binlog到queue还提供转发binlog和重放的功能；</li>
+</ul>
+<p><img src="https://upload-images.jianshu.io/upload_images/908013-c502daf7d8453894.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ClustrixDB rebalance"></p>
+<ul>
+<li>Initial State阶段：Node 3和Node 4为含有同一个分片数据的replica；</li>
+<li>Data Copy阶段：在epoch B开始时间，新增了Node 1作为replica（Building状态）和Node 2作为Queue（Store状态）；epoch A之后对于Node 4的新增修改将以类似于binlog的方式同步到Node 2的queue；Node 4的旧有数据将以一致性视图冻结在该时刻，并逐条传输到Node 1的Building replica；</li>
+<li>Queue Replay阶段：旧有数据已经同步完毕，此时将Node 2的queue数据进行重放到Node 1，此时queue仍然接受写入；</li>
+<li>End of Queue阶段：queue的数据重放执行完后，立马转为synchronize queue，即转为store &amp; Forward状态，数据进到queue后同步给Node 1执行，执行完成才返回；</li>
+<li>Queue Flipped阶段：将旧节点Node 4标记为Retired，新节点Node 1标记为Online，epoch B开始的未提交的事务还是提交到Node 4，由queue直接forward到Node 1；</li>
+<li>Final state状态：待epoch B时间开始的transaction都提交后，可以将旧节点和queue都下线。</li>
+</ul>
+<p>ClustrixDB的metadata也是<a href="http://docs.clustrix.com/display/CLXDOC/Concurrency+Control" target="_blank" rel="noopener">Multi-Version Concurrency Control (MVCC)</a>的，从epoch B开始意味着metadata发生了变化。为了防止数据不一致，需要在epoch A开始的事务全部提交后再开始epoch B。另外，如果磁盘和网络容量富余，其实上文的queue可以考虑与Node 1放在一起。最后，上文说到的synchronize queue是一个漂亮的设计，这不就是Java的synchronize queue吗？</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+            <a href="/tags/HDFS/" rel="tag"># HDFS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/16/mysql-mmm-mha/" rel="next" title="mysql mmm和mha对比">
+                <i class="fa fa-chevron-left"></i> mysql mmm和mha对比
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/31/beyond-sharding/" rel="prev" title="RDMS Sharding的一些总结">
+                RDMS Sharding的一些总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">54</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Cluster-Reshard"><span class="nav-number">1.</span> <span class="nav-text">Redis Cluster Reshard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HDFS-rebalance"><span class="nav-number">2.</span> <span class="nav-text">HDFS rebalance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ClustrixDB-rebalance"><span class="nav-number">3.</span> <span class="nav-text">ClustrixDB rebalance</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,数据库," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文简单总结RDMS对数据进行shard的一些套路。">
+<meta name="keywords" content="MySQL,数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RDMS Sharding的一些总结">
+<meta property="og:url" content="https://zhangjunjia.github.io/2019/03/31/beyond-sharding/index.html">
+<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:description" content="本文简单总结RDMS对数据进行shard的一些套路。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-145d20a1811e438f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-03-31T14:14:52.164Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RDMS Sharding的一些总结">
+<meta name="twitter:description" content="本文简单总结RDMS对数据进行shard的一些套路。">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2019/03/31/beyond-sharding/"/>
+
+
+
+
+
+  <title>RDMS Sharding的一些总结 | 张俊佳的网络日志</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的网络日志</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay hungry stay foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2019/03/31/beyond-sharding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的网络日志">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RDMS Sharding的一些总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-31T22:13:22+08:00">
+                2019-03-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文简单总结RDMS对数据进行shard的一些套路。</p>
+<a id="more"></a>
+<h2 id="Why-sharding"><a href="#Why-sharding" class="headerlink" title="Why sharding"></a>Why sharding</h2><p>早期的RDMS（Relational Database Management System）是单物理机单实例。随着用户量、访问量的急剧上升，20%的表可能占据了80%的数据量（二八法则），这时你可能会考虑将大数据表拆到机器A和机器B，小数据表拆到机器C。好处是显而易见的，原先压在一部机器的负载分散到多部机器，坏处是以前的一些SQL可能需要改写，因为我们无法跨库做join，尽可能把需要join的表分在一部机器的同一个库内可以暂时规避这个问题。</p>
+<p>很快的，用户量和数据继续蹭蹭蹭的往上涨，有些表已经是百万行级别了，很快又要撑不住了。这时，你把目光聚焦在那些大表上，发现有些表的某些列是BLOB型数据（图片或文件等）。这些数据一般不需要范围查询，基本都是指定主键查出来的，于是你把这些列分离出去，单独存在文件或图片服务器上，你的一些糟糕的<code>select * from xxx</code>的语句从此性能得到提升，新增的insert因为不需要写BLOB也比以前快了一丢丢，数据表的总体数据量大小也大大减少，代价是你需要根据主键到图片或文件服务器获取你要的BLOB数据。<br>（知识扩展：<code>select *</code>语句需要查聚簇索引——主键索引，因为BLOB数据一般不建立索引，需要在主键索引才能拿到没建立索引的列的数据）</p>
+<p>但是，把部分列分离出去，行数还是那么多啊！按照业务规模发展下去，行数分分钟就要破千万了啊！所有读写负载都打在了单表单服务器上，想想都是噩梦，怎么破？</p>
+<p>这时候只能把一张大表水平切几刀（表结构不变），切成多张小表了。这便是本文讨论的范围，主要是一些思路上的总结。</p>
+<ul>
+<li>怎么切：sharding strategy</li>
+<li>切完后怎么扩容：resharding</li>
+<li>切完有什么好处，又有何副作用以及业界是怎么解决这些问题的：side effect</li>
+</ul>
+<h2 id="Sharding-strategy-compare"><a href="#Sharding-strategy-compare" class="headerlink" title="Sharding strategy compare"></a>Sharding strategy compare</h2><h3 id="Case-1-静态算式规则切分"><a href="#Case-1-静态算式规则切分" class="headerlink" title="Case 1 静态算式规则切分"></a>Case 1 静态算式规则切分</h3><p><img src="https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="id % 4"></p>
+<p>上图的<code>id</code>是主键，4是结点总数，<code>id % 4</code>即静态算术规则。输入主键计算出数值下标，由数值到LOOKUP表就可以确定数据在哪台服务器上。<br>（注：LOOKUP表维护下标与真实服务器信息的对应关系，简单实现可以考虑配置在服务器，复杂的可以考虑引入Zookeeper）</p>
+<p><strong>1、如何扩容？</strong></p>
+<p>对于<code>id % 4</code>的规则，扩容类似于<a href="https://www.geeksforgeeks.org/load-factor-and-rehashing/" target="_blank" rel="noopener">Java HashMap的rebash的过程</a>。如果id不是一个整型数值，规则需要改写成<code>hash(id) % 4</code>，hash函数用于将id转为int。假如新增一个节点，此时需要经历以下过程：</p>
+<ul>
+<li>将第0结点上的id做<code>id % 5</code>，如果值不为0，则将该行记录移动到其他服务器上；</li>
+<li>其他结点以此类推。</li>
+</ul>
+<p>这里有两个显而易见的坏处，</p>
+<ul>
+<li>几乎每个结点的数据都需要重新打散，分发到其他服务器。这需要大量的磁盘IO，可谓伤筋动骨，改进办法见下文；</li>
+<li>在扩容未完成时，该从哪个结点读？该从哪个结点写？如果要做到动态扩容不影响读写，那么就需要做非常非常多的额外工作。一个可以考虑的策略是，挂个升级公告，停止对外服务，扩容期间数据库无任何读写，这应该算是一般游戏公司的做法了。</li>
+</ul>
+<p><strong>2、好处是什么？</strong></p>
+<p>读和写能够比较均匀的打到各个节点。</p>
+<ul>
+<li>对于自增主键式的写入，不会出现负载都打在一个结点的情况；</li>
+<li>对于频繁读最近新增的数据的case，也不会出现负载都打在一个结点的情况。</li>
+</ul>
+<p><strong>3、代价是什么？是否有解决思路？</strong></p>
+<p>对于上面的<code>id % 4</code>问题，其实可以换一个思路。虽然我们只有4台物理机，但我们可以把规则定为<code>id % 1024</code>，即逻辑上有1024台机。然后通过配置上面说的LOOKUP表，实现4台物理机均摊这1024台逻辑机器的角色，这样可以规避上面的新增结点需要全部数据打散的问题，这也是<a href="https://en.wikipedia.org/wiki/Consistent_hashing" target="_blank" rel="noopener">一致性哈希</a><br>的思想。1024这数值必须是公司业务理论上不能达到的上限（除了顶尖的那几家互联网公司，一般公司也不会超过这个值了），否则还是会出现上面的痛点。</p>
+<p>主键被打散，对按主键范围查询不友好，范围查询基本退化成了全表查询。如果主键范围查询时还带<code>order by</code>，那还得在查询完后自行对数据进行排序。</p>
+<p>解决思路是，数据在单节点是有序的，将查询分发给每个结点，并行去查数据，最后对返回结果做合并。如果要求<code>order by</code>，则在合并结果集时进行两两的归并排序。</p>
+<h3 id="Case-2-范围规则切分"><a href="#Case-2-范围规则切分" class="headerlink" title="Case 2 范围规则切分"></a>Case 2 范围规则切分</h3><p><img src="https://upload-images.jianshu.io/upload_images/908013-145d20a1811e438f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="dynamic range"></p>
+<p>与上面的算式规则不同的是，这里需要一个range函数，输入主键后得到一个range数值，然后再去查LOOKUP表确定数据落在哪个结点。range函数一般有两种，有序型和无序性。输入[1,2,3,4]这一组数据后，输出的数据依然是有序的称为有序型（一般应用在数据类型），输出无序的称为无序型（比如hash函数）。</p>
+<p><strong>1、如何扩容？</strong></p>
+<p>相比“静态算式规则”，“范围规则”的扩容较为简单。以将范围[10, 30]拆成[10,20]和[21,30]为例，大概需要以下过程，</p>
+<ul>
+<li>新增物理节点；</li>
+<li>标记旧节点[10,30]当前binlog的ID为A；</li>
+<li>利用MySQL的可重复读（repeatable read）的特性，将数据copy到新节点；</li>
+<li>完成copy后，新节点从上文binlog的ID为A的位置，同步旧节点的binlog数据，仅应用对[21,30]范围有影响的语句；</li>
+<li>binlog同步完成后，修改LOOKUP表，使得后续对[21,30]范围的读写路由到新节点，清除旧节点[21,30]这个范围的数据；</li>
+</ul>
+<p>这里有几个挑战，1）数据表太大一次性拷贝将导致<a href="https://www.simononsoftware.com/are-long-running-transactions-bad/" target="_blank" rel="noopener">长事务</a><br>怎么办，2）如何确保数据已全部同步到新节点，3）修改LOOKUP表前已经有读写数据的请求被路由到旧节点该怎么办？</p>
+<p>对于第1点，可以考虑，</p>
+<ul>
+<li>先拷贝[21至25]的数据，然后读取旧节点的最新binlog的ID为B；</li>
+<li>紧接着拷贝[26至30]的数据；</li>
+<li>将binlog的id为A至B的改动应用在[21至25]这个数据范围；</li>
+<li>将binlog的id为B至最新binlog的ID的全部数据应用到[21至30]这个范围；</li>
+</ul>
+<p>对于第2点，可以考虑通过新、旧节点间的lag来判断，并产生一个触发信号。</p>
+<p>对于第3点，需要有某个仲裁节点，在收到前述触发信号后，阻塞后续所有对于[20,30]的读写请求，直到旧节点对于[20,30]已发起的SQL语句已经全部处理返回后，修改LOOKUP表再让被阻塞的读写请求通行。</p>
+<p><strong>2、好处是什么？</strong></p>
+<p>相较于“静态算式规则”，“范围规则”的扩容更为简单，且不存在预设的最大节点数的影响。</p>
+<p>对于上文的range函数，如果是有序型的，</p>
+<ul>
+<li>则对范围查询较为友好；</li>
+<li>但却对自增主键式写入不友好（负载都压在最后一个结点），以及可能会导致hotspot（最近新增数据的读都压在最后一个结点），除非更换range函数为无序型的否则没有解决方案。</li>
+</ul>
+<p>如果是无序型的，</p>
+<ul>
+<li>则对范围查询不友好，解决思路同上文；</li>
+<li>但却能很好的将读写负载分散到各节点。</li>
+</ul>
+<p><strong>3、代价是什么？是否有解决思路？</strong></p>
+<p>上文已提及。</p>
+<h2 id="Common-issue"><a href="#Common-issue" class="headerlink" title="Common issue"></a>Common issue</h2><p>上面提到的两种sharding的case，有一些共同问题如下。</p>
+<p>一、都需要解决跨节点join的问题。业界解决思路是通过应用层代码去处理join，即先查小表A，再用小表A的结果作为参数去查询需要join的大表B（这里的大、小是相对的含义）；另外一种则是通过代理层去解决。</p>
+<p>二、都需要解决跨节点transaction的问题。业界的解决思路一般是改进式的2PC(<a href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol" target="_blank" rel="noopener">Two-phase commit protocol</a>)。</p>
+<p>三、如果主键有多个列应该如何sharding。假如主键是id和time，可以先通过id来定位到机器组0（假设有A、B、C、D四部机器组成），然后再由time来定位到A、B、C、D的其中一部机器。如果有超过2个主键呢？你确定你需要这么多主键吗？</p>
+<p>四、如何支持非聚簇索引。RDMS中，表除了聚簇索引，还有非聚簇索引。在已经sharding的前提下，如果要以非聚簇索引的列作为查询条件去查询数据，此时查询便退化成了全节点扫描。一个解决思路是，将非聚簇索引和聚簇索引单独建一张表（冗余表），然后以非聚簇索引去sharding，查询时先查冗余表，然后再回表到主表，以此避免全节点扫描。</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>本文介绍了两种sharding方式。一种是算术规则式，需要先预估逻辑节点的最大值，以避免代价昂贵的全节点rehash；另一种是范围规则式，其关键在于range函数的选取——有顺序型和无序型两种。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://medium.com/@jeeyoungk/how-sharding-works-b4dec46b3f6" target="_blank" rel="noopener">How Sharding Works</a><br><a href="http://docs.clustrix.com/display/CLXDOC/Data+Distribution" target="_blank" rel="noopener">ClustrixDB Data Distribution</a><br><a href="https://www.clustrix.com/bettersql/challenges-sharding-mysql/" target="_blank" rel="noopener">Challenges of Sharding MySQL</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/31/beyond-resharding/" rel="next" title="Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance">
+                <i class="fa fa-chevron-left"></i> Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">54</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Why-sharding"><span class="nav-number">1.</span> <span class="nav-text">Why sharding</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sharding-strategy-compare"><span class="nav-number">2.</span> <span class="nav-text">Sharding strategy compare</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Case-1-静态算式规则切分"><span class="nav-number">2.1.</span> <span class="nav-text">Case 1 静态算式规则切分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Case-2-范围规则切分"><span class="nav-number">2.2.</span> <span class="nav-text">Case 2 范围规则切分</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Common-issue"><span class="nav-number">3.</span> <span class="nav-text">Common issue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">4.</span> <span class="nav-text">Conclusion</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
