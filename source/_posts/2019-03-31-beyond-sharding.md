@@ -28,7 +28,7 @@ tags: ['MySQL', '数据库']
 
 ### Case 1 静态算式规则切分
 
-![id % 4](https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![id % 4](https://user-images.githubusercontent.com/4915189/71431441-d97a8e80-270c-11ea-9b72-ed3ec0e921a2.png)
 
 上图的`id`是主键，4是结点总数，`id % 4`即静态算术规则。输入主键计算出数值下标，由数值到LOOKUP表就可以确定数据在哪台服务器上。
 （注：LOOKUP表维护下标与真实服务器信息的对应关系，简单实现可以考虑配置在服务器，复杂的可以考虑引入Zookeeper）
@@ -63,7 +63,7 @@ tags: ['MySQL', '数据库']
 
 ### Case 2 范围规则切分
 
-![dynamic range](https://upload-images.jianshu.io/upload_images/908013-145d20a1811e438f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![dynamic range](https://user-images.githubusercontent.com/4915189/71431444-dd0e1580-270c-11ea-8d7d-c801dd1df161.png)
 
 与上面的算式规则不同的是，这里需要一个range函数，输入主键后得到一个range数值，然后再去查LOOKUP表确定数据落在哪个结点。range函数一般有两种，有序型和无序性。输入[1,2,3,4]这一组数据后，输出的数据依然是有序的称为有序型（一般应用在数据类型），输出无序的称为无序型（比如hash函数）。
 

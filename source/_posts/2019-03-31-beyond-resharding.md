@@ -13,7 +13,7 @@ tags: ['数据库', 'MySQL', 'Redis', 'HDFS']
 细节参考自[Redis Cluster Spec](https://redis.io/topics/cluster-spec)的**Redirection and resharding**章节。下图表示数据slot原先在Original节点，被迁移到New节点需要经历的过程。
 （注：slot的介绍见[Redis Cluster Spec](https://redis.io/topics/cluster-spec)）
 
-![redis cluster reshard](https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![redis cluster reshard](https://user-images.githubusercontent.com/4915189/71431424-c23ba100-270c-11ea-91b1-1cafb8aeaef5.png)
 
 - 新增了New节点——Redis Instance（也可能是本来就存在的一个redis实例）；
 - Original上待迁移slot被设置为importing状态，New上欲接受slot被设置为migrating状态。对该slot的读写请求仍然从original节点进来，但是当original不存在请求中包含的key时，请求将被转发给new节点，original已存在该key则请求仍由original受理；
@@ -26,7 +26,7 @@ Redis Cluster可以做到online resharding，代价是迁移旧key的过程会�
 
 细节参考自[hdfs rebalance JIRA需求](https://issues.apache.org/jira/browse/HADOOP-1652)的**RebalanceDesign6.pdf**，大概过程如下图所示。
 
-![hdfs rebalance](https://upload-images.jianshu.io/upload_images/908013-5fd20229d2f1436e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![hdfs rebalance](https://user-images.githubusercontent.com/4915189/71431431-c9fb4580-270c-11ea-90b9-d851304c514a.png)
 
 - 先向namenode取得各datanode的数据报告，根据规则确定source节点和destination节点；
 - 获取source节点的部分block的metadata（元数据）；
@@ -45,7 +45,7 @@ ClustrixDB是一个闭源的数据库——目的是解决MySQL难以scale的问
 - ClustrixDB sharding后的数据分片，由一个slice和多个replica组成（类比一主多备）；
 - 下文的queue可以类比MySQL的binlog，不同的是它除了存储binlog到queue还提供转发binlog和重放的功能；
 
-![ClustrixDB rebalance](https://upload-images.jianshu.io/upload_images/908013-c502daf7d8453894.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![ClustrixDB rebalance](https://user-images.githubusercontent.com/4915189/71431435-d1225380-270c-11ea-8a89-657b928f8ded.png)
 
 - Initial State阶段：Node 3和Node 4为含有同一个分片数据的replica；
 - Data Copy阶段：在epoch B开始时间，新增了Node 1作为replica（Building状态）和Node 2作为Queue（Store状态）；epoch A之后对于Node 4的新增修改将以类似于binlog的方式同步到Node 2的queue；Node 4的旧有数据将以一致性视图冻结在该时刻，并逐条传输到Node 1的Building replica；

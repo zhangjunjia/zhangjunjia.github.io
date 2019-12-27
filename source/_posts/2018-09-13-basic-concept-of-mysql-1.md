@@ -39,7 +39,7 @@ orgid|orgname
 
 下图为表连接的文氏图表示，中间蓝色部分表示`A.x = B.y`的A表与B表的行记录，即A的x字段与B的y字段相等，x与y称为连接字段。习惯上，我们把join左边的表称为左表，其右边的表称为右表，在本例中A是左表，B是右表。
 
-![image.png](https://upload-images.jianshu.io/upload_images/908013-e4bd042c0115b6cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image.png](https://user-images.githubusercontent.com/4915189/71431479-0dee4a80-270d-11ea-8bdd-da043078410d.png)
 
 对于join，可以理解为把A的所有列和B的所有列并在一起。以上面的表格为例，A表和B表的列并在一起变成了：
 

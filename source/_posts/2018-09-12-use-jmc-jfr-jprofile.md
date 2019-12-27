@@ -26,7 +26,7 @@ tags: ['Java']
 8月29至9月1，搜计程序部署在192.168.8.181服务器用于自定义项目自测时，发生了多次的OutOfMemoryError，截取部分信息如下：
 
 > java.lang.OutOfMemoryError: GC overhead limit exceeded
-> ![OutOfMemoryError](https://upload-images.jianshu.io/upload_images/908013-c8f117f516a65b13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+> ![OutOfMemoryError](https://user-images.githubusercontent.com/4915189/71431495-1c3c6680-270d-11ea-90d1-363a669926ad.png)
 
 
 ## OS表现
@@ -43,11 +43,11 @@ Web系统等调用搜计程序接口服务的进程，出现了调用接口服�
 
 ## CPU及分析
 
-![图01 程序OutOfMemoryError前的CPU使用率](https://upload-images.jianshu.io/upload_images/908013-f1818b6df1ed7cde.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图01 程序OutOfMemoryError前的CPU使用率](https://user-images.githubusercontent.com/4915189/71431503-20688400-270d-11ea-9daa-25778fbe457c.png)
 
 通过图01分析发现，程序OutOfMemoryError前，有一段时间CPU使用率急剧上升，随后下降一段时间，然后又急剧上升。且CPU使用率的急剧上升，是由JVM用户线程导致的（图01蓝色部分）。
 
-![图02 程序OutOfMemoryError前的热点线程和热点方法分析](https://upload-images.jianshu.io/upload_images/908013-bf16c33bc18214cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图02 程序OutOfMemoryError前的热点线程和热点方法分析](https://user-images.githubusercontent.com/4915189/71431506-23fc0b00-270d-11ea-9cde-f38238128793.png)
 
 通过图02分析发现，程序OutOfMemoryError前，存在大量的上下文切换，CPU时间主要分配给了调用请求响应线程（dubbo）。
 
@@ -55,7 +55,7 @@ Web系统等调用搜计程序接口服务的进程，出现了调用接口服�
 
 ## 内存分析
 
-![图03 程序OutOfMemoryError前的内存使用情况](https://upload-images.jianshu.io/upload_images/908013-5efeb251f0e1d0ff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图03 程序OutOfMemoryError前的内存使用情况](https://user-images.githubusercontent.com/4915189/71431507-28c0bf00-270d-11ea-8279-1079cb2c8039.png)
 
 如图03所示，堆内存的低谷节节攀升。在程序退出前（红框处），即使是GC后，也接近有3G的大小。通过dump内存分析后发现，搜计程序大部分内存基本分布在程序的mergeData方法，而mergeData是由调用请求触发的。
 
@@ -63,13 +63,13 @@ Web系统等调用搜计程序接口服务的进程，出现了调用接口服�
 
 ## GC分析
 
-![图04 程序OutOfMemoryError前young gc和full gc监控](https://upload-images.jianshu.io/upload_images/908013-aa21c2efa6b34d8b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图04 程序OutOfMemoryError前young gc和full gc监控](https://user-images.githubusercontent.com/4915189/71431509-2bbbaf80-270d-11ea-922d-2be36cd1c0a1.png)
 
 如果04所示，通过监控搜计程序的gc次数和时间发现：程序full gc的次数（252），远大于young gc的次数（9）；同时full gc的时间（750秒），远大于young gc的时间（3.2秒）。当程序长时间处于GC状态时，调用请求对应的用户线程将长时间处于阻塞状态，得不到响应，这是程序变慢最直接的原因。大部分用户线程处于阻塞状态如图05所示。
 
-![图 05 Park表示线程处于阻塞状态](https://upload-images.jianshu.io/upload_images/908013-895ff0ce488a1b77.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图 05 Park表示线程处于阻塞状态](https://user-images.githubusercontent.com/4915189/71431511-2eb6a000-270d-11ea-93ee-2ea28c6759d1.png)
 
-![图06 程序OutOfMemoryError前发生了一次时间特别长的FULL GC](https://upload-images.jianshu.io/upload_images/908013-d46a4c99cb50be72.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图06 程序OutOfMemoryError前发生了一次时间特别长的FULL GC](https://user-images.githubusercontent.com/4915189/71431514-3413ea80-270d-11ea-8f82-040fe8cbb8cc.png)
 
 图06所示，程序OutOfMemoryError前发生了一次时间特别长的FULL GC，且仅回收了400M的内存。这是JVM出现“GC overhead limit exceeded”的根本原因。表明了GC时间太长，但回收的内存太少。
 
@@ -77,7 +77,7 @@ Web系统等调用搜计程序接口服务的进程，出现了调用接口服�
 
 ## 内存泄漏分析
 
-![图07 搜计程序0ld gen长时间监控](https://upload-images.jianshu.io/upload_images/908013-420a4fe84546771e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图07 搜计程序0ld gen长时间监控](https://user-images.githubusercontent.com/4915189/71431518-370edb00-270d-11ea-8da0-368182699273.png)
 
 使用3个调用者线程，对搜计程序进行长达三天的不间断调用，但限定每次调用请求仅获取少量数据。图07为这期间的old gen内存使用情况，经历gc后old gen的内存基本持稳在0.07GB。这表明搜计程序在请求不多、请求数据量不大的情况下，JVM内存回收正常，程序本身没有存在内存泄漏。
 
@@ -85,7 +85,7 @@ Web系统等调用搜计程序接口服务的进程，出现了调用接口服�
 
 基于以上分析，归结得出程序OutOfMemoryError的主要原因：部分调用请求的执行步骤，申请了大量内存耗尽JVM可用内存导致的程序问题。
 
-![图08 一次调用请求](https://upload-images.jianshu.io/upload_images/908013-c40d62c5a3363ed3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图08 一次调用请求](https://user-images.githubusercontent.com/4915189/71431520-3c6c2580-270d-11ea-96a7-600262a7dedb.png)
 
 如图08所示，为一次导致OutOfMemoryError调用请求的示例。S1和S2表示执行步骤，S1和S2汇总后得到最终结果返回给调用者。且S1和S2所需的内存较多，超过了JVM的可用内存，Full GC后便会导致OutOfMemoryError。
 
@@ -133,7 +133,7 @@ Web系统等调用搜计程序接口服务的进程，出现了调用接口服�
 
 ### 用IO换取内存的策略
 
-![图09 将S1步骤的数据获取转为链式IO](https://upload-images.jianshu.io/upload_images/908013-691e2044b371dc40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图09 将S1步骤的数据获取转为链式IO](https://user-images.githubusercontent.com/4915189/71431522-40984300-270d-11ea-8fb8-9a3b79ec213a.png)
 
 
 如图09所示，S1为一个需用到大量堆内存的执行步骤。原有的做法是一次性将S1需要用到的全部数据都从数据库查出，并加载到内存。一种改进措施是，**分多次查询数据，逐次将部分结果加载入内存**。

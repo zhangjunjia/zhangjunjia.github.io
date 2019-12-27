@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="SVN," />
+  <meta name="keywords" content="redis," />
 
 
 
@@ -79,18 +79,20 @@
 
 
 
-<meta name="description" content="公司有一个ExtJS+Java的云平台项目，该项目模块化得较好，一个包就是一个模块。">
-<meta name="keywords" content="SVN">
+<meta name="description" content="Redis单实例用于分布式锁的方案，在对可靠性要求不够高的场景下已经被大量应用，然而此方案存在一些缺陷，其作者提出了一种新的基于redis多实例的改进版算法。">
+<meta name="keywords" content="redis">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SVN嵌套权限管理">
-<meta property="og:url" content="https://zhangjunjia.github.io/2016/05/05/svn-that-i-used/index.html">
+<meta property="og:title" content="redis的分布式锁算法redlock">
+<meta property="og:url" content="https://zhangjunjia.github.io/2019/08/21/redlock-algorithm/index.html">
 <meta property="og:site_name" content="张俊佳的网络日志">
-<meta property="og:description" content="公司有一个ExtJS+Java的云平台项目，该项目模块化得较好，一个包就是一个模块。">
+<meta property="og:description" content="Redis单实例用于分布式锁的方案，在对可靠性要求不够高的场景下已经被大量应用，然而此方案存在一些缺陷，其作者提出了一种新的基于redis多实例的改进版算法。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-04-09T14:42:10.000Z">
+<meta property="og:image" content="http://martin.kleppmann.com/2016/02/unsafe-lock.png">
+<meta property="og:updated_time" content="2019-08-21T00:43:06.045Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SVN嵌套权限管理">
-<meta name="twitter:description" content="公司有一个ExtJS+Java的云平台项目，该项目模块化得较好，一个包就是一个模块。">
+<meta name="twitter:title" content="redis的分布式锁算法redlock">
+<meta name="twitter:description" content="Redis单实例用于分布式锁的方案，在对可靠性要求不够高的场景下已经被大量应用，然而此方案存在一些缺陷，其作者提出了一种新的基于redis多实例的改进版算法。">
+<meta name="twitter:image" content="http://martin.kleppmann.com/2016/02/unsafe-lock.png">
 
 
 
@@ -120,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://zhangjunjia.github.io/2016/05/05/svn-that-i-used/"/>
+  <link rel="canonical" href="https://zhangjunjia.github.io/2019/08/21/redlock-algorithm/"/>
 
 
 
 
 
-  <title>SVN嵌套权限管理 | 张俊佳的网络日志</title>
+  <title>redis的分布式锁算法redlock | 张俊佳的网络日志</title>
   
 
 
@@ -233,7 +235,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/05/05/svn-that-i-used/">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2019/08/21/redlock-algorithm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张俊佳">
@@ -250,7 +252,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">SVN嵌套权限管理</h1>
+          <h1 class="post-title" itemprop="name headline">redis的分布式锁算法redlock</h1>
         
 
         <div class="post-meta">
@@ -262,8 +264,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-05T13:48:00+08:00">
-                2016-05-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-21T08:07:44+08:00">
+                2019-08-21
               </time>
             
 
@@ -272,28 +274,6 @@
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/编程实践/" itemprop="url" rel="index">
-                    <span itemprop="name">编程实践</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -322,17 +302,31 @@
       
 
       
-        <p>公司有一个ExtJS+Java的云平台项目，该项目模块化得较好，一个包就是一个模块。</p>
+        <p>Redis单实例用于分布式锁的方案，在对可靠性要求不够高的场景下已经被大量应用，然而此方案存在一些缺陷，其作者提出了一种新的基于redis多实例的改进版算法。</p>
 <a id="more"></a>
-<p>该项目需要多人协作，同时又要让协作者不能获取到全部模块（防止代码泄露）。以往我的做法是分子项目然后使用BeyondCompare作合并，但这样太费时费力了，后来发现SVN能完美达成我的需求。</p>
-<p>介绍我的SVN的authz（Linux环境）配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[groups]</span><br><span class="line">admin = jayzee,luzhiquan,hwq</span><br><span class="line">user = yifei,shenkai,linjie,cjm</span><br><span class="line"># gx-desk</span><br><span class="line">[myproject:/gx-desk]</span><br><span class="line">@admin = rw</span><br><span class="line">@user = r</span><br><span class="line">## gx-desk src</span><br><span class="line">[myproject:/gx-desk/src]</span><br><span class="line">@user = rw</span><br><span class="line">[myproject:/gx-desk/src/main/resources]</span><br><span class="line">@user = r</span><br><span class="line">[myproject:/gx-desk/src/main/resources/com]</span><br><span class="line">@user = rw</span><br><span class="line">## gx-desk WebContent</span><br><span class="line">[myproject:/gx-desk/WebContent]</span><br><span class="line">@user = rw</span><br><span class="line">[myproject:/gx-desk/WebContent/.sencha]</span><br><span class="line">@user = r</span><br><span class="line">[myproject:/gx-desk/WebContent/Chart]</span><br><span class="line">@user = r</span><br><span class="line">[myproject:/gx-desk/WebContent/app/App.js]</span><br><span class="line">@user = r</span><br><span class="line">[myproject:/gx-desk/WebContent/app/view/infomanage]</span><br><span class="line">@user =</span><br><span class="line">linjie = rw</span><br></pre></td></tr></table></figure>
+<p><strong>1. Redis单实例作为分布式锁存在什么问题？</strong></p>
+<p>单点故障。假设Redis实例crash了，依赖获取锁后进行相应工作的业务逻辑无法执行。</p>
+<p>互斥问题。进程A取锁，进入业务逻辑工作，此时Redis实例恰好crash并快速恢复了。进程B立即取到锁，也进入了业务逻辑。Boom，分布式锁的互斥性得不到保证了。</p>
+<p><strong>2. 新版Redlock算法的思路是什么？</strong></p>
+<blockquote>
 <ol>
-<li>SVN的权限具有继承关系，上例中，<code>/gx-desk</code>为项目的根，它设置admin用户可读写，而普通用户可读不可写；</li>
-<li><code>/gx-desk/src</code>继承了上一级的权限，其下方的<code>@user = rw</code>表示我们将<code>/gx-desk/src</code>的权限重写为可读写；</li>
-<li>其他的以此类推，基于此我们就可以实现嵌套的内存管理啦！</li>
+<li>It gets the current time in milliseconds.<br>客户端获取当前时间（毫秒）</li>
+<li>It tries to acquire the lock in all the N instances sequentially, using the same key name and random value in all the instances. During step 2, when setting the lock in each instance, the client uses a timeout which is small compared to the total lock auto-release time in order to acquire it. For example if the auto-release time is 10 seconds, the timeout could be in the ~ 5-50 milliseconds range. This prevents the client from remaining blocked for a long time trying to talk with a Redis node which is down: if an instance is not available, we should try to talk with the next instance ASAP.<br>用同一个key+随机value顺序向N个redis实例取NX锁，取NX锁的timeout相比redlock锁的release时间要小得多（毫秒级），若某个redis实例crash客户端能快速越过</li>
+<li>The client computes how much time elapsed in order to acquire the lock, by subtracting from the current time the timestamp obtained in step 1. If and only if the client was able to acquire the lock in the majority of the instances (at least 3), and the total time elapsed to acquire the lock is less than lock validity time, the lock is considered to be acquired.<br>当且仅当获取半数以上redis实例的NX锁，且获取NX锁的总耗时（利用当前时间减去第一步的时间）小于redlock锁的release时间，获取redlock锁成功</li>
+<li>If the lock was acquired, its validity time is considered to be the initial validity time minus the time elapsed, as computed in step 3.</li>
+<li>If the client failed to acquire the lock for some reason (either it was not able to lock N/2+1 instances or the validity time is negative), it will try to unlock all the instances (even the instances it believed it was not able to lock).<br>如果获取redlock锁失败，主动释放各个redis实例已经获取的NX锁</li>
 </ol>
-<p>注：<br><code>@user =</code>表示不可读和不可写；</p>
+</blockquote>
+<p><strong>3. Martin认为以上算法存在什么问题？</strong></p>
+<p>分布式领域的专家在<a href="http://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">他的博客</a>对分布式算法redlock提出质疑，质疑点如下。</p>
+<p>互斥性问题。见下图。Client1获取锁后进入STW，STW后锁已经超时，但Client1仍然认为自己持有锁。antirez在<a href="http://antirez.com/news/101" target="_blank" rel="noopener">他的博客</a>回应可以通过时间的double check来规避这个问题，但Martin提出，STW可能在任何情况下发生，更甚的是网络导致的延迟更是程序难以规避的，检查时间根本没用。Martin在他的博客提出了fencing的解决方案，详见他的博客。</p>
+<p><img src="http://martin.kleppmann.com/2016/02/unsafe-lock.png" alt="互斥问题"></p>
+<p>时钟依赖问题。Martin提到Redis依赖于系统调用<code>gettimeofday</code>来判断NX锁是否超时，<code>gettimeofday</code>的可靠性堪忧，某些情况下如NTP校时会导致NX锁的提前或延后超时，Martin在他的博客提出这也会导致互斥问题。</p>
+<p>直觉上来讲，redlock算法在上述第3步，获取锁的时间虽然没超时，但获取锁的时间占据了redlock锁release时间的大部分，此时还有进行下去的必要吗？</p>
+<p><strong>4. antirez的回应有哪些亮点？</strong></p>
+<p>为什么NX锁的value要用随机值？可以通过lua脚本原子性的释放锁。</p>
+<p>客户端获取redlock锁失败后，应休眠random delay后重试，防止多客户端在同一时间又去竞争锁，竞态得不到缓解。</p>
+<p>如果N个redis实例其中某一个crash了，可以为其设置一个delay start，防止它恢复后突然加入打破现有的平衡。也可以考虑设置fsync，这样每次redis数据修改都会落盘。</p>
 
       
     </div>
@@ -350,7 +344,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/SVN/" rel="tag"># SVN</a>
+            <a href="/tags/redis/" rel="tag"># redis</a>
           
         </div>
       
@@ -363,8 +357,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/22/advanced-linux-programing/" rel="next" title="读《Advanced Linux Programing》">
-                <i class="fa fa-chevron-left"></i> 读《Advanced Linux Programing》
+              <a href="/2019/03/31/beyond-sharding/" rel="next" title="RDMS Sharding的一些总结">
+                <i class="fa fa-chevron-left"></i> RDMS Sharding的一些总结
               </a>
             
           </div>
@@ -372,10 +366,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/05/09/after-my-machine-was-attacked/" rel="prev" title="记录一次华为云主机被入侵">
-                记录一次华为云主机被入侵 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>

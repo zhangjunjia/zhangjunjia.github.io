@@ -10,7 +10,7 @@ tags: ['MySQL']
 
 ## MMM
 
-![image.png](https://upload-images.jianshu.io/upload_images/908013-d074f3493901aafc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image.png](https://user-images.githubusercontent.com/4915189/71431448-e5fee700-270c-11ea-8139-12d41a02f4b4.png)
 
 MMM(Master-Master replication managerfor Mysql)的基本组成如下，
 - 主节点master1：承载写流量
@@ -24,7 +24,7 @@ MMM(Master-Master replication managerfor Mysql)的基本组成如下，
 
 MMM的主节点切换过程如下：
 
-![image.png](https://upload-images.jianshu.io/upload_images/908013-cdaf92ca2a23058e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image.png](https://user-images.githubusercontent.com/4915189/71431454-eac39b00-270c-11ea-9899-b51b6260851f.png)
 
 - master1的mmm-agent与mmm-mon长期通信失败
 - mmm-mon请求master1的agent，移除VIP
@@ -61,7 +61,7 @@ MHA(Master High Availability)不同于MMM，它主要保障的是master的高可
 
 master提升主节点的流程如下，
 
-![image.png](https://upload-images.jianshu.io/upload_images/908013-78b8c51cc0fb18a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image.png](https://user-images.githubusercontent.com/4915189/71431458-ee572200-270c-11ea-846c-bcf25ff79b5a.png)
 
 
 - 从宕机崩溃的master保存二进制日志事件（binlog events）;
