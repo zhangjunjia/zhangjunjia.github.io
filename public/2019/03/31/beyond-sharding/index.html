@@ -84,16 +84,16 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="RDMS Sharding的一些总结">
 <meta property="og:url" content="https://zhangjunjia.github.io/2019/03/31/beyond-sharding/index.html">
-<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:site_name" content="张俊佳的博客">
 <meta property="og:description" content="本文简单总结RDMS对数据进行shard的一些套路。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-145d20a1811e438f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2019-03-31T14:14:52.164Z">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431441-d97a8e80-270c-11ea-9b72-ed3ec0e921a2.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431444-dd0e1580-270c-11ea-8d7d-c801dd1df161.png">
+<meta property="og:updated_time" content="2019-12-27T13:11:26.684Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RDMS Sharding的一些总结">
 <meta name="twitter:description" content="本文简单总结RDMS对数据进行shard的一些套路。">
-<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/71431441-d97a8e80-270c-11ea-9b72-ed3ec0e921a2.png">
 
 
 
@@ -129,7 +129,7 @@
 
 
 
-  <title>RDMS Sharding的一些总结 | 张俊佳的网络日志</title>
+  <title>RDMS Sharding的一些总结 | 张俊佳的博客</title>
   
 
 
@@ -159,12 +159,12 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">张俊佳的网络日志</span>
+        <span class="site-title">张俊佳的博客</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
       
-        <p class="site-subtitle">Stay hungry stay foolish</p>
+        <p class="site-subtitle">stay hungry stay foolish</p>
       
   </div>
 
@@ -245,7 +245,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张俊佳的网络日志">
+      <meta itemprop="name" content="张俊佳的博客">
     </span>
 
     
@@ -314,7 +314,7 @@
 <li>切完后怎么扩容：resharding</li>
 <li>切完有什么好处，又有何副作用以及业界是怎么解决这些问题的：side effect</li>
 </ul>
-<h2 id="Sharding-strategy-compare"><a href="#Sharding-strategy-compare" class="headerlink" title="Sharding strategy compare"></a>Sharding strategy compare</h2><h3 id="Case-1-静态算式规则切分"><a href="#Case-1-静态算式规则切分" class="headerlink" title="Case 1 静态算式规则切分"></a>Case 1 静态算式规则切分</h3><p><img src="https://upload-images.jianshu.io/upload_images/908013-654b49e26aa68937.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="id % 4"></p>
+<h2 id="Sharding-strategy-compare"><a href="#Sharding-strategy-compare" class="headerlink" title="Sharding strategy compare"></a>Sharding strategy compare</h2><h3 id="Case-1-静态算式规则切分"><a href="#Case-1-静态算式规则切分" class="headerlink" title="Case 1 静态算式规则切分"></a>Case 1 静态算式规则切分</h3><p><img src="https://user-images.githubusercontent.com/4915189/71431441-d97a8e80-270c-11ea-9b72-ed3ec0e921a2.png" alt="id % 4"></p>
 <p>上图的<code>id</code>是主键，4是结点总数，<code>id % 4</code>即静态算术规则。输入主键计算出数值下标，由数值到LOOKUP表就可以确定数据在哪台服务器上。<br>（注：LOOKUP表维护下标与真实服务器信息的对应关系，简单实现可以考虑配置在服务器，复杂的可以考虑引入Zookeeper）</p>
 <p><strong>1、如何扩容？</strong></p>
 <p>对于<code>id % 4</code>的规则，扩容类似于<a href="https://www.geeksforgeeks.org/load-factor-and-rehashing/" target="_blank" rel="noopener">Java HashMap的rebash的过程</a>。如果id不是一个整型数值，规则需要改写成<code>hash(id) % 4</code>，hash函数用于将id转为int。假如新增一个节点，此时需要经历以下过程：</p>
@@ -337,7 +337,7 @@
 <p>对于上面的<code>id % 4</code>问题，其实可以换一个思路。虽然我们只有4台物理机，但我们可以把规则定为<code>id % 1024</code>，即逻辑上有1024台机。然后通过配置上面说的LOOKUP表，实现4台物理机均摊这1024台逻辑机器的角色，这样可以规避上面的新增结点需要全部数据打散的问题，这也是<a href="https://en.wikipedia.org/wiki/Consistent_hashing" target="_blank" rel="noopener">一致性哈希</a><br>的思想。1024这数值必须是公司业务理论上不能达到的上限（除了顶尖的那几家互联网公司，一般公司也不会超过这个值了），否则还是会出现上面的痛点。</p>
 <p>主键被打散，对按主键范围查询不友好，范围查询基本退化成了全表查询。如果主键范围查询时还带<code>order by</code>，那还得在查询完后自行对数据进行排序。</p>
 <p>解决思路是，数据在单节点是有序的，将查询分发给每个结点，并行去查数据，最后对返回结果做合并。如果要求<code>order by</code>，则在合并结果集时进行两两的归并排序。</p>
-<h3 id="Case-2-范围规则切分"><a href="#Case-2-范围规则切分" class="headerlink" title="Case 2 范围规则切分"></a>Case 2 范围规则切分</h3><p><img src="https://upload-images.jianshu.io/upload_images/908013-145d20a1811e438f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="dynamic range"></p>
+<h3 id="Case-2-范围规则切分"><a href="#Case-2-范围规则切分" class="headerlink" title="Case 2 范围规则切分"></a>Case 2 范围规则切分</h3><p><img src="https://user-images.githubusercontent.com/4915189/71431444-dd0e1580-270c-11ea-8d7d-c801dd1df161.png" alt="dynamic range"></p>
 <p>与上面的算式规则不同的是，这里需要一个range函数，输入主键后得到一个range数值，然后再去查LOOKUP表确定数据落在哪个结点。range函数一般有两种，有序型和无序性。输入[1,2,3,4]这一组数据后，输出的数据依然是有序的称为有序型（一般应用在数据类型），输出无序的称为无序型（比如hash函数）。</p>
 <p><strong>1、如何扩容？</strong></p>
 <p>相比“静态算式规则”，“范围规则”的扩容较为简单。以将范围[10, 30]拆成[10,20]和[21,30]为例，大概需要以下过程，</p>
@@ -490,7 +490,7 @@
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
               <p class="site-author-name" itemprop="name">张俊佳</p>
-              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang/Life Learner</p>
           </div>
 
           <nav class="site-state motion-element">

@@ -84,17 +84,17 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis Cluster &amp; HDFS &amp; ClustrixDB Reshard&#x2F;Rebalance">
 <meta property="og:url" content="https://zhangjunjia.github.io/2019/03/31/beyond-resharding/index.html">
-<meta property="og:site_name" content="张俊佳的网络日志">
+<meta property="og:site_name" content="张俊佳的博客">
 <meta property="og:description" content="对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-5fd20229d2f1436e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/908013-c502daf7d8453894.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2019-03-31T14:20:14.680Z">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431424-c23ba100-270c-11ea-91b1-1cafb8aeaef5.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431431-c9fb4580-270c-11ea-90b9-d851304c514a.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431435-d1225380-270c-11ea-8a89-657b928f8ded.png">
+<meta property="og:updated_time" content="2019-12-27T13:10:20.444Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis Cluster &amp; HDFS &amp; ClustrixDB Reshard&#x2F;Rebalance">
 <meta name="twitter:description" content="对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。">
-<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/71431424-c23ba100-270c-11ea-91b1-1cafb8aeaef5.png">
 
 
 
@@ -130,7 +130,7 @@
 
 
 
-  <title>Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance | 张俊佳的网络日志</title>
+  <title>Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance | 张俊佳的博客</title>
   
 
 
@@ -160,12 +160,12 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">张俊佳的网络日志</span>
+        <span class="site-title">张俊佳的博客</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
       
-        <p class="site-subtitle">Stay hungry stay foolish</p>
+        <p class="site-subtitle">stay hungry stay foolish</p>
       
   </div>
 
@@ -246,7 +246,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张俊佳的网络日志">
+      <meta itemprop="name" content="张俊佳的博客">
     </span>
 
     
@@ -307,7 +307,7 @@
         <p>对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。</p>
 <a id="more"></a>
 <h2 id="Redis-Cluster-Reshard"><a href="#Redis-Cluster-Reshard" class="headerlink" title="Redis Cluster Reshard"></a>Redis Cluster Reshard</h2><p>细节参考自<a href="https://redis.io/topics/cluster-spec" target="_blank" rel="noopener">Redis Cluster Spec</a>的<strong>Redirection and resharding</strong>章节。下图表示数据slot原先在Original节点，被迁移到New节点需要经历的过程。<br>（注：slot的介绍见<a href="https://redis.io/topics/cluster-spec" target="_blank" rel="noopener">Redis Cluster Spec</a>）</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/908013-eef84a57ef4fd1e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="redis cluster reshard"></p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431424-c23ba100-270c-11ea-91b1-1cafb8aeaef5.png" alt="redis cluster reshard"></p>
 <ul>
 <li>新增了New节点——Redis Instance（也可能是本来就存在的一个redis实例）；</li>
 <li>Original上待迁移slot被设置为importing状态，New上欲接受slot被设置为migrating状态。对该slot的读写请求仍然从original节点进来，但是当original不存在请求中包含的key时，请求将被转发给new节点，original已存在该key则请求仍由original受理；</li>
@@ -316,7 +316,7 @@
 </ul>
 <p>Redis Cluster可以做到online resharding，代价是迁移旧key的过程会对每个key进行加锁，加锁时间与key的值正相关。另外，其resharding是需要手动触发的。</p>
 <h2 id="HDFS-rebalance"><a href="#HDFS-rebalance" class="headerlink" title="HDFS rebalance"></a>HDFS rebalance</h2><p>细节参考自<a href="https://issues.apache.org/jira/browse/HADOOP-1652" target="_blank" rel="noopener">hdfs rebalance JIRA需求</a>的<strong>RebalanceDesign6.pdf</strong>，大概过程如下图所示。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/908013-5fd20229d2f1436e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="hdfs rebalance"></p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431431-c9fb4580-270c-11ea-90b9-d851304c514a.png" alt="hdfs rebalance"></p>
 <ul>
 <li>先向namenode取得各datanode的数据报告，根据规则确定source节点和destination节点；</li>
 <li>获取source节点的部分block的metadata（元数据）；</li>
@@ -332,7 +332,7 @@
 <li>ClustrixDB sharding后的数据分片，由一个slice和多个replica组成（类比一主多备）；</li>
 <li>下文的queue可以类比MySQL的binlog，不同的是它除了存储binlog到queue还提供转发binlog和重放的功能；</li>
 </ul>
-<p><img src="https://upload-images.jianshu.io/upload_images/908013-c502daf7d8453894.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ClustrixDB rebalance"></p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431435-d1225380-270c-11ea-8a89-657b928f8ded.png" alt="ClustrixDB rebalance"></p>
 <ul>
 <li>Initial State阶段：Node 3和Node 4为含有同一个分片数据的replica；</li>
 <li>Data Copy阶段：在epoch B开始时间，新增了Node 1作为replica（Building状态）和Node 2作为Queue（Store状态）；epoch A之后对于Node 4的新增修改将以类似于binlog的方式同步到Node 2的queue；Node 4的旧有数据将以一致性视图冻结在该时刻，并逐条传输到Node 1的Building replica；</li>
@@ -457,7 +457,7 @@
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
               <p class="site-author-name" itemprop="name">张俊佳</p>
-              <p class="site-description motion-element" itemprop="description">程序猿/JayzeeZhang/Blogger/Life learner</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang/Life Learner</p>
           </div>
 
           <nav class="site-state motion-element">
