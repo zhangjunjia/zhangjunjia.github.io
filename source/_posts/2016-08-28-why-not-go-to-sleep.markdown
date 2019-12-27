@@ -4,7 +4,7 @@ title: 为什么你还不去睡觉
 date: 2016-08-28 20:32:40 +0800
 comments: true
 categories: ['一些感悟']
-tags: ['随想']
+tags: ['随笔']
 ---
 
 为什么你还不去睡觉？

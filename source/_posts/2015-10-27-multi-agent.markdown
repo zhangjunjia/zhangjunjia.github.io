@@ -4,7 +4,7 @@ title: Multi-Agent Systems简介
 date: '2015-10-27 08:50'
 comments: true
 categories: ['人工智能']
-tags: ['AI']
+tags: ['Algorithm']
 ---
 
 本文简单介绍Multi-Agent Systems这项技术。

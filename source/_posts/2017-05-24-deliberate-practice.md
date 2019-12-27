@@ -1,7 +1,7 @@
 ---
 title: 我理解的刻意练习
 date: 2017-05-24 12:27:57
-tags: ['刻意练习']
+tags: ['读书']
 comments: true
 categories: ['读书笔记']
 ---

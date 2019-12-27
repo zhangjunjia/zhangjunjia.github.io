@@ -1,7 +1,7 @@
 ---
 title: 论快乐
 date: 2017-06-03 14:52:32
-tags: ['快乐', '幸福', '成长日志']
+tags: ['成长日志']
 comments: true
 categories: ['一些感悟']
 ---

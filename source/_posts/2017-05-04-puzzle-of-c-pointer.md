@@ -3,7 +3,7 @@ title: C语言指针与数组
 date: 2017-05-04 17:09:07
 comments: true
 categories: ['编程实践'] 
-tags: ['C/C++', '指针']
+tags: ['C/C++']
 ---
 
 C语言数组下标`[]`符号竟是个语法糖？
