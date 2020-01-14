@@ -6,6 +6,8 @@ tags: ['Kafka']
 
 本文是极客时间专栏《Kafka核心技术与实战》的阅读笔记。
 
+<!--more-->
+
 ## Kafka的三层模型
 
 ![image](https://user-images.githubusercontent.com/4915189/70886991-c6363780-2017-11ea-9b16-c455e0daf769.png)
@@ -64,7 +66,7 @@ Producer压缩、Broker保持、Consumer解压
 
 ## __consumer_offsets
 - 早期版本将消费者位移数据保存在zookeeper，但高频的读写zookeeper使得其成为瓶颈点
-- 保存的记录为key/value，key为<Group ID, 主题名, 分区号>，消息体为位移数据
+- 保存的记录为key/value，key为`<Group ID, 主题名, 分区号>`，消息体为位移数据
 - 当kafka集群的第一个consumer启动时，kafka会自动创建位移主题
 - kafka使用compact策略定期删除过期的位移数据，防止撑爆硬盘
 
@@ -141,6 +143,10 @@ broker的socket模型为[reactor模型](http://gee.cs.oswego.edu/dl/cpjslides/ni
 （专栏的这张图片有不严谨之处，最终的响应队列如何能直接返回结果给客户端呢？）
 
 网络线程池read()完数据，生产给共享队列，IO线程池取数据消费。请求分两种：一种是数据类，一种是控制类。数据类比如PRODUCE、FETCH等请求，需要落盘或读盘，比较特殊的是当PRODUCE请求的ack设置为all时，在当前leader副本数据落盘后还需要等待其他follower副本落盘成功的消息才返回给客户端，此类PRODUCE请求会被放置到purgatory队列中（延迟队列）。控制类请求有诸如角色变更、停止replica。
+
+![image](https://user-images.githubusercontent.com/4915189/72348031-69ac6200-3714-11ea-87c9-d445e7349d01.png)
+
+（matt33博客的这张图比较靠谱）
 
 数据类、控制类实质上是两套不同的处理流程（可简单理解为两个抽象队列），他们各自有acceptor、网络线程池、IO线程池，即他们的入端口都是不同的。
 
