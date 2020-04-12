@@ -3,8 +3,8 @@ layout: post
 title: 《深入理解计算机系统》读书笔记
 date: '2015-11-21 15:18'
 comments: true
-categories: ['读书笔记'] 
-tags: ['计算机原理']
+categories: ['操作系统'] 
+tags: ['操作系统']
 ---
 
 本文为《深入理解计算机系统》的读书笔记。

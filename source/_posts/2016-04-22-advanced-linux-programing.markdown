@@ -3,7 +3,7 @@ layout: post
 title: 读《Advanced Linux Programing》
 date: '2016-04-22 19:03'
 comments: true
-categories: ['读书笔记']  
+categories: ['编程语言']  
 tags: ['Linux', 'C/C++']
 ---
 

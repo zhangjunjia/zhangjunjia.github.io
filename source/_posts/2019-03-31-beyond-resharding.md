@@ -2,6 +2,8 @@
 title: Redis Cluster & HDFS & ClustrixDB Reshard/Rebalance
 date: 2019-03-31 22:12:14
 tags: ['数据库', 'MySQL', 'Redis', 'HDFS']
+comments: true
+categories: ['系统设计']
 ---
 
 对于分布式存储，在新增或删除节点时，必将存在某些节点的数据“过多”，某些节点的数据“过少”。对节点上的数据进行重新整理使各节点的数据趋于相近的过程，就叫rebalance或reshard。本文简单介绍Redis Cluster、HDFS和ClustrixDB是如何对数据进行重分片的。

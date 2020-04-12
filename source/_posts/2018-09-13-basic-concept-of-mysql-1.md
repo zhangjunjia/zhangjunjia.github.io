@@ -2,6 +2,8 @@
 title: MySQL基础回顾01 | 表连接与Group By
 date: 2018-09-13 20:00:03
 tags: 'MySQL'
+comments: true
+categories: ['数据库']
 ---
 
 MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。

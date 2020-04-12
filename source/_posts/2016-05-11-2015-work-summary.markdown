@@ -3,7 +3,7 @@ layout: post
 title: 2015年3月至2016年3月工作总结
 date: '2016-05-11 21:16'
 comments: true
-categories: ['一些感悟']  
+categories: ['职场感悟']  
 tags: ['职场']
 ---
 

@@ -2,7 +2,7 @@
 title: C语言指针与数组
 date: 2017-05-04 17:09:07
 comments: true
-categories: ['编程实践'] 
+categories: ['编程语言'] 
 tags: ['C/C++']
 ---
 

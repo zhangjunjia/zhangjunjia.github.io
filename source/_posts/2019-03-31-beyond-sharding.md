@@ -2,6 +2,8 @@
 title: RDMS Sharding的一些总结
 date: 2019-03-31 22:13:22
 tags: ['MySQL', '数据库']
+comments: true
+categories: ['系统设计']
 ---
 
 本文简单总结RDMS对数据进行shard的一些套路。

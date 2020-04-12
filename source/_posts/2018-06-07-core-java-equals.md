@@ -2,6 +2,8 @@
 title: "Core Java 01 | equals vs =="
 date: 2018-06-07 12:22:29
 tags: ['Java']
+comments: true
+categories: ['编程语言']
 ---
 
 Java中，equals和==有何区别？

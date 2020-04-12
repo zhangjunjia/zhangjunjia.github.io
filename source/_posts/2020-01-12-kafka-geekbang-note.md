@@ -2,6 +2,8 @@
 title: 《Kafka核心技术与实战》专栏笔记
 date: 2020-01-03 22:00:32
 tags: ['Kafka']
+comments: true
+categories: ['分布式系统']
 ---
 
 本文是极客时间专栏《Kafka核心技术与实战》的阅读笔记。

@@ -2,6 +2,8 @@
 title: 算法训练营毕业总结
 date: 2019-12-27 22:18:05
 tags: ['Algorithm']
+comments: true
+categories: ['算法']
 ---
 
 参加即可时间算法训练营的总结。

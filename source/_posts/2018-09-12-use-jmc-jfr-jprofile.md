@@ -2,6 +2,8 @@
 title: 使用JMC+JFR+JProfile检测Java程序异常
 date: 2018-09-12 23:03:39
 tags: ['Java']
+comments: true
+categories: ['编程实践']
 ---
 
 本文记录使用JMC（Java Mission Controll）、JFR（Java Flight Record）以及JProfile诊断Java应用不可用（OutOfMemroy）的过程。

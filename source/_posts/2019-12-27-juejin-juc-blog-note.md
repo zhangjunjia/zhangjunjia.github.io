@@ -2,6 +2,8 @@
 title: 【博客笔记】掘金的knock_小新的Java并发系列
 date: 2019-12-27 22:14:52
 tags: ['Java']
+comments: true
+categories: ['编程语言']
 ---
 
 博客地址：https://juejin.im/post/5b4f54d66fb9a04f8d6bb44a

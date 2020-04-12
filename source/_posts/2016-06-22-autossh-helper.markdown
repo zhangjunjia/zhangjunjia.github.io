@@ -3,7 +3,7 @@ layout: post
 title: 多对一autossh隧道管理
 date: '2016-06-22 21:05'
 comments: true
-categories: ['编程实践']  
+categories: ['工具篇']  
 tags: ['Linux', 'Network']
 ---
 

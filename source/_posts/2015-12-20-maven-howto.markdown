@@ -3,7 +3,7 @@ layout: post
 title: Maven HOWTO
 date: '2015-12-20 16:31'
 comments: true
-categories: ['编程实践']  
+categories: ['工具篇']  
 tags: ['Maven']
 ---
 

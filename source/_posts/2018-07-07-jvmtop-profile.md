@@ -2,6 +2,8 @@
 title: 如何诊断java程序CPU占用率过高
 date: 2018-07-07 23:13:53
 tags: ['Java']
+comments: true
+categories: ['编程实践']
 ---
 
 在最近一次编程时，我的一个Java应用在嵌入式设备bbblack上的CPU占用率高达60%至70%，简单记录我是如何诊断这个问题的。

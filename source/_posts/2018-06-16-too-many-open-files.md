@@ -2,6 +2,8 @@
 title: Too many open files in java
 date: 2018-06-16 17:00:05
 tags: ['Java']
+comments: true
+categories: ['操作系统']
 ---
 
 Linux平台下，每个进程能打开的文件描述符是有上限的，这个参数可以通过`ulimit`命令查看和在运行时设置，但若想持久化该配置，需配置到`sysctl.conf`，具体如何

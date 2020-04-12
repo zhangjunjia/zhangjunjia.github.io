@@ -3,7 +3,7 @@ layout: post
 title: SVN嵌套权限管理
 date: '2016-05-05 13:48'
 comments: true
-categories: ['编程实践']  
+categories: ['工具篇']  
 tags: ['SVN']
 ---
 

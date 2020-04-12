@@ -3,7 +3,7 @@ title: 关于C语言的fread函数
 date: 2017-07-07 17:14:16
 tags: ['C/C++']
 comments: true
-categories: ['编程实践']
+categories: ['编程语言']
 ---
 
 关于C函数fread的一道小小题目。

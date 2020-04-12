@@ -3,7 +3,7 @@ layout: post
 title: Multi virtual HOST of Tomcat
 date: '2016-08-17 17:51'
 comments: true
-categories: ['编程实践'] 
+categories: ['工具篇'] 
 tags: ['Tomcat']
 ---
 

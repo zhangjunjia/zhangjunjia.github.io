@@ -3,7 +3,7 @@ layout: post
 title: 《C++ Primer v5》读书笔记
 date: '2015-11-23 20:31'
 comments: true
-categories: ['读书笔记']  
+categories: ['编程语言']  
 tags: ['C/C++']
 ---
 
@@ -14,11 +14,8 @@ tags: ['C/C++']
 ## CHAPTER 1 GETTING STARTED
 
 - Variable type: when we wrote`T t`, we sayed that "t has type T", or "t is a T"
-
 - gcc/g++ warning all options: `-Wall` for *nix, `/W4` for windows
-
 - Flush the stream: we should always put `std::cout << std::endl;` at the end of `std::cout` to flush the stream of std-out, or else it won't output immediately
-
 - Left operating left: `std::cout << "text 1" << " and text 2" << std::endl;` equals to
 ```c++
 std::cout << "text 1";

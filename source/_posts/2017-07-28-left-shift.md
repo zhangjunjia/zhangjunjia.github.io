@@ -1,7 +1,9 @@
 ---
-title: 左移算法
+title: 浅谈左移算法
 date: 2017-07-28 12:29:39
-tags:
+tags: ['C/C++']
+comments: true
+categories: ['算法']
 ---
 
 假设有一个字符串"abcdefgh"，循环左移3位后得到"defghabc"，本文讲解其中的一种左移算法。

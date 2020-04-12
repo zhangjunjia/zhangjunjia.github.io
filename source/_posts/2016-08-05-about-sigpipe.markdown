@@ -3,7 +3,7 @@ layout: post
 title: 关于SIGPIPE
 date: '2016-08-05 20:14'
 comments: true
-categories: ['编程实践'] 
+categories: ['操作系统'] 
 tags: ['C/C++', 'TCP/IP', 'Linux']
 ---
 

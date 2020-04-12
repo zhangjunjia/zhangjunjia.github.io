@@ -3,7 +3,7 @@ layout: post
 title: LVM用到的一些特性
 date: '2016-05-09 17:25'
 comments: true
-categories: ['编程实践']  
+categories: ['工具篇']  
 tags: ['LVM']
 ---
 

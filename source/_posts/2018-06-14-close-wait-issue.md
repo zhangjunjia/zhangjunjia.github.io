@@ -2,6 +2,8 @@
 title: Java Mina close_wait issue
 date: 2018-06-14 11:02:06
 tags: ['Java', 'Mina', 'TCP/IP']
+comments: true
+categories: ['计算机网络']
 ---
 
 在Linux下使用Java Mina编写TCP/IP通信程序时，发现TCP Server出现了大量的CLOSE_WAIT，why？

@@ -3,7 +3,7 @@ layout: post
 title: 《UNP卷1》的一些问题
 date: '2016-08-02 09:01'
 comments: true
-categories: ['读书笔记']
+categories: ['计算机网络']
 tags: ['C/C++', 'Linux', 'Network']
 ---
 

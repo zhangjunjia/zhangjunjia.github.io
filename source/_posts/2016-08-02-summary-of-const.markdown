@@ -3,7 +3,7 @@ layout: post
 title: C/C++的const
 date: '2016-08-02 09:04'
 comments: true
-categories: ['编程实践'] 
+categories: ['编程语言'] 
 tags: ['C/C++']
 ---
 

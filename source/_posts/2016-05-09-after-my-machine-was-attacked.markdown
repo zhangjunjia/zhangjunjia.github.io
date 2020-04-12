@@ -3,7 +3,7 @@ layout: post
 title: 记录一次华为云主机被入侵
 date: '2016-05-09 12:34'
 comments: true
-categories: ['编程实践']  
+categories: ['网络安全']  
 tags: ['信息安全']
 ---
 

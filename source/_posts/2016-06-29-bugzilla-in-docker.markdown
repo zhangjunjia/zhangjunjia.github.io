@@ -3,7 +3,7 @@ layout: post
 title: docker初探
 date: '2016-06-29 17:57'
 comments: true
-categories: ['编程实践'] 
+categories: ['工具篇'] 
 tags: ['Docker']
 ---
 

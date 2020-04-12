@@ -3,7 +3,7 @@ layout: post
 title: 使用ant自动生成WAR包需知
 date: '2016-06-28 11:07'
 comments: true
-categories: ['编程实践']  
+categories: ['工具篇']  
 tags: ['Java', 'Eclipse']
 ---
 
