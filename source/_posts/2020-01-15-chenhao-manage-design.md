@@ -1,7 +1,7 @@
 ---
 title: 《左耳听风》笔记：管理设计篇
 date: 2020-01-15 11:03:25
-tags: ['分布式系统设计']
+tags: ['系统设计']
 comments: true
 categories: ['系统设计']
 ---
