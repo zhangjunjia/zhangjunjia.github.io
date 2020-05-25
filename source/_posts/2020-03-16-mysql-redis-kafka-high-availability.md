@@ -3,7 +3,7 @@ title: 浅谈MySQL/Redis/Kafka高可用
 date: 2020-03-16 20:29:45
 tags: ['系统设计', 'MySQL', 'Redis', 'Kafka']
 comments: true
-categories: ['系统设计', '中间件']
+categories: ['系统设计']
 ---
 
 浅谈MySQL/Redis/Kafka高可用设计。

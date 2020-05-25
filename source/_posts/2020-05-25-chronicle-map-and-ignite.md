@@ -3,7 +3,7 @@ title: chronicle-map与apache ignite的使用场景及限制性
 date: 2020-05-25 21:11:00
 tags: ['Java', 'ChronicleMap', 'ApacheIgnite']
 comments: true
-categories: ['中间件']
+categories: ['分布式系统']
 ---
 
 本文浅谈HashMap从Java Heap中offload的方案考虑.

@@ -3,7 +3,7 @@ title: mysql mmm和mha对比
 date: 2019-03-16 16:50:39
 tags: ['MySQL']
 comments: true
-categories: ['数据库', '中间件']
+categories: ['数据库']
 ---
 
 本文简单介绍MySQL的两个high availability方案，MMM和MHA。

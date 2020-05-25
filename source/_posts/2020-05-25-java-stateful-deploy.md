@@ -3,7 +3,7 @@ title: 浅谈有状态Java服务热部署方案
 date: 2020-04-25 21:03:36
 tags: ['Java', '系统设计']
 comments: true
-categories: ['系统设计', '编程语言']
+categories: ['编程语言']
 ---
 
 近期工作中需解决Java有状态服务的热部署问题，将调研的方案以及其trade-off阐述如下。
