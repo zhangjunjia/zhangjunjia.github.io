@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git add *
+git add source/_posts/*
 git commit -m "source changed"
 git push -u origin origin
 

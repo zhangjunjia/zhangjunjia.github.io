@@ -17,19 +17,14 @@ categories: ['系统设计']
 
 模式其一，cache aside。其特点是cache本身不与storage打交道，cache中item的新增由应用调用触发，其过程如下：
 
-![image](https://user-images.githubusercontent.com/4915189/74585594-07979300-5019-11ea-85ed-ebcee5b003af.png)
+![image](https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png)
+（图片源自《Scaling Memcache at Facebook》）
 
 - miss：应用读cache发现缓存不存在，应用从数据库加载记录写入到cache，需要注意如果数据库也读不到最后设置某个占位符到cache防止因为不存在的key导致频繁读盘
 - hit：从cache取值返回
-- update：更新数据库，然后覆盖cache
+- update：更新数据库，然后失效cache
 
-图片中的update的方案：更新数据库，然后覆盖cache。这可能存在问题，假定以下时序：
-- A更新数据库；
-- B更新数据库；
-- B覆盖cache；
-- A覆盖cache（BOOM，脏数据）
-
-另一个update方案：先更新数据库，再删除cache。也存在问题，假定有以下时序：
+假定有以下时序，以上cache aside方案将存在问题：
 - cache已失效；
 - A读cache，发现cache不存在；
 - A读数据库，网络拥堵；
@@ -40,13 +35,12 @@ categories: ['系统设计']
 
 模式其二，read/write-through，程序不直接和storage打交道，由cache代理负责缓存更新，如下：
 
-![image](https://user-images.githubusercontent.com/4915189/74585915-27c95100-501d-11ea-87ad-9c80fa8bca6b.png)
-
-![image](https://user-images.githubusercontent.com/4915189/74587953-741f8b80-5033-11ea-86a2-1527ec0b6391.png)
+![image](https://user-images.githubusercontent.com/4915189/82790438-a2b4ca00-9e9e-11ea-9340-112f79c3c907.png)
+![image](https://user-images.githubusercontent.com/4915189/82790449-a7797e00-9e9e-11ea-8e4c-8d1ca60efaf4.png)
+（图片源自 https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/）
 
 模式其三，write back，是基于r/w through的优化，将写批量化提交，缺点是未提交的写可能丢失。
-
-![image](https://user-images.githubusercontent.com/4915189/74587969-94e7e100-5033-11ea-8018-1ad3817d47c7.png)
+![image](https://user-images.githubusercontent.com/4915189/82790494-ba8c4e00-9e9e-11ea-9912-7bcfcecdc517.png)
 
 需要注意的是，LRU是把无序的key-value数据结构变成有序的，在读写时都需要加锁修改数据结构，在高并发时可能成为瓶颈。
 
