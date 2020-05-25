@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="系统设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="极客时间《左耳听风》专栏读书笔记之性能设计篇。">
+<meta name="keywords" content="系统设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《左耳听风》笔记：性能设计篇">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/02/15/chenhao-performance-design/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="极客时间《左耳听风》专栏读书笔记之性能设计篇。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82790438-a2b4ca00-9e9e-11ea-9340-112f79c3c907.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82790449-a7797e00-9e9e-11ea-8e4c-8d1ca60efaf4.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82790494-ba8c4e00-9e9e-11ea-9912-7bcfcecdc517.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/74600725-6f5ce500-50d0-11ea-87e4-3b75d7c7b8a9.png">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.374Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《左耳听风》笔记：性能设计篇">
+<meta name="twitter:description" content="极客时间《左耳听风》专栏读书笔记之性能设计篇。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/02/15/chenhao-performance-design/"/>
+
+
+
+
+
+  <title>《左耳听风》笔记：性能设计篇 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/02/15/chenhao-performance-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《左耳听风》笔记：性能设计篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-15T20:20:26+08:00">
+                2020-02-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统设计</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>极客时间《左耳听风》专栏读书笔记之性能设计篇。</p>
+<a id="more"></a>
+<h1 id="性能设计"><a href="#性能设计" class="headerlink" title="性能设计"></a>性能设计</h1><h2 id="缓存-cache"><a href="#缓存-cache" class="headerlink" title="缓存 cache"></a>缓存 cache</h2><p>本篇主要讲解了缓存读取更新的三种设计模式，cache章节的图片取自<a href="https://vladmihalcea.com/a-beginners-guide-to-cache-synchronization-strategies/" target="_blank" rel="noopener">A beginner’s guide to Cache synchronization strategies</a>。</p>
+<p>模式其一，cache aside。其特点是cache本身不与storage打交道，cache中item的新增由应用调用触发，其过程如下：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png" alt="image"><br>（图片源自《Scaling Memcache at Facebook》）</p>
+<ul>
+<li>miss：应用读cache发现缓存不存在，应用从数据库加载记录写入到cache，需要注意如果数据库也读不到最后设置某个占位符到cache防止因为不存在的key导致频繁读盘</li>
+<li>hit：从cache取值返回</li>
+<li>update：更新数据库，然后失效cache</li>
+</ul>
+<p>假定有以下时序，以上cache aside方案将存在问题：</p>
+<ul>
+<li>cache已失效；</li>
+<li>A读cache，发现cache不存在；</li>
+<li>A读数据库，网络拥堵；</li>
+<li>B更新数据库；</li>
+<li>B使缓存失效；</li>
+<li>网络拥堵结束，A将数据写到cache（BOOM，脏数据）</li>
+<li>总结：以上时序出现概率特别低，因为读操作一般远快于写操作（需要加锁）。但还是有可能发生的，业务需要能容忍，cache需要加过期时间，这是在不动用分布式锁下的较简单方案（Facebook的方案）。</li>
+</ul>
+<p>模式其二，read/write-through，程序不直接和storage打交道，由cache代理负责缓存更新，如下：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/82790438-a2b4ca00-9e9e-11ea-9340-112f79c3c907.png" alt="image"><br><img src="https://user-images.githubusercontent.com/4915189/82790449-a7797e00-9e9e-11ea-8e4c-8d1ca60efaf4.png" alt="image"><br>（图片源自 <a href="https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/）" target="_blank" rel="noopener">https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/）</a></p>
+<p>模式其三，write back，是基于r/w through的优化，将写批量化提交，缺点是未提交的写可能丢失。<br><img src="https://user-images.githubusercontent.com/4915189/82790494-ba8c4e00-9e9e-11ea-9912-7bcfcecdc517.png" alt="image"></p>
+<p>需要注意的是，LRU是把无序的key-value数据结构变成有序的，在读写时都需要加锁修改数据结构，在高并发时可能成为瓶颈。</p>
+<h2 id="异步处理-asynchronize"><a href="#异步处理-asynchronize" class="headerlink" title="异步处理 asynchronize"></a>异步处理 asynchronize</h2><p>弹性设计讲了异步通讯，异步处理是指收到上游任务后立即返回一个确认信号，然后使用PULL模型或PUSH模型（需要考虑消费者的更多信息防止投递不出去或压垮消费者）将任务分发给下游消费者处理。</p>
+<p>异步处理一般会搭配另外一个设计模式event sourcing（事件溯源）。event sourcing不直接修改结果数据，而是把对数据的操作存储为一个个不可变的event，通过顺序重放event即可得出最终结果。</p>
+<p>异步处理也可用于处理分布式事务，如A给B转账。</p>
+<ul>
+<li>A扣款，生成扣款凭证；</li>
+<li>凭证发到B，B收款，B对凭证和收款的处理是幂等的；</li>
+<li>转账失败需要事务补偿；</li>
+</ul>
+<p>异步处理设计需要有以下考量：</p>
+<ul>
+<li>异步处理完成需要通知发起方；</li>
+<li>发起方定时检查那些没有回传的任务，需要异步处理系统支持幂等；</li>
+<li>事务需要补偿；</li>
+<li>强一致不适合使用异步处理；</li>
+<li>异步处理需要监控队列堆积；</li>
+</ul>
+<h2 id="数据库扩展"><a href="#数据库扩展" class="headerlink" title="数据库扩展"></a>数据库扩展</h2><p>读写分离</p>
+<ul>
+<li>写库容易出现单点故障</li>
+<li>需要强一致性的还是得落在写库上</li>
+</ul>
+<p>CQRS(Command and Query Responsibility Segregation)</p>
+<ul>
+<li>command只返回执行状态，会修改数据</li>
+<li>query返回结果数据，但不修改状态</li>
+<li>command和query分离，提高系统扩展性，将command转为event sourcing可使得写无状态化</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/4915189/74600725-6f5ce500-50d0-11ea-87e4-3b75d7c7b8a9.png" alt="image"></p>
+<p>sharding是解决数据库太大的问题，把单体库按照某个规则分为多个库。分片的方式其一是按业务（需要仔细评估业务），其二是按哈希（扩展时会有重哈希的问题）。sharding后，需要有一个数据访问层解析SQL将任务分发给多个库，同时数据访问层还需要聚合多个库的结果返回给调用方。</p>
+<p>根本的解法，还是得将数据库、微服务从单体库拆分开。</p>
+<h2 id="秒杀-flash-sales"><a href="#秒杀-flash-sales" class="headerlink" title="秒杀 flash sales"></a>秒杀 flash sales</h2><p>第一道关，带简单逻辑的CDN（需要和运营商沟通，亚马逊目前有Lambda）。100W用户经过CDN这第一道关后，只放一定比例的用户到数据中心，这个比例值是动态算出来的。</p>
+<p>第二道关，数据中心的应对真实流量，之前所讲的弹性设计都可以在这里用上。</p>
+<p>CDN玩法非常适合那些用户有地域特征分布的。</p>
+<h2 id="边缘计算-edge-computing"><a href="#边缘计算-edge-computing" class="headerlink" title="边缘计算 edge computing"></a>边缘计算 edge computing</h2><p>边缘计算是为了降低数据中心架构复杂度，把一部分计算逻辑分到离用户较近的边缘节点。其关键技术有两个：API Gateway、Serverless/Faas。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/系统设计/" rel="tag"># 系统设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/02/09/chat-root-design/" rel="next" title="聊天室高并发架构概要">
+                <i class="fa fa-chevron-left"></i> 聊天室高并发架构概要
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/16/mysql-redis-kafka-high-availability/" rel="prev" title="浅谈MySQL/Redis/Kafka高可用">
+                浅谈MySQL/Redis/Kafka高可用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#性能设计"><span class="nav-number">1.</span> <span class="nav-text">性能设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存-cache"><span class="nav-number">1.1.</span> <span class="nav-text">缓存 cache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步处理-asynchronize"><span class="nav-number">1.2.</span> <span class="nav-text">异步处理 asynchronize</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库扩展"><span class="nav-number">1.3.</span> <span class="nav-text">数据库扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#秒杀-flash-sales"><span class="nav-number">1.4.</span> <span class="nav-text">秒杀 flash sales</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边缘计算-edge-computing"><span class="nav-number">1.5.</span> <span class="nav-text">边缘计算 edge computing</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

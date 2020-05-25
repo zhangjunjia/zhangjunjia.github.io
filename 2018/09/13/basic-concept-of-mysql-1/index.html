@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL基础回顾01 | 表连接与Group By">
+<meta property="og:url" content="https://zhangjunjia.github.io/2018/09/13/basic-concept-of-mysql-1/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431479-0dee4a80-270d-11ea-8bdd-da043078410d.png">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.373Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL基础回顾01 | 表连接与Group By">
+<meta name="twitter:description" content="MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/71431479-0dee4a80-270d-11ea-8bdd-da043078410d.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2018/09/13/basic-concept-of-mysql-1/"/>
+
+
+
+
+
+  <title>MySQL基础回顾01 | 表连接与Group By | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2018/09/13/basic-concept-of-mysql-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL基础回顾01 | 表连接与Group By</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-13T20:00:03+08:00">
+                2018-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MySQL基础回顾第一篇，回顾4种表连接的含义、与笛卡尔积的区别以及group by的用途。</p>
+<a id="more"></a>
+<h2 id="表连接"><a href="#表连接" class="headerlink" title="表连接"></a>表连接</h2><p>User表信息如下：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+<p>Org表信息如下：</p>
+<table>
+<thead>
+<tr>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>15</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<h3 id="表连接语法"><a href="#表连接语法" class="headerlink" title="表连接语法"></a>表连接语法</h3><p>表连接的语法为：<code>A [left|right|inner|full] join B on A.x = B.y</code>。<code>[]</code>内的选项4选一，不填写时默认表示表示<code>inner</code>。4个选项的含义如下：</p>
+<ul>
+<li>inner：内连接</li>
+<li>left：左连接</li>
+<li>right：右连接</li>
+<li>full：全连接</li>
+</ul>
+<h3 id="表连接解释"><a href="#表连接解释" class="headerlink" title="表连接解释"></a>表连接解释</h3><p>下图为表连接的文氏图表示，中间蓝色部分表示<code>A.x = B.y</code>的A表与B表的行记录，即A的x字段与B的y字段相等，x与y称为连接字段。习惯上，我们把join左边的表称为左表，其右边的表称为右表，在本例中A是左表，B是右表。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431479-0dee4a80-270d-11ea-8bdd-da043078410d.png" alt="image.png"></p>
+<p>对于join，可以理解为把A的所有列和B的所有列并在一起。以上面的表格为例，A表和B表的列并在一起变成了：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid(user表)</th>
+<th>orgid(org表)</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>此时由于orgid字段重名，我们需通过select挑出需要的字段。以上面的表格为例，可编写SQL如下挑出所需字段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT u.userid, u.username, u.orgid, o.orgname FROM user u join org o ON u.orgid = o.orgid</span><br></pre></td></tr></table></figure>
+<p>left join时，A表（左表）的所有行原封不动的保留，B表（右表）的行保留情况如下，</p>
+<ul>
+<li>上午文氏图的蓝色部分：B表的所有行原封不动的保留；</li>
+<li>上午文氏图的右白色部分：B表的所有行的值全部显示为NULL；</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+</tbody>
+</table>
+<p>right join时，与right join刚好相反，B表（右表）的所有行原封不动的保留，A表（左表）仅有与B表orgid重叠的行原封不动的保留。</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>NULL</td>
+<td>15</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<p>inner join，仅保留A表与B表orgid重叠的行。</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+</tbody>
+</table>
+<p>full join，用集合运算可理解为<code>(left join) + (right join) - (inner join)</code>。</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>NULL</td>
+<td>15</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<h2 id="笛卡尔积Cross-Join"><a href="#笛卡尔积Cross-Join" class="headerlink" title="笛卡尔积Cross Join"></a>笛卡尔积Cross Join</h2><p>这是一种特殊的Join，以上文的user表cross join org表为例，全连接SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid,</span><br><span class="line">    u.username,</span><br><span class="line">    u.orgid,</span><br><span class="line">    o.orgname</span><br><span class="line">FROM</span><br><span class="line">    user u cross join org o -- 注：cross join可用逗号表示</span><br></pre></td></tr></table></figure>
+<p>得到的结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>skj</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>skj</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gzut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>skj</td>
+</tr>
+</tbody>
+</table>
+<p>也就说，在cross join不设定where条件的情况下，得到的结果是一个笛卡尔积，总行数等于左表的行数乘以B表的行数。在指定where条件的情况下，下文的SQL等同于inner join。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid,</span><br><span class="line">    u.username,</span><br><span class="line">    u.orgid,</span><br><span class="line">    o.orgname</span><br><span class="line">FROM</span><br><span class="line">    user u, org o -- 注：cross join可用逗号表示</span><br><span class="line">WHERE</span><br><span class="line">    u.orgid = o.orgid</span><br></pre></td></tr></table></figure>
+<h2 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h2><p><code>group by</code>的语义是把行进行分组，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid,</span><br><span class="line">    u.username,</span><br><span class="line">    u.orgid,</span><br><span class="line">    o.orgname</span><br><span class="line">FROM</span><br><span class="line">    user u cross join org o</span><br><span class="line">GROUP BY u.userid</span><br></pre></td></tr></table></figure>
+<p>以上SQL，会把userid相同的分成一个组，然后仅保留组内的第一条记录，得到的结果为：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>username</th>
+<th>orgid</th>
+<th>orgname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jay</td>
+<td>10</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>2</td>
+<td>tom</td>
+<td>11</td>
+<td>gdut</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shelly</td>
+<td>12</td>
+<td>gdut</td>
+</tr>
+</tbody>
+</table>
+<p>基于<code>group by</code>分组的特性，一般其会配置聚合函数使用，如count()和avg()等函数。修改SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SELECT </span><br><span class="line">    u.userid, count(*)</span><br><span class="line">FROM</span><br><span class="line">    user u cross join org o</span><br><span class="line">GROUP BY u.userid</span><br></pre></td></tr></table></figure>
+<p>将得到结果：</p>
+<table>
+<thead>
+<tr>
+<th>userid</th>
+<th>count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>3</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><code>group by</code>后跟一个字段，表示一维分组，如果跟两个字段则为二维分组，三个字段及以上以此类推。以二重<code>group by</code>为例，<code>group by a, b</code>可以通俗的理解为：<strong>所有a字段值相同，同时b字段值相同的行，会被分到同一组</strong>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/12/use-jmc-jfr-jprofile/" rel="next" title="使用JMC+JFR+JProfile检测Java程序异常">
+                <i class="fa fa-chevron-left"></i> 使用JMC+JFR+JProfile检测Java程序异常
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/20/tcp-state/" rel="prev" title="TCP状态转移总结">
+                TCP状态转移总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#表连接"><span class="nav-number">1.</span> <span class="nav-text">表连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#表连接语法"><span class="nav-number">1.1.</span> <span class="nav-text">表连接语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表连接解释"><span class="nav-number">1.2.</span> <span class="nav-text">表连接解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#笛卡尔积Cross-Join"><span class="nav-number">2.</span> <span class="nav-text">笛卡尔积Cross Join</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#group-by"><span class="nav-number">3.</span> <span class="nav-text">group by</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

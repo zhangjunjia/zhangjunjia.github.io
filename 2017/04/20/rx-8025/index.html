@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Beaglebone," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
+<meta name="keywords" content="Beaglebone">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Beaglebone Black&#x2F;bbblack上使用i2c读取rx8025硬件时钟">
+<meta property="og:url" content="https://zhangjunjia.github.io/2017/04/20/rx-8025/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.372Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Beaglebone Black&#x2F;bbblack上使用i2c读取rx8025硬件时钟">
+<meta name="twitter:description" content="简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2017/04/20/rx-8025/"/>
+
+
+
+
+
+  <title>在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2017/04/20/rx-8025/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在Beaglebone Black/bbblack上使用i2c读取rx8025硬件时钟</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-20T18:42:49+08:00">
+                2017-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>简绍如何在Beaglebone Black/bbblack上使用i2c设置和读取外置的rx8025硬件时钟。</p>
+<a id="more"></a>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>注意，</p>
+<ul>
+<li>目前仅支持rx8025t和rx8025sa；</li>
+<li>目前仅支持i2c1（P9_17和P9_18，默认未启用）；</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025.git</span><br><span class="line"><span class="built_in">cd</span> beaglebone_black_bbblack_rx8025</span><br><span class="line">gcc rtc-8025.c -o rtc-8025</span><br><span class="line"><span class="comment">## set bbblack os time to rx8025</span></span><br><span class="line">./rtc-8025 <span class="built_in">set</span></span><br><span class="line"><span class="comment">## get rx8025time and set to os</span></span><br><span class="line">./rtc-8025 get</span><br></pre></td></tr></table></figure>
+<h2 id="原理简介"><a href="#原理简介" class="headerlink" title="原理简介"></a>原理简介</h2><h3 id="beaglebone的准备"><a href="#beaglebone的准备" class="headerlink" title="beaglebone的准备"></a>beaglebone的准备</h3><ol>
+<li>搭配好rx8025外电路，笔者选用的是i2c1口；</li>
+<li>参考<a href="https://datko.net/2013/11/03/bbb_i2c/" target="_blank" rel="noopener">BeagleBone Black I2C References</a>设置i2c1（即bash下执行<code>echo BB-I2C1 &gt; /sys/devices/bone_capemgr.9/slots</code>）</li>
+</ol>
+<p>通过文章可知rx8025芯片的默认slave address是0x32，在代码<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/rtc-8025.c" target="_blank" rel="noopener">rtc-8025.c</a>可见。</p>
+<h3 id="i2c-dev"><a href="#i2c-dev" class="headerlink" title="i2c-dev"></a>i2c-dev</h3><p>笔者使用i2c-dev工具操作i2c设备与rx8025芯片进行通信。关于i2c-dev的详细实现见<a href="https://www.kernel.org/doc/Documentation/i2c/dev-interface" target="_blank" rel="noopener">i2c-dev-interface</a>的<strong>Implementation details</strong>章节。简要描述下：操作i2c设备的驱动由内核负责，通过上文的设置将i2c设备映射为一个系统文件，就能在用户空间下对i2c设备进行读写编程，实质是内核操作i2c设备的系统调用，SCL和SDL的控制完全由内核驱动接管。</p>
+<h3 id="rx8025t和rx8025sa的差别"><a href="#rx8025t和rx8025sa的差别" class="headerlink" title="rx8025t和rx8025sa的差别"></a>rx8025t和rx8025sa的差别</h3><p>rx8025t的说明书见<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/rx8025_cn.pdf" target="_blank" rel="noopener">rx8025_cn</a>，rx8025sa的说明书见<a href="https://github.com/zhangjunjia/beaglebone_black_bbblack_rx8025/blob/master/RX8025SA.pdf" target="_blank" rel="noopener">RX8025SA</a>。下面从编程的角度列举其不同点，</p>
+<ul>
+<li><strong>EEPROM</strong>：rx8025t的寄存器为EEPROM，这意味着每次读写rx8025t后，其PC指针将增加1，越限时回到0，rx8025sa则不是；</li>
+<li><strong>read操作结果不同</strong>：rx8025sa在使用<code>read</code>函数读取时，属于情况<code>Read method from address Fh, with no specified start address for read opreation</code>（说明书第26页），因此<code>read</code>函数返回结果的第一个字节其实是0x0F寄存器的内容，而rx8025t的第一个字节是秒寄存器；</li>
+<li><strong>未就绪位不同</strong>：未就绪位为1表征芯片处于初始化状态或需要程序初始化芯片，此状态下寄存器的内容无意义，rx8025t的未就绪位为VLF，而rx8025sa为PON；</li>
+<li><strong>小时表示不同</strong>：rx8025t默认使用24小时制，rx8025sa支持12/24小时制；</li>
+<li><strong>写操作的不同</strong>：根据说明书时序图章节，rx8025t通过<code>write</code>函数写的第一个字节是寄存器的开始地址，而rx8025sa则是寄存器的开始地址加上传输模式。</li>
+</ul>
+<h3 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h3><p>为什么读取rx8025t时，通过<code>read</code>函数读取到的第一个字节是秒寄存器，从时序图的角度如何解释？</p>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ol>
+<li><a href="https://datko.net/2013/11/03/bbb_i2c/" target="_blank" rel="noopener">BeagleBone Black I2C References</a></li>
+<li><a href="https://www.kernel.org/doc/Documentation/i2c/dev-interface" target="_blank" rel="noopener">i2c-dev-interface</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Beaglebone/" rel="tag"># Beaglebone</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/17/tomcat-multi-virtual-host/" rel="next" title="Multi virtual HOST of Tomcat">
+                <i class="fa fa-chevron-left"></i> Multi virtual HOST of Tomcat
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/04/puzzle-of-c-pointer/" rel="prev" title="C语言指针与数组">
+                C语言指针与数组 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用"><span class="nav-number">1.</span> <span class="nav-text">如何使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理简介"><span class="nav-number">2.</span> <span class="nav-text">原理简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beaglebone的准备"><span class="nav-number">2.1.</span> <span class="nav-text">beaglebone的准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#i2c-dev"><span class="nav-number">2.2.</span> <span class="nav-text">i2c-dev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rx8025t和rx8025sa的差别"><span class="nav-number">2.3.</span> <span class="nav-text">rx8025t和rx8025sa的差别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TODO"><span class="nav-number">2.4.</span> <span class="nav-text">TODO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">3.</span> <span class="nav-text">reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

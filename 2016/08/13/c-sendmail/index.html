@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,C/C++," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文简单介绍C语言调用sendmail遇到的一些问题。">
+<meta name="keywords" content="Linux,C&#x2F;C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用C语言调用sendmail的一些注意点">
+<meta property="og:url" content="https://zhangjunjia.github.io/2016/08/13/c-sendmail/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="本文简单介绍C语言调用sendmail遇到的一些问题。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://zhangjunjia.github.io/images/pics/mail.jpg">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.372Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用C语言调用sendmail的一些注意点">
+<meta name="twitter:description" content="本文简单介绍C语言调用sendmail遇到的一些问题。">
+<meta name="twitter:image" content="https://zhangjunjia.github.io/images/pics/mail.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2016/08/13/c-sendmail/"/>
+
+
+
+
+
+  <title>使用C语言调用sendmail的一些注意点 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2016/08/13/c-sendmail/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用C语言调用sendmail的一些注意点</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-13T08:46:00+08:00">
+                2016-08-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文简单介绍C语言调用sendmail遇到的一些问题。</p>
+<a id="more"></a>
+<h2 id="sendmail原理"><a href="#sendmail原理" class="headerlink" title="sendmail原理"></a>sendmail原理</h2><p>先附上邮件发送的原理图如下，该图转自<a href="http://www.itye.org/archives/1304" target="_blank" rel="noopener">基础邮件原理（MUA/MTA/MDA）</a>，</p>
+<p><img src="/images/pics/mail.jpg" alt="mail"></p>
+<p>sendmail作为MTA，在DNS定位到对方的MTA地址后，将邮件发送到对端MTA。</p>
+<h2 id="使用sendmail注意"><a href="#使用sendmail注意" class="headerlink" title="使用sendmail注意"></a>使用sendmail注意</h2><p>笔者在Shell下调用sendmail的语法如下（当然，这不是唯一的调用方式，详细请<code>man sendmail</code>），</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sendmail -f&lt;sender&gt; -vt receiver &lt; mail.txt</span><br></pre></td></tr></table></figure>
+<p>其中，</p>
+<ul>
+<li><code>-f</code>指定发件人邮箱；</li>
+<li><code>receiver</code>指定收件人邮箱；</li>
+<li><code>-v</code>表示以调试输出的模式打印；</li>
+<li><code>-t</code>表示读取mail.txt里面的<code>To</code>和<code>Cc</code>等字段；</li>
+</ul>
+<p>举个实际的例子如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sendmail -fjayzee@jayzee.com -vt jayzee@qq.com &lt; mail.txt</span><br></pre></td></tr></table></figure>
+<p>mail.txt的内容，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Suject: Hello</span><br><span class="line"></span><br><span class="line">World</span><br></pre></td></tr></table></figure>
+<p>但是，在执行上述语句前，你需要注意以下事项，</p>
+<ul>
+<li>你的发件邮箱不需要是真实邮箱，但必须符合<a href="mailto:`xxx@xxx.com" target="_blank" rel="noopener">`xxx@xxx.com</a>`的格式，否则会被你的收件人的邮件服务器拒绝；</li>
+<li>将你的发件邮箱添加到收件邮箱的白名单，否则极有可能被当成垃圾邮件拦截；</li>
+<li>你的mail.txt的<code>Subject</code>表示标题，紧接着是一个空行和正文，建议加上该空行，因为笔者在debian wheezy上使用sendmail发邮件时没有空行会报错，但在ubuntu又不会；</li>
+<li>配置你的/etc/hosts如下，<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1	localhost	jayzee.com</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>为什么hosts要如上配置呢？原因是在邮件发送失败时，sendmail会把邮件返回给sender，在此例子中即<a href="mailto:`jayzee@jayzee.com" target="_blank" rel="noopener">`jayzee@jayzee.com</a><code>，而由于配置了hosts，相当于收件人其实是</code><a href="mailto:jayzee@127.0.0.1" target="_blank" rel="noopener">jayzee@127.0.0.1</a><code>，这就保证了在邮件发送失败时邮件会回送给本机的jayzee用户，然后便可在本机的</code>/var/mail/jayzee`回溯到发送失败的详细信息啦。</p>
+<p>关于为什么本机会收到邮件，stackoverflow上有一段很好的解释，</p>
+<blockquote>
+<p>Just to offer some clarification, it’s been the tradition for a long time for UNIX boxes to run a “locally configured” mailer daemon that <strong> doesn’t route messages through the Internet, but only copies messages to other users spool directories </strong> (as @John T mentioned). It is real SMTP-compliant email, it’s just not routed over the Internet because it doesn’t need to be.</p>
+</blockquote>
+<h2 id="使用C语言调用sendmail"><a href="#使用C语言调用sendmail" class="headerlink" title="使用C语言调用sendmail"></a>使用C语言调用sendmail</h2><p>使用C语言调用sendmail，</p>
+<ul>
+<li>首先，准备好mail.txt；</li>
+<li>其次，如果你想在调用结束时读取到调用信息，可考虑使用管道，如<code>popen(...)</code>；否则，使用<code>system(...)</code>就足够了。</li>
+</ul>
+<h2 id="sendmail错误处理"><a href="#sendmail错误处理" class="headerlink" title="sendmail错误处理"></a>sendmail错误处理</h2><p><code>sysexits.h</code>标识出了sendmail调用的返回值，但没有一个是标识邮件是否发送成功的。C编程时若要判断sendmail是否发送成功，只能在程序端对回显信息（使用<code>popen</code>才取得回显信息）进行分析。</p>
+<p>还有一个思路是，专门建一个用户用于发送邮件，且需要保证该用户发送邮件是同步的，这样通过检测<code>/var/mail/$USER</code>的文件状态变化（比如配置邮件发送失败才回送，这样该文件的最后修改时间就发生了变化）就能判断是否发送成功了，这里需要在调用sendmail时恰当配置其<code>-N</code>选项。</p>
+<blockquote>
+<p><code>-N dsn</code> Set delivery status notification conditions to dsn, which can be ‘never’ for no notifications or a comma separated list of the values ‘failure’ to be notified if  delivery  failed, ‘delay’ to be notified if delivery is delayed, and ‘success’ to be notified when the message is successfully delivered.</p>
+</blockquote>
+<p>至于这里为什吗不考虑邮件delay的情况，文章<a href="https://askleo.com/why_am_i_getting_a_delay_notification_on_an_email_i_sent-2/" target="_blank" rel="noopener">Why Am I Getting a “Delivery Status Notification (Delay)” on an Email I Sent?</a>给出解释如下，</p>
+<blockquote>
+<p>Delivery Status Notification (Delay)<br>This is an automatically generated Delivery Status Notification.<br>THIS IS A WARNING MESSAGE ONLY.<br><strong>YOU DO NOT NEED TO RESEND YOUR MESSAGE</strong>.<br>Delivery to the following recipients has been delayed.</p>
+<p>if you get this “Delivery Status Notification (Delay)” warning, there’s nothing you can really do, other than to <strong>make sure you sent it to the correct address.</strong></p>
+</blockquote>
+<h2 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> 相关头文件</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(网络在线) &#123;</span><br><span class="line">        stat1=/var/mail/user最后修改时间</span><br><span class="line">        system(sendmail -N failure -fuser@user.com -vt 收件人邮箱 &lt; mail.txt);</span><br><span class="line">        stat2=/var/mail/user最后修改时间</span><br><span class="line">        <span class="keyword">if</span>(stat1 != stat2) &#123;</span><br><span class="line">            发送失败</span><br><span class="line">            清空user@user.com的邮件队列避免重发</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            发送成功</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        发送失败</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>360converter博客：<a href="http://www.itye.org/archives/1304" target="_blank" rel="noopener">基础邮件原理（MUA/MTA/MDA）</a></li>
+<li>Ask Leo：<a href="https://askleo.com/why_am_i_getting_a_delay_notification_on_an_email_i_sent-2/" target="_blank" rel="noopener">Why Am I Getting a “Delivery Status Notification (Delay)” on an Email I Sent?</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/05/about-sigpipe/" rel="next" title="关于SIGPIPE">
+                <i class="fa fa-chevron-left"></i> 关于SIGPIPE
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/17/tomcat-multi-virtual-host/" rel="prev" title="Multi virtual HOST of Tomcat">
+                Multi virtual HOST of Tomcat <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sendmail原理"><span class="nav-number">1.</span> <span class="nav-text">sendmail原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用sendmail注意"><span class="nav-number">2.</span> <span class="nav-text">使用sendmail注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用C语言调用sendmail"><span class="nav-number">3.</span> <span class="nav-text">使用C语言调用sendmail</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sendmail错误处理"><span class="nav-number">4.</span> <span class="nav-text">sendmail错误处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伪代码"><span class="nav-number">5.</span> <span class="nav-text">伪代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

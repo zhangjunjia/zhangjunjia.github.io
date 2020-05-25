@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kafka," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文是极客时间专栏《Kafka核心技术与实战》的阅读笔记。">
+<meta name="keywords" content="Kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Kafka核心技术与实战》专栏笔记">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/01/03/kafka-geekbang-note/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="本文是极客时间专栏《Kafka核心技术与实战》的阅读笔记。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/70886991-c6363780-2017-11ea-9b16-c455e0daf769.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/70970163-9b5fe800-20d8-11ea-955d-1949f4889d4f.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/70970212-bc283d80-20d8-11ea-9c1d-1e4bd5772adf.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/70912772-a02c8980-204f-11ea-8643-b0d48cf9741f.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/70974586-0e6e5c00-20e3-11ea-8b6f-061ba7136691.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/70974621-234aef80-20e3-11ea-9465-ae83e6d74c63.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/72348031-69ac6200-3714-11ea-87c9-d445e7349d01.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71159642-fcc2bb00-2280-11ea-83c9-3674506d08aa.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71161512-727c5600-2284-11ea-816a-0488b3d93976.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71415497-f4122080-2696-11ea-92b9-4060d033b866.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71415605-769ae000-2697-11ea-92a9-faa2fc36bca0.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431213-50af2300-270b-11ea-8af6-8146d902e255.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431323-0c705280-270c-11ea-92c0-de96d67b89ce.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431336-25790380-270c-11ea-8301-3e582ff3c1cb.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71614560-5a42fa00-2be7-11ea-9a9f-f30a025b6381.png">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.373Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Kafka核心技术与实战》专栏笔记">
+<meta name="twitter:description" content="本文是极客时间专栏《Kafka核心技术与实战》的阅读笔记。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/70886991-c6363780-2017-11ea-9b16-c455e0daf769.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/01/03/kafka-geekbang-note/"/>
+
+
+
+
+
+  <title>《Kafka核心技术与实战》专栏笔记 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/01/03/kafka-geekbang-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Kafka核心技术与实战》专栏笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-03T22:00:32+08:00">
+                2020-01-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式系统/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文是极客时间专栏《Kafka核心技术与实战》的阅读笔记。</p>
+<a id="more"></a>
+<h2 id="Kafka的三层模型"><a href="#Kafka的三层模型" class="headerlink" title="Kafka的三层模型"></a>Kafka的三层模型</h2><p><img src="https://user-images.githubusercontent.com/4915189/70886991-c6363780-2017-11ea-9b16-c455e0daf769.png" alt="image"></p>
+<ul>
+<li>第一层：主题Topic。主题是承载消息的逻辑容器，物理上通过多个分区来实现。</li>
+<li>第二层：分区Partition。一个主题的消息按规则分散（比如轮询、哈希）存储在多个分区，单个分区内的消息是有序的，分区间的消息没有顺序关系。分区还分为leader和follower，leader才对外提供服务（producer写入、consumer消费）并记录消息位移offset，follower用于灾备。消费者以一个组（consumer group）的方式消费多个分区的数据，分配每个消费者消费哪些分区leader的过程称为rebalance，每个消费者自行记录单个分区的消费位移（consumer offset）。</li>
+<li>第三层：消息record。存储在分区内的最小单元信息。</li>
+</ul>
+<h2 id="Kafka的几个重要版本"><a href="#Kafka的几个重要版本" class="headerlink" title="Kafka的几个重要版本"></a>Kafka的几个重要版本</h2><ul>
+<li>0.9.0.0版本：增加基础安全认证，使用Java重写消费API，引入Kafka Connect</li>
+<li>0.11.0.0版本：幂等性Producer API、事务API，对Kafka消息格式做了重构</li>
+</ul>
+<h2 id="kafka的重要参数"><a href="#kafka的重要参数" class="headerlink" title="kafka的重要参数"></a>kafka的重要参数</h2><p><img src="https://user-images.githubusercontent.com/4915189/70970163-9b5fe800-20d8-11ea-955d-1949f4889d4f.png" alt="image"><br><img src="https://user-images.githubusercontent.com/4915189/70970212-bc283d80-20d8-11ea-9c1d-1e4bd5772adf.png" alt="image"></p>
+<h2 id="分区策略"><a href="#分区策略" class="headerlink" title="分区策略"></a>分区策略</h2><ul>
+<li>轮询策略：轮询写到每个分区</li>
+<li>随机策略：随机写到每个分区</li>
+<li>Key-ordering策略：消息指定了key的，会被放到同一个分区，保障了单分区的有序性</li>
+</ul>
+<h2 id="压缩、解压策略"><a href="#压缩、解压策略" class="headerlink" title="压缩、解压策略"></a>压缩、解压策略</h2><p>Producer压缩、Broker保持、Consumer解压</p>
+<ul>
+<li>吞吐量：lz4 &gt; snappy &gt; zstd &amp; gzip</li>
+<li>压缩比：zstd &gt; lz4 &gt; gzip &gt; snappy</li>
+<li>带宽：snappy最多，zstd最少</li>
+<li>CPU：压缩时snappy多，解压时gzip多</li>
+</ul>
+<h2 id="丢消息问题"><a href="#丢消息问题" class="headerlink" title="丢消息问题"></a>丢消息问题</h2><ul>
+<li>producer应该使用带回调的producer.send(msg, callback)而不是producer.send(msg)，前者在丢消息可以在callback进行处理</li>
+<li>消费者应该在消费消息后再提交位移，且不要开启自动提交，而应该用自动提交；</li>
+<li>broker端应该设置factor参数，将消息多存几份防止丢失；</li>
+<li>producer设置acks = all</li>
+<li>producer设置retries为一个比较大的值防止网络抖动导致的失败</li>
+<li>禁用unclean的broker leader选举</li>
+<li>关闭consumer的自动提交位移</li>
+</ul>
+<h2 id="producer对TCP连接的管理"><a href="#producer对TCP连接的管理" class="headerlink" title="producer对TCP连接的管理"></a>producer对TCP连接的管理</h2><ul>
+<li>创建producer时，它会连接bootstrap.servers的所有Broker</li>
+<li>producer会定时请求更新元数据，判断到连接未建立则会触发创建</li>
+<li>发送数据时，同上</li>
+<li>关闭有两种，用户主动关闭，空链路被kafka释放</li>
+</ul>
+<h2 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h2><ul>
+<li>可用于客户端监控、端到端监控、消息审计等；</li>
+<li>producer可在send之前、send完收到ack触发拦截方法；</li>
+<li>消费者可在消费前、消费后commit触发拦截方法；</li>
+</ul>
+<h2 id="consumer-offsets"><a href="#consumer-offsets" class="headerlink" title="__consumer_offsets"></a>__consumer_offsets</h2><ul>
+<li>早期版本将消费者位移数据保存在zookeeper，但高频的读写zookeeper使得其成为瓶颈点</li>
+<li>保存的记录为key/value，key为<code>&lt;Group ID, 主题名, 分区号&gt;</code>，消息体为位移数据</li>
+<li>当kafka集群的第一个consumer启动时，kafka会自动创建位移主题</li>
+<li>kafka使用compact策略定期删除过期的位移数据，防止撑爆硬盘</li>
+</ul>
+<h2 id="consumer-group"><a href="#consumer-group" class="headerlink" title="consumer group"></a>consumer group</h2><ul>
+<li>consumer提交位移时，其实是向coordinator所在broker提交位移</li>
+<li>消费者组注册、成员管理也是由coordinator管理</li>
+<li>如何确定消费者组的coordinator<ul>
+<li>partitionId=Math.abs(groupId.hashCode() % __consumer_offsets的总分区数)</li>
+<li>找出给分区leader副本所在的broker</li>
+</ul>
+</li>
+<li>大部分重平衡都是由于consumer被认为已经挂掉被kafka剔除组导致的，如何防止？<ul>
+<li>延长会话<ul>
+<li>session.timeout.ms建议设为6秒，延长会话存活时间防止被误认为consumer死亡</li>
+<li>heartbeat.interval.ms建议设为2秒，值越小能越快感知进入重平衡</li>
+<li><strong>以上两值，consumer被认为死亡至少经历了3次心跳</strong></li>
+</ul>
+</li>
+<li>延长消费时间<ul>
+<li>max.poll.interval.ms，两次poll的间隔如果大于这个值consumer会主动离开组，这可能是消费逻辑太重导致的，适当延长该值</li>
+</ul>
+</li>
+<li>排查是否FULL GC</li>
+</ul>
+</li>
+</ul>
+<h2 id="消费者端多线程设计（KafkaConsumer为单线程）"><a href="#消费者端多线程设计（KafkaConsumer为单线程）" class="headerlink" title="消费者端多线程设计（KafkaConsumer为单线程）"></a>消费者端多线程设计（KafkaConsumer为单线程）</h2><ul>
+<li>主线程负责消费数据提交位移，心跳线程负责探活</li>
+<li>KafkaConsumer不是线程安全的</li>
+<li>方案1：消费者端多个线程，每个线程是一个KafkaConsumer（受限于topic_partition分区数）</li>
+<li>方案2：消费者端一个KafkaConsumer线程，poll到的消息丢给线程池消费（可能导致消息重复消费、不利于提交位移）</li>
+</ul>
+<h2 id="CommitFailedException"><a href="#CommitFailedException" class="headerlink" title="CommitFailedException"></a>CommitFailedException</h2><ul>
+<li>poll之后的消费时间超过max.poll.interval.ms，consumer触发LeaveGroup，此时必然会提交位移失败（0.10.1.0版本之后），解决方案<ul>
+<li>优化消费逻辑</li>
+<li>增加max.poll.interval.ms</li>
+<li>减少max.poll.records</li>
+<li>消费者端使用多线程消费（但引入多线程提交位移的负责度）</li>
+</ul>
+</li>
+<li>消费者组和standalone的消费者的groupid冲突，也会导致这个错误</li>
+</ul>
+<h2 id="消费者管理TCP连接"><a href="#消费者管理TCP连接" class="headerlink" title="消费者管理TCP连接"></a>消费者管理TCP连接</h2><ul>
+<li>创建KafkaConsumer时不会创建TCP连接，以下3个时机才会发起TCP连接<ul>
+<li>发起 FindCoordinator 请求时（发给负载最小的Broker，使用完后关闭）</li>
+<li>连接协调者时（连接coordinator）=&gt; 心跳、Rebalance相关</li>
+<li>消费数据时（消费要消费的leader副本所在broker）=&gt; 数据消费、元数据相关</li>
+</ul>
+</li>
+</ul>
+<h2 id="消费者组位移"><a href="#消费者组位移" class="headerlink" title="消费者组位移"></a>消费者组位移</h2><ul>
+<li>自动提交可能会导致重复消费，假设每5秒自动提交一次，在两次提交中间发生重平衡就会导致这个问题</li>
+<li>commitSync会阻塞消费者，失败时会自动重试</li>
+<li>commitAsync是异步操作，而且可以带回调，失败了不重试（因为此时位移值已经不是最新的了）</li>
+<li>大部分情况用异步提交，在consumer要关闭前用同步提交</li>
+<li>kafka支持一次取多消息如5000条，每消费100条手动提交一次位移</li>
+</ul>
+<h2 id="consumer-group的消费监控"><a href="#consumer-group的消费监控" class="headerlink" title="consumer group的消费监控"></a>consumer group的消费监控</h2><p>consumer lag指的是滞后未消费的消息数。假如生产了100W条消息，但当下只消费了80W条，那么lag为20W条。监控方法有三种：kafka的consumers-group脚本、comsumer的java api、自带的jmx监控指标（优选）。</p>
+<h2 id="副本机制"><a href="#副本机制" class="headerlink" title="副本机制"></a>副本机制</h2><p>kafka的replica本质是一个只能追加写（append）的日志。kafka在创建分区时，会根据replica参数创建多个分区副本，分区副本分leader副本和follower副本两种，分布在不同的broker，他们的关系如下图：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/70912772-a02c8980-204f-11ea-8643-b0d48cf9741f.png" alt="image"></p>
+<p>针对具体一分区的读/写，都会定位到leader副本。follower副本并不向外提供读取的功能，它们的作用只会在leader副本crash时进行重新选举用到。kafka的副本，没有类似于其他分布式系统的一些好处：</p>
+<ul>
+<li>副本可提供读，读的能力得到扩充；</li>
+<li>可根据客户端地理位置分配距离较近的副本提供读，加速读取。</li>
+</ul>
+<p>但kafka的副本也规避了不能read-your-writes的问题。如果写到分区A，但读的是分区B，分区A、B是异步同步，此时读B可能读不到最新的数据，如果保证能读到即时更新则为read-your-writes。</p>
+<p>kafka维护了一个ISR副本集合，领导副本重新选举时从这个集合中进行选择（normal情况），leader副本必会存在ISR集合中。follower副本与leader副本的时间差若小于replica.lag.time.max.ms则会被加到ISR集合，否则会被从ISR集合中踢出。极端情况下，ISR集合可能为空，这意味着leader副本crash了且所有follower副本都“落后”了replica.lag.time.max.ms时间，这种情况意味着丢失数据较严重。此时进行的领导者选举称作unclean选举，需要unclean.leader.election.enable为true时才开启。</p>
+<h2 id="broker的请求处理模型"><a href="#broker的请求处理模型" class="headerlink" title="broker的请求处理模型"></a>broker的请求处理模型</h2><p>broker的socket模型为<a href="http://gee.cs.oswego.edu/dl/cpjslides/nio.pdf" target="_blank" rel="noopener">reactor模型</a>，reactor负责accept请求，然后dispatch给不同的worker进行处理，大致如下：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/70974586-0e6e5c00-20e3-11ea-8b6f-061ba7136691.png" alt="image"></p>
+<p>专栏提到更细致的线程模型如下：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/70974621-234aef80-20e3-11ea-9465-ae83e6d74c63.png" alt="image"></p>
+<p>（专栏的这张图片有不严谨之处，最终的响应队列如何能直接返回结果给客户端呢？）</p>
+<p>网络线程池read()完数据，生产给共享队列，IO线程池取数据消费。请求分两种：一种是数据类，一种是控制类。数据类比如PRODUCE、FETCH等请求，需要落盘或读盘，比较特殊的是当PRODUCE请求的ack设置为all时，在当前leader副本数据落盘后还需要等待其他follower副本落盘成功的消息才返回给客户端，此类PRODUCE请求会被放置到purgatory队列中（延迟队列）。控制类请求有诸如角色变更、停止replica。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/72348031-69ac6200-3714-11ea-87c9-d445e7349d01.png" alt="image"></p>
+<p>（matt33博客的这张图比较靠谱）</p>
+<p>数据类、控制类实质上是两套不同的处理流程（可简单理解为两个抽象队列），他们各自有acceptor、网络线程池、IO线程池，即他们的入端口都是不同的。</p>
+<h2 id="kafka重平衡"><a href="#kafka重平衡" class="headerlink" title="kafka重平衡"></a>kafka重平衡</h2><p>什么情况下会触发消费者组(consumer group)的重平衡：</p>
+<ul>
+<li>新的消费者通过指定group.id加入组</li>
+<li>已有的消费退出组（主动退出、崩溃导致的心跳timeout）</li>
+<li>消费者组关联的分区数、主题数发生变化</li>
+</ul>
+<p>consumer group的重平衡，需要broker端的协调者组件协调，kafka内部实现了一个状态机协助状态转移：<br><img src="https://user-images.githubusercontent.com/4915189/71159642-fcc2bb00-2280-11ea-83c9-3674506d08aa.png" alt="image"></p>
+<ul>
+<li>进入PreparingRebalance，意味着触发了重平衡，所有消费者都需要重新参与一次重平衡</li>
+<li>Stable意味着重平衡完成</li>
+<li>Dead意味着这个组的一些元数据被清除了</li>
+</ul>
+<p>kafka内部维护了一个_consumer_offsets的topic，一个consumer group消费的全部主题的offset数据，存在该topic的同一个partition，该partition的leader副本所在broker，即为该group的协调者。</p>
+<p>从consumer的视角来看，它们参与重平衡的过程如下：</p>
+<ul>
+<li>程序刚启动，或者收到了协调者组件含<strong>REBALANCE_IN_PROGRESS</strong>的心跳response（如果是这种情况需要先把当前未提交的位移数据提交）</li>
+<li>向协调者组件发起加入组(JoinGroup)请求，协调者组件会回复ACK信号；特殊的是，一般第一个发起JoinGroup的consumer会被协调者组件选为leader consumer，协调者组件回复的ACK会携带上所有发起JoinGroup的consumer信息</li>
+<li>向协调者组件发起SyncGroup请求，leader consumer的请求会带上分区分配方案，其余的consumer则是一个空消息</li>
+<li>协调者组件将重平衡分配方案回复给每个consumer</li>
+</ul>
+<p>对分区消费的并行度有疑问，查资料后整理如下：<br><img src="https://user-images.githubusercontent.com/4915189/71161512-727c5600-2284-11ea-816a-0488b3d93976.png" alt="image"></p>
+<p>一个topic下的一个分区只能由一个consumer消费，但反之并不成立，一个consumer可能分配到多个topic_partition。假设分组订阅的topic下的partition总数为N，消费者组的消费者数最好不要超过N，多出来的消费者不会分配topic_partition是一种浪费。</p>
+<h2 id="kafka的控制器（controller）"><a href="#kafka的控制器（controller）" class="headerlink" title="kafka的控制器（controller）"></a>kafka的控制器（controller）</h2><p>在Zookeeper的协助下协调和管理整个Kafka集群。多个Broker竞争创建zookeeper的/controller，第一个创建成功的即为controller；当现有的controller宕机时，各broker监听到该事件触发重新选举（创建/controller）。它主要有以下职责：</p>
+<ul>
+<li>主题管理（创建、删除、增加分区）</li>
+<li>分区重分配</li>
+<li>preferred领导者选举（避免部分broker负载过重而提供的一种更换leader的方案）</li>
+<li>集群成员管理（新增broker、broker主动关闭、broker宕机，/broker/ids/下的临时节点）</li>
+<li>元数据服务（从zookeeper同步最新元数据，同步最新元数据给其他broker）</li>
+</ul>
+<p>其内部线程设计如下：<br><img src="https://user-images.githubusercontent.com/4915189/71415497-f4122080-2696-11ea-92b9-4060d033b866.png" alt="image"></p>
+<ul>
+<li>多个zookeeper事件（异步处理）放到queue，由单线程顺序处理防止竞态；</li>
+<li>控制类请求有另外一条通道，将比queue中的事件高优处理，如StopReplica请求；</li>
+</ul>
+<h2 id="高水位和Leader-Epoch"><a href="#高水位和Leader-Epoch" class="headerlink" title="高水位和Leader Epoch"></a>高水位和Leader Epoch</h2><p><img src="https://user-images.githubusercontent.com/4915189/71415605-769ae000-2697-11ea-92a9-faa2fc36bca0.png" alt="image"></p>
+<ul>
+<li>高水位（high water mask，简称HW）：表征已提交消息和未提交消息的分界，这里的未提交是指该message未被全部follower副本replicate——大于等于HW的均未被replicate<ul>
+<li>leader副本的HW即为分区的HW</li>
+<li>follower副本的HW表征其与leader副本的同步情况，其值 = min(收到的leader的HW, follower的LEO)</li>
+</ul>
+</li>
+<li>日志末端位移（log end offset，简称LEO）：表征待写入消息的位置位移，新的消息来临时将写入LEO指向的位置，然后LEO自增1<ul>
+<li>leader副本同时保存有follower的LEO，用途：leader的HW = min(缓存的follower的LEO，leader的LEO)</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431213-50af2300-270b-11ea-8af6-8146d902e255.png" alt="image"></p>
+<ul>
+<li>当producer生产消息0时，leader的LEO被设为1</li>
+<li>此时follower来fetch消息（offset为0），leader更新remote LEO为0（offset的值），leader的HW更新为min(remote LEO, leader LEO)即为0</li>
+<li>follower收到fetch的消息0，LEO自增1，更新HW为min(follower的LEO，leader的HW)，即为0</li>
+<li>follower继续fetch消息（offset为1），leader更新remote LEO为1（offset的值），leader的HW更新为min(remote LEO, leader LEO)即为1</li>
+<li>follower收到fetch的空消息（leader没有新消息了），更新HW为min(follower的LEO，leader的HW)，即为1</li>
+</ul>
+<p>可以看到，leader的HW需要在第二次RPC时才更新，且在HW更新的response返回给follower前若follower宕机，则follower重启后LEO会被截断为HW导致未提交的消息丢失，此时若leader也正好宕机则会导致消息的彻底丢失，如下图：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431323-0c705280-270c-11ea-92c0-de96d67b89ce.png" alt="image"></p>
+<p><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation" target="_blank" rel="noopener">KIP-101</a>提出了利用Epoch解决该问题，follower在重启后向leader获取最新的LEO防止错误截断，如下图：<br><img src="https://user-images.githubusercontent.com/4915189/71431336-25790380-270c-11ea-8301-3e582ff3c1cb.png" alt="image"></p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ol>
+<li>为何使用MQ<ul>
+<li>异步通信（调用解耦、故障隔离）</li>
+<li>流量的削峰（防止流量压垮）</li>
+<li>消息的持久化（可重试，可重复消费）</li>
+</ul>
+</li>
+<li>与其他MQ的对比<ul>
+<li>RabbitMQ支持多协议，非常重量级，更适合于企业级开发</li>
+<li>Redis的MQ支持，适合于存小消息，且可能丢消息</li>
+<li>ZeroMQ是一个代码库，需要自己设计mq通信模式，可能丢消息</li>
+<li>ActiveMQ支持多协议，类似于ZeroMQ，它能够以代理人和点对点的技术实现队列</li>
+<li>kafka的显示特点：顺序写、push and pull、消息可重复消费、水平扩展、replica</li>
+</ul>
+</li>
+<li>Kafka delivery guarantee<ul>
+<li>At most once：设置producer为异步发送</li>
+<li>At least once：可能会导致消息的重复投递</li>
+<li>Exactly once：每个producer在创建时将会被分配一个PID，broker收到数据后将会检测&lt;PID, TOPIC, PARTITION&gt;对应的sequence是否增加，是则接受消息，否则丢弃消息。这种机制只能针对单个分区实现幂等，且要求producer不能宕机</li>
+</ul>
+</li>
+<li>物理上如何存储<ul>
+<li>每个topic-partition组合为一个文件夹，文件夹中存有多个segment，segment的命名为第一条消息的offset+kafka后缀，且伴随有segment的索引文件</li>
+</ul>
+</li>
+<li>push vs pull<ul>
+<li>生产时push，由于kafka是顺序追加，因此可以做较高吞吐量的写入；消费时pull，由客户端自己去决定要pull多少，不至于压垮客户端</li>
+</ul>
+</li>
+<li>topic的partition是如何分配的<ul>
+<li>假设有n个broker</li>
+<li>第i个partition的leader副本将被分配到第(i mod n)个broker</li>
+<li>第i个partition的第j个follower副本将被分配到第((i+j) mod n)个broker</li>
+</ul>
+</li>
+<li>produer的ACK机制是如何保证的<ul>
+<li>acks = all</li>
+<li>producer将消息给到leader副本，leader副本将消息写到log</li>
+<li>ISR副本中的所有follower副本PULL到新消息立即回复ACK给leader，此时消息还在内存中，这算是性能和持久化的一个折中平衡，所有follower同时挂掉的可能性很低</li>
+</ul>
+</li>
+<li>leader副本挂了是如何重新选举的<ul>
+<li>kafka并非借助zookeeper的临时节点进行重新选举的，因为如果挂掉的broker上面有多个partition将会导致zookeeper负载非常的大。其重选举是由controller角色的broker从ISR集合中挑选的broker作为新leader（具体实现待考究）</li>
+</ul>
+</li>
+<li>kafka是如何实现读写负载均衡的<ul>
+<li>partition均可能均匀的分发到各个broker</li>
+<li>partition是最小并发粒度提供读写，不至于使流量集中压在一台broker上</li>
+</ul>
+</li>
+<li>kafka在网络传输层面的优化<ul>
+<li>producer并发每次send调用都将消息发送到broker，而是按时间或量积攒后批处理发到broker</li>
+<li>broker也不是每收到一条消息就flush落盘，而是先写page cache，如果生产、消费速率相当此时消费者可能从cache直接取到消息绕开读盘，其缺点也由replica机制规避</li>
+<li>kafka使用sendfile调用实现segment传输的zero copy</li>
+<li>produce、consume传输的都是压缩的数据</li>
+<li>kafka支持avro、protocol buffer等序列化方式对消息进行序列化，进一步减少传输的数据量大小</li>
+</ul>
+</li>
+<li>kafka的事务保障<ul>
+<li>跨session的幂等写入，producer中间故障后恢复重写依然可以保证幂等</li>
+<li>跨session的事务恢复，producer中间故障后恢复的新实例可以保证旧事务的commit或abort</li>
+<li>跨多个topic-partition的写入，要么全部成功，要么全部失败，不会有中间状态</li>
+<li>注意事项<ul>
+<li>需要在producer的配置文件配置唯一的transaction.id</li>
+<li>consumer不保证一个已commit的事务的所有消息都会被消费，原因有：consumer不一定订阅全部topic，consumer可以使用seek从任意位置消费</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="最终总结"><a href="#最终总结" class="headerlink" title="最终总结"></a>最终总结</h2><p><img src="https://user-images.githubusercontent.com/4915189/71614560-5a42fa00-2be7-11ea-9a9f-f30a025b6381.png" alt="image"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/27/b-tree/" rel="next" title="b-tree的由来">
+                <i class="fa fa-chevron-left"></i> b-tree的由来
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/14/chenhao-resilience-design/" rel="prev" title="《左耳听风》笔记：弹性设计篇">
+                《左耳听风》笔记：弹性设计篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka的三层模型"><span class="nav-number">1.</span> <span class="nav-text">Kafka的三层模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka的几个重要版本"><span class="nav-number">2.</span> <span class="nav-text">Kafka的几个重要版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka的重要参数"><span class="nav-number">3.</span> <span class="nav-text">kafka的重要参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分区策略"><span class="nav-number">4.</span> <span class="nav-text">分区策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#压缩、解压策略"><span class="nav-number">5.</span> <span class="nav-text">压缩、解压策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#丢消息问题"><span class="nav-number">6.</span> <span class="nav-text">丢消息问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#producer对TCP连接的管理"><span class="nav-number">7.</span> <span class="nav-text">producer对TCP连接的管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拦截器"><span class="nav-number">8.</span> <span class="nav-text">拦截器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#consumer-offsets"><span class="nav-number">9.</span> <span class="nav-text">__consumer_offsets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#consumer-group"><span class="nav-number">10.</span> <span class="nav-text">consumer group</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消费者端多线程设计（KafkaConsumer为单线程）"><span class="nav-number">11.</span> <span class="nav-text">消费者端多线程设计（KafkaConsumer为单线程）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CommitFailedException"><span class="nav-number">12.</span> <span class="nav-text">CommitFailedException</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消费者管理TCP连接"><span class="nav-number">13.</span> <span class="nav-text">消费者管理TCP连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消费者组位移"><span class="nav-number">14.</span> <span class="nav-text">消费者组位移</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#consumer-group的消费监控"><span class="nav-number">15.</span> <span class="nav-text">consumer group的消费监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#副本机制"><span class="nav-number">16.</span> <span class="nav-text">副本机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#broker的请求处理模型"><span class="nav-number">17.</span> <span class="nav-text">broker的请求处理模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka重平衡"><span class="nav-number">18.</span> <span class="nav-text">kafka重平衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kafka的控制器（controller）"><span class="nav-number">19.</span> <span class="nav-text">kafka的控制器（controller）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高水位和Leader-Epoch"><span class="nav-number">20.</span> <span class="nav-text">高水位和Leader Epoch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题"><span class="nav-number">21.</span> <span class="nav-text">常见问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最终总结"><span class="nav-number">22.</span> <span class="nav-text">最终总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

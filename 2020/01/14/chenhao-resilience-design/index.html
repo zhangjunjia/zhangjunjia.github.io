@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="系统设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="极客时间《左耳听风》专栏读书笔记之弹性设计篇。">
+<meta name="keywords" content="系统设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《左耳听风》笔记：弹性设计篇">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/01/14/chenhao-resilience-design/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="极客时间《左耳听风》专栏读书笔记之弹性设计篇。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71655359-517e2f80-2d71-11ea-82a2-3489c1d0ea2e.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71948706-d5219b80-320b-11ea-887e-055f03e117d0.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71948724-eb2f5c00-320b-11ea-8b45-456a4325b7ff.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71948727-f08ca680-320b-11ea-8152-9260165cdafd.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/72056536-c4565000-3307-11ea-93bb-c1b6f88e4361.png">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.373Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《左耳听风》笔记：弹性设计篇">
+<meta name="twitter:description" content="极客时间《左耳听风》专栏读书笔记之弹性设计篇。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/71655359-517e2f80-2d71-11ea-82a2-3489c1d0ea2e.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/01/14/chenhao-resilience-design/"/>
+
+
+
+
+
+  <title>《左耳听风》笔记：弹性设计篇 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/01/14/chenhao-resilience-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《左耳听风》笔记：弹性设计篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-14T22:43:57+08:00">
+                2020-01-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统设计</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>极客时间《左耳听风》专栏读书笔记之弹性设计篇。</p>
+<a id="more"></a>
+<h2 id="隔离设计-bulkheads"><a href="#隔离设计-bulkheads" class="headerlink" title="隔离设计 bulkheads"></a>隔离设计 bulkheads</h2><p>按服务类型进行隔离</p>
+<ul>
+<li>域名隔离</li>
+<li>服务器隔离</li>
+<li>数据库隔离</li>
+</ul>
+<p>按请求做分离</p>
+<ul>
+<li>完全资源隔离（资源共享度低、实现复杂度低）</li>
+<li>共享服务、共享数据（隔离度低、占用成本低）</li>
+<li>折中：共享服务、数据分区</li>
+</ul>
+<h2 id="异步通讯设计-asynchronous"><a href="#异步通讯设计-asynchronous" class="headerlink" title="异步通讯设计 asynchronous"></a>异步通讯设计 asynchronous</h2><p>为什么需要异步通讯？先看看同步通讯的缺点：</p>
+<ul>
+<li>影响吞吐量、浪费资源：A同步调用B，B同步调用C，当同步调用的链条太长时，系统中响应最慢的那个结点决定了整体调用时间，拖慢了处理快的结点，影响系统吞吐量，浪费上游调用方的资源（因为需要保存context等待结果返回）</li>
+<li>只能一对一调用，出故障时极容易出现多米诺骨牌效应（雪崩）</li>
+</ul>
+<p>异步通讯有哪几种模式：</p>
+<ul>
+<li>sender调用receiver，receiver立即返回一个确认信号。紧接着sender间隔轮询receiver，检测调用是否完成；另一种办法是，sender在调用时携带上callback地址，receiver处理完成后主动调用callback地址，sender弱依赖receiver</li>
+<li>把sender当成publisher，receiver当成subscriber，subscriber主动订阅publisher的消息，收到消息后触发相应逻辑。如库存服务订阅订单服务，在订单生成后的30分钟内锁住该一定件数的库存。对于publisher，它只需要subscriber的ACK即可，不需要知道subscriber干成什么样，此时subscriber弱依赖publisher</li>
+<li>sender =&gt; broker =&gt; receiver。增加一个broker中间件，sender和receiver间的依赖彻底打破，sender只管生产消息到broker，receiver只管从broker消费消息。同步调用本质上是一种函数调用，有入参、需要保存context，然后等待return结果，此时sender是有状态的。broker模式是一种event driven architecture，状态下沉到broker，使得sender无状态化，它们之间交互的只有event（含data）。比如：订单服务 -&gt; broker_a =&gt; 支付服务 =&gt; broker_b =&gt; 物流服务。</li>
+</ul>
+<p>broker模式至少有以下好处：</p>
+<ul>
+<li>可替换：服务解耦了，只要遵循broker的消息规范，服务可任意替换</li>
+<li>隔离：服务相互隔离，其扩容、运维、开发互不影响</li>
+<li>adapter：服务增加adapter相当容易（鉴权、熔断、降级、限流、日志）</li>
+<li>非阻塞：服务通过事件关联，不会相互block</li>
+<li>高吞吐：服务的吞吐量依赖关系也解开了，可各自按照服务自身的情况进行扩容。把抖动的流量变成平均流量，起到了削峰的作用</li>
+</ul>
+<p>但同时broker模式也带来以下坏处：</p>
+<ul>
+<li>观测性：业务的处理变得复杂，不像同步调用那样容易观测，需要一些辅助可视化工具</li>
+<li>事件乱序：分布式化后难以保证事件在消费时的顺序性，因此要求服务本身不依赖事件的时序来设计</li>
+<li>事务复杂：事务的处理变得复杂，可能需要二阶段提交或者退化为最终一致性</li>
+</ul>
+<p>broker作为核心的中间件，必须满足以下特性：</p>
+<ul>
+<li>高可用；</li>
+<li>高性能而且是可水平扩展的；</li>
+<li>持久化不丢数据。</li>
+</ul>
+<h2 id="幂等设计-idempotency"><a href="#幂等设计-idempotency" class="headerlink" title="幂等设计 idempotency"></a>幂等设计 idempotency</h2><p>用数学语言表达就是：y = f(x)，只要x值不变，y的值也不变。比如abs(x)，调用多少次得到的都是同一个值。为什么需要幂等设计？对API的调用可能存在timeout，此时有两个解决办法：</p>
+<ul>
+<li>系统暴露另外个接口给调用方，去查询调用是否完成</li>
+<li>系统支持重复调用，调用方检测到timeout重复调用即可</li>
+</ul>
+<p>以上两个方案都需要有一个全局id来标识一次调用，全局id可参考Twitter的snowflake算法，通过机房、机器、时间戳、worker数量、计数器等多参数构造全局id。</p>
+<p>对于API系统，需要有存储用于存储和查询全局id，用于判断该调用是否已完成，已完成的话直接返回。存储的全局id必须是无状态的容易扩容的，否则将成为系统的瓶颈，可以使用关系型数据库或者NoSQL服务（如MongoDB）</p>
+<h2 id="服务的状态-state"><a href="#服务的状态-state" class="headerlink" title="服务的状态 state"></a>服务的状态 state</h2><p>服务的状态无处不在，比如：</p>
+<ul>
+<li>多服务调用的上下文</li>
+<li>幂等调用记录的某次调用的标识ID</li>
+<li>用户的session</li>
+</ul>
+<p>无状态的服务stateless</p>
+<ul>
+<li>可随意扩容伸缩</li>
+<li>一般需要把状态下沉到分布式存储，如Redis/MySQL/ZooKeeper等</li>
+<li>为了减少服务到分布式存储的网络开销，一般还需要在每台服务上做全量缓存，内存上较为浪费</li>
+</ul>
+<p>有状态的服务stateful</p>
+<ul>
+<li>data locality：状态和数据都是特定机器保存，更低的延时；更强的一致性，更高的可用性</li>
+<li>实现方式之一：sticky connection，比如持久化的长连接，这种方式容易造成服务端的负载不均衡，需要客户端配合一起实现反向压力back pressure</li>
+<li>实现方式之二：路由节点，根据元数据索引来路由到特定机器</li>
+<li>实现方式之三：摘掉路由节点，服务本身也承担路由功能，多服务之间通过gossip发现其他服务的元数据</li>
+<li>容错策略：把状态数据持久化到一个高可用的分布式存储，这样在应用重启时可以快速拉取恢复，再从其他replica节点拉取少量数据即可</li>
+</ul>
+<h2 id="补偿事务-compensating-transaction"><a href="#补偿事务-compensating-transaction" class="headerlink" title="补偿事务 compensating transaction"></a>补偿事务 compensating transaction</h2><p>ACID的可扩展性差，BASE是基于ACID的一个变种：</p>
+<ul>
+<li>basic availability：可能出现短暂的不可用</li>
+<li>soft-state：介于有状态、无状态之间，这些数据可能不是强一致的（为了提高性能）</li>
+<li>eventually consistency：最终一致性</li>
+</ul>
+<p>亚马逊在创建订单时并不会去锁库存，因此并发创建订单是无锁的，这可能出现超卖，但能提供下单的吞吐量，不用受限于锁库存、更新库存等耗时操作。订单创建后，被并行的进行处理（异步），此时才会真正去扣减库存并发货，此时若发现库存没有了则会触发致歉邮件同时触发退款。这背后就是BASE的思想了。因此，为了实现BASE，我们需要对事物进行补偿（回滚）。业务补偿的设计有两个重点：</p>
+<ul>
+<li>努力达成业务：这意味着上游应进行重试、且服务的调用需要是幂等的</li>
+<li>如果多次尝试都无法成功则需要对事务进行补偿：调用是多服务组合的，需要有一个高可用的工作流引擎记录成功进行到哪一步，把已经成功的有影响的操作进行回滚</li>
+</ul>
+<h2 id="重试的设计-retry"><a href="#重试的设计-retry" class="headerlink" title="重试的设计 retry"></a>重试的设计 retry</h2><ul>
+<li>when: 什么时候需要重试</li>
+<li>how: 重试多少次、重试的间隔（fail fast/exponential backoff）</li>
+<li>注意：重试要求对端服务支持幂等调用，否则会有副作用；重试逻辑也可以下沉到service mesh，也可由spring进行代理（annotation）</li>
+</ul>
+<h2 id="熔断设计-circuit-breaker"><a href="#熔断设计-circuit-breaker" class="headerlink" title="熔断设计 circuit breaker"></a>熔断设计 circuit breaker</h2><p><img src="https://user-images.githubusercontent.com/4915189/71655359-517e2f80-2d71-11ea-82a2-3489c1d0ea2e.png" alt="image"></p>
+<p>熔断器设计灵感由于电气中的保险丝，它是介于调用方和被调用方的一个安全保障。熔断器有以下三种状态：</p>
+<ul>
+<li>closed：此时调用直达到调用方</li>
+<li>open：此时调用直接被熔断器拒绝，当一定时间内的失败调用次数达到阈值会从closed进入此状态</li>
+<li>half-open：进入open后达到一个阈值时间自动进入此状态，此时新进来的流量若能正常调用成功，则恢复到closed状态，否则重新变为open状态</li>
+</ul>
+<p>在设计熔断器时，有以下要点需要考虑：</p>
+<ul>
+<li>错误的类型：有些返回（如服务集群crash）就应该让熔断器直接进入open状态</li>
+<li>测试服务可用：与其直接进入half-open状态让真实流量来探活，还不如在切换到此状态前先调用对方的健康检查接口确保调用方的可用性</li>
+<li>手动重置：提供admin接口，便于运维人员的人为介入改变熔断器状态</li>
+<li>分区问题：有些后端服务是分区的，如分库分表，部分分区不可用不代表整个服务不可用</li>
+</ul>
+<h2 id="限流设计-throttle"><a href="#限流设计-throttle" class="headerlink" title="限流设计 throttle"></a>限流设计 throttle</h2><p>限流有4个主要目</p>
+<ul>
+<li>保障SLA（可用性）和RT（响应时间）</li>
+<li>多租户情况下防止单一租户将资源耗尽</li>
+<li>应对突发流量，如秒杀</li>
+<li>节约成本，系统不需要时候运行在最高容量</li>
+</ul>
+<p>在行为上，它表现为以下几种：</p>
+<ul>
+<li>拒绝服务：可以拒绝掉那些请求最多的客户端，防止恶意攻击</li>
+<li>服务降级：可以把不重要服务停掉，可以只返回部分而非全量数据，可以返回缓存（牺牲一致性）</li>
+<li>特权请求：有限的资源分配给更重要的客户</li>
+<li>延时处理：要队列来缓存，达到削峰效果</li>
+<li>弹性伸缩：自动化运维对TOP5的高负载服务进行弹性伸缩</li>
+</ul>
+<p>限流的静态实现方式有以下几种</p>
+<ul>
+<li>计数器方式：请求进来+1，请求结束-1，当计数值大于M触发限流，当计数值小于N解除限流</li>
+<li>队列方式：请求积压到队列，processor一空闲就获取任务进行处理。如果需要考虑高优请求先处理，可以将队列设计成两个队列（一个高优、一个次优），多个队列可设置时间权重防止某个队列出现饥饿<br><img src="https://user-images.githubusercontent.com/4915189/71948706-d5219b80-320b-11ea-887e-055f03e117d0.png" alt="image"></li>
+<li>漏斗算法：请求积压到队列，processor以特定的速率取任务进行处理，不能超过这个限定的速率<br><img src="https://user-images.githubusercontent.com/4915189/71948724-eb2f5c00-320b-11ea-8b45-456a4325b7ff.png" alt="image"></li>
+<li>令牌桶算法：请求积压队列，processor只要能在令牌桶取到令牌就可以进行处理。处理速率受限于令牌桶的令牌数，当令牌桶积压了多数令牌，且恰好有大量待处理请求，则此时可能有一个较高的QPS<br><img src="https://user-images.githubusercontent.com/4915189/71948727-f08ca680-320b-11ea-8152-9260165cdafd.png" alt="image"></li>
+</ul>
+<p>以上几种限流方式，都需系统预设一个静态的阈值。限流的动态实现方式是基于RT（response time），实现思路如下：</p>
+<ul>
+<li>利用采样，或者reservoir sampling，统计一段时间的RT的P99和P90所在位置（毫秒值）</li>
+<li>如果P99和P90的时间慢于我们的期望值，将QPS进行折半限流，然后模仿TCP拥塞处理将QPS值进入慢启动，直到P99和P90又低于期望值，重新折半QPS</li>
+</ul>
+<p>最后，限流在设计中还应该有以下考量</p>
+<ul>
+<li>限流设计应在架构早期引入</li>
+<li>限流模块性能必须足够好，对流量变化需要非常敏感</li>
+<li>限流应该有手动开关供应急使用</li>
+<li>限流发送应该有事件通知运维</li>
+<li>限流发生时，对于拒绝掉的请求带上限流状态码，以供客户端做相应调整</li>
+<li>限流应让后端感知到，如设置Header，服务端可决定是否降级</li>
+</ul>
+<h2 id="降级设计-degradation"><a href="#降级设计-degradation" class="headerlink" title="降级设计 degradation"></a>降级设计 degradation</h2><p>降级，本质是为了解决资源不足和访问量过大的问题。降级需要牺牲的一般有：</p>
+<ul>
+<li>降低一致性：流程一致性，数据一致性</li>
+<li>停止次要功能：停止不重要的功能，把资源释放出来</li>
+<li>简化功能：不再返回全量数据，而是部分数据</li>
+</ul>
+<p>降低一致性</p>
+<ul>
+<li>流程一致性：流程异步化，如果期间某个流程失败需要进行补偿</li>
+<li>数据一致性：返回缓存数据，使用cache aside缓存模式（参考<a href="https://coolshell.cn/articles/17416.html" target="_blank" rel="noopener">缓存套路</a>）</li>
+</ul>
+<p>停止次要功能</p>
+<ul>
+<li>优先停掉次要流量，停次要功能毕竟有损体验</li>
+<li>对用户做一些补偿，如跳转到红包页面</li>
+</ul>
+<p>简化功能</p>
+<ul>
+<li>仅返回最小可用数据</li>
+</ul>
+<p>设计要点</p>
+<ul>
+<li>定义清楚降级的条件</li>
+<li>梳理哪些业务可以牺牲</li>
+<li>降级做成配置开关化，或是通过调用参数来辨别是否降级</li>
+<li>需要客户端配合，如有些次要数据是否能不返回</li>
+<li>不是常规case，需要演练</li>
+</ul>
+<h2 id="弹性设计的总结"><a href="#弹性设计的总结" class="headerlink" title="弹性设计的总结"></a>弹性设计的总结</h2><p><img src="https://user-images.githubusercontent.com/4915189/72056536-c4565000-3307-11ea-93bb-c1b6f88e4361.png" alt="image"><br>服务冗余：服务不能是单点，需要多个replica，这需要服务发现、负载均衡、动态路由、健康检查4个功能或组件</p>
+<ul>
+<li>负载均衡：nginx或haproxy等技术</li>
+<li>服务发现、动态路由、健康检查：Zuul作为API网关实现动态路由，Consul或Zookeeper作为服务发现</li>
+<li>自动化运维：kubernates服务调度、伸缩和故障转移</li>
+</ul>
+<p>服务解耦：把服务隔离开来，使其不相互影响。水平上，可业务分区（业务隔离），或用户分区（多租户；垂直上，需要异步通讯；服务编排和聚合上，需要工作流把服务串起来（如Spring或Akka的Streams）；一致性上，需要业务补偿来做反向交易</p>
+<ul>
+<li>bulkheads模式：用户分片、业务分片、数据库拆分</li>
+<li>自包含系统：无外部服务依赖，把一组相关的微服务给拆出来</li>
+<li>异步通讯：异步通讯、消息队列、事件驱动</li>
+<li>自动化运维：需要有一个服务调用链和性能监控的监控系统</li>
+</ul>
+<p>服务容错：让这个架构能接受失败的设计。重试带来幂等问题，为了保障稳定性需要有限流、降级、熔断</p>
+<ul>
+<li>错误方面：重试设计+熔断设计+幂等设计</li>
+<li>一致性：强一致性使用两阶段提交，最终一致性使用异步通讯+事件补偿</li>
+<li>流控：限流设计+降级设计</li>
+<li>自动化运维：网关流量调度，服务监控</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/系统设计/" rel="tag"># 系统设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/03/kafka-geekbang-note/" rel="next" title="《Kafka核心技术与实战》专栏笔记">
+                <i class="fa fa-chevron-left"></i> 《Kafka核心技术与实战》专栏笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/15/chenhao-manage-design/" rel="prev" title="《左耳听风》笔记：管理设计篇">
+                《左耳听风》笔记：管理设计篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#隔离设计-bulkheads"><span class="nav-number">1.</span> <span class="nav-text">隔离设计 bulkheads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步通讯设计-asynchronous"><span class="nav-number">2.</span> <span class="nav-text">异步通讯设计 asynchronous</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#幂等设计-idempotency"><span class="nav-number">3.</span> <span class="nav-text">幂等设计 idempotency</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务的状态-state"><span class="nav-number">4.</span> <span class="nav-text">服务的状态 state</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补偿事务-compensating-transaction"><span class="nav-number">5.</span> <span class="nav-text">补偿事务 compensating transaction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重试的设计-retry"><span class="nav-number">6.</span> <span class="nav-text">重试的设计 retry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#熔断设计-circuit-breaker"><span class="nav-number">7.</span> <span class="nav-text">熔断设计 circuit breaker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限流设计-throttle"><span class="nav-number">8.</span> <span class="nav-text">限流设计 throttle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#降级设计-degradation"><span class="nav-number">9.</span> <span class="nav-text">降级设计 degradation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弹性设计的总结"><span class="nav-number">10.</span> <span class="nav-text">弹性设计的总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

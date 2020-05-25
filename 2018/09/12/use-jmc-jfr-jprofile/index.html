@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文记录使用JMC（Java Mission Controll）、JFR（Java Flight Record）以及JProfile诊断Java应用不可用（OutOfMemroy）的过程。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用JMC+JFR+JProfile检测Java程序异常">
+<meta property="og:url" content="https://zhangjunjia.github.io/2018/09/12/use-jmc-jfr-jprofile/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="本文记录使用JMC（Java Mission Controll）、JFR（Java Flight Record）以及JProfile诊断Java应用不可用（OutOfMemroy）的过程。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431495-1c3c6680-270d-11ea-90d1-363a669926ad.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431503-20688400-270d-11ea-9daa-25778fbe457c.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431506-23fc0b00-270d-11ea-9cde-f38238128793.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431507-28c0bf00-270d-11ea-8279-1079cb2c8039.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431509-2bbbaf80-270d-11ea-922d-2be36cd1c0a1.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431511-2eb6a000-270d-11ea-93ee-2ea28c6759d1.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431514-3413ea80-270d-11ea-8f82-040fe8cbb8cc.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431518-370edb00-270d-11ea-8da0-368182699273.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431520-3c6c2580-270d-11ea-96a7-600262a7dedb.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431522-40984300-270d-11ea-8fb8-9a3b79ec213a.png">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.373Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用JMC+JFR+JProfile检测Java程序异常">
+<meta name="twitter:description" content="本文记录使用JMC（Java Mission Controll）、JFR（Java Flight Record）以及JProfile诊断Java应用不可用（OutOfMemroy）的过程。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/71431495-1c3c6680-270d-11ea-90d1-363a669926ad.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2018/09/12/use-jmc-jfr-jprofile/"/>
+
+
+
+
+
+  <title>使用JMC+JFR+JProfile检测Java程序异常 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2018/09/12/use-jmc-jfr-jprofile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用JMC+JFR+JProfile检测Java程序异常</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-12T23:03:39+08:00">
+                2018-09-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程实践/" itemprop="url" rel="index">
+                    <span itemprop="name">编程实践</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文记录使用JMC（Java Mission Controll）、JFR（Java Flight Record）以及JProfile诊断Java应用不可用（OutOfMemroy）的过程。</p>
+<a id="more"></a>
+<h1 id="术语说明"><a href="#术语说明" class="headerlink" title="术语说明"></a>术语说明</h1><ul>
+<li><strong>搜计程序</strong>：搜索与计算引擎服务程序。</li>
+<li><strong>接口服务（function）</strong>：搜计程序通过dubbo和http暴露出来的服务，调用此接口服务可获取相关数据，搜计程序有多个接口服务，接口服务的别名为function。接口服务的名称及调用入参，由客户通过搜计程序的管理界面设定。</li>
+<li><strong>调用者</strong>：调用搜计程序接口服务的进程，如Web系统。</li>
+<li><strong>调用请求</strong>：调用者对搜计程序提供的接口服务进行一次RPC调用称为一次调用请求。</li>
+<li><strong>执行步骤（procedure）</strong>：接口服务被调用后，通常需要在后台执行一次或多次计算过程，每个计算过程称为一个执行步骤，别名为procedure。接口服务最终返回的结果，依赖于各执行步骤结果的聚合。执行步骤的内部细节（查询的字段、是否联表等），由客户通过搜计程序的管理界面设定。</li>
+<li><strong>Limit参数</strong>：当数据无限多时，理论上来讲function以及procedure返回的数据可能无限多，因此必须对返回结果的行数进行限定。此限定参数称为limit参数，格式一般为limit offset, number。Offset表示前多少条结果需要被忽略，number表示忽略了offset条结果后需要取的结果数量。</li>
+</ul>
+<h1 id="现象描述"><a href="#现象描述" class="headerlink" title="现象描述"></a>现象描述</h1><p>搜计程序出现了OutOfMemoryError、调用者请求无响应以及调用请求耗时较长等问题。</p>
+<h2 id="JVM表现"><a href="#JVM表现" class="headerlink" title="JVM表现"></a>JVM表现</h2><p>8月29至9月1，搜计程序部署在192.168.8.181服务器用于自定义项目自测时，发生了多次的OutOfMemoryError，截取部分信息如下：</p>
+<blockquote>
+<p>java.lang.OutOfMemoryError: GC overhead limit exceeded<br><img src="https://user-images.githubusercontent.com/4915189/71431495-1c3c6680-270d-11ea-90d1-363a669926ad.png" alt="OutOfMemoryError"></p>
+</blockquote>
+<h2 id="OS表现"><a href="#OS表现" class="headerlink" title="OS表现"></a>OS表现</h2><p>搜计程序在181服务器的最大堆内存（Xmx）为8G，通过监测发现，程序在濒临OutOfMemoryError时，实用memory为8G，实用+swap的memory为9G。程序在OutOfMemoryError前，有接近1G的内存被swap到了硬盘，表明程序本身所需内存不断增大，同时OS可用内存不足。</p>
+<h2 id="调用者表现"><a href="#调用者表现" class="headerlink" title="调用者表现"></a>调用者表现</h2><p>Web系统等调用搜计程序接口服务的进程，出现了调用接口服务无返回数据，以及调用接口服务后需要等待长时间才有返回数据的情况。</p>
+<h1 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h1><p>通过Java Flight Recoder对181服务器的搜计程序进行1小时的采样，得到以下信息，基于这些信息可推测出搜计程序OutOfMemoryError以及无响应的原因。</p>
+<h2 id="CPU及分析"><a href="#CPU及分析" class="headerlink" title="CPU及分析"></a>CPU及分析</h2><p><img src="https://user-images.githubusercontent.com/4915189/71431503-20688400-270d-11ea-9daa-25778fbe457c.png" alt="图01 程序OutOfMemoryError前的CPU使用率"></p>
+<p>通过图01分析发现，程序OutOfMemoryError前，有一段时间CPU使用率急剧上升，随后下降一段时间，然后又急剧上升。且CPU使用率的急剧上升，是由JVM用户线程导致的（图01蓝色部分）。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431506-23fc0b00-270d-11ea-9cde-f38238128793.png" alt="图02 程序OutOfMemoryError前的热点线程和热点方法分析"></p>
+<p>通过图02分析发现，程序OutOfMemoryError前，存在大量的上下文切换，CPU时间主要分配给了调用请求响应线程（dubbo）。</p>
+<p>基于以上信息，推测搜计程序的OutOfMemoryError可能和大量的调用请求有关。</p>
+<h2 id="内存分析"><a href="#内存分析" class="headerlink" title="内存分析"></a>内存分析</h2><p><img src="https://user-images.githubusercontent.com/4915189/71431507-28c0bf00-270d-11ea-8279-1079cb2c8039.png" alt="图03 程序OutOfMemoryError前的内存使用情况"></p>
+<p>如图03所示，堆内存的低谷节节攀升。在程序退出前（红框处），即使是GC后，也接近有3G的大小。通过dump内存分析后发现，搜计程序大部分内存基本分布在程序的mergeData方法，而mergeData是由调用请求触发的。</p>
+<p>基于以上信息以及<strong>3.4 内存泄漏分析</strong>，可以断定搜计程序的OutOfMemoryError是由调用请求导致的。</p>
+<h2 id="GC分析"><a href="#GC分析" class="headerlink" title="GC分析"></a>GC分析</h2><p><img src="https://user-images.githubusercontent.com/4915189/71431509-2bbbaf80-270d-11ea-922d-2be36cd1c0a1.png" alt="图04 程序OutOfMemoryError前young gc和full gc监控"></p>
+<p>如果04所示，通过监控搜计程序的gc次数和时间发现：程序full gc的次数（252），远大于young gc的次数（9）；同时full gc的时间（750秒），远大于young gc的时间（3.2秒）。当程序长时间处于GC状态时，调用请求对应的用户线程将长时间处于阻塞状态，得不到响应，这是程序变慢最直接的原因。大部分用户线程处于阻塞状态如图05所示。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431511-2eb6a000-270d-11ea-93ee-2ea28c6759d1.png" alt="图 05 Park表示线程处于阻塞状态"></p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431514-3413ea80-270d-11ea-8f82-040fe8cbb8cc.png" alt="图06 程序OutOfMemoryError前发生了一次时间特别长的FULL GC"></p>
+<p>图06所示，程序OutOfMemoryError前发生了一次时间特别长的FULL GC，且仅回收了400M的内存。这是JVM出现“GC overhead limit exceeded”的根本原因。表明了GC时间太长，但回收的内存太少。</p>
+<p>当Full GC后，JVM依然没有足够内存提供给应用线程时，JVM就会抛出OutOfMemoryError。基于以上信息，可得出程序OutOfMemoryError的根本原因是大量调用请求导致的JVM内存不足。而大量请求之所以会导致JVM内存不足，<strong>主要原因在于部分调用请求在每个执行步骤申请了大量的堆内存，如日志查询等调用请求</strong>。如果频繁的、并发的调用日志查询请求，搜计程序短时间内就会产生OutOfMemoryError。</p>
+<h2 id="内存泄漏分析"><a href="#内存泄漏分析" class="headerlink" title="内存泄漏分析"></a>内存泄漏分析</h2><p><img src="https://user-images.githubusercontent.com/4915189/71431518-370edb00-270d-11ea-8da0-368182699273.png" alt="图07 搜计程序0ld gen长时间监控"></p>
+<p>使用3个调用者线程，对搜计程序进行长达三天的不间断调用，但限定每次调用请求仅获取少量数据。图07为这期间的old gen内存使用情况，经历gc后old gen的内存基本持稳在0.07GB。这表明搜计程序在请求不多、请求数据量不大的情况下，JVM内存回收正常，程序本身没有存在内存泄漏。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>基于以上分析，归结得出程序OutOfMemoryError的主要原因：部分调用请求的执行步骤，申请了大量内存耗尽JVM可用内存导致的程序问题。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/71431520-3c6c2580-270d-11ea-96a7-600262a7dedb.png" alt="图08 一次调用请求"></p>
+<p>如图08所示，为一次导致OutOfMemoryError调用请求的示例。S1和S2表示执行步骤，S1和S2汇总后得到最终结果返回给调用者。且S1和S2所需的内存较多，超过了JVM的可用内存，Full GC后便会导致OutOfMemoryError。</p>
+<p>针对此问题，大致整理有以下解决方案。</p>
+<h2 id="重新审视产品需求"><a href="#重新审视产品需求" class="headerlink" title="重新审视产品需求"></a>重新审视产品需求</h2><p>从新审视产品需求，为何有请求大量数据的调用请求，需考虑：</p>
+<p>1） 这些调用请求是否是必要的，如果不必要则去除；</p>
+<p>2） 减少调用请求的执行步骤数量（尽可能不要联表查询，减少执行步骤的滞留内存）；</p>
+<p>3） 减少执行步骤命中的结果数量（多加一些查询参数的制约）。</p>
+<p>以上，需要和产品需求制定者和调用者进行沟通讨论。</p>
+<h2 id="在现有程序进行维护"><a href="#在现有程序进行维护" class="headerlink" title="在现有程序进行维护"></a>在现有程序进行维护</h2><h3 id="常规策略"><a href="#常规策略" class="headerlink" title="常规策略"></a>常规策略</h3><p><strong>1）废除全连接</strong></p>
+<p>左连接和内连接已经足以应对业务需要，是否还需要有全连接的支持。</p>
+<p><strong>2）查询结果重用（带超时）</strong></p>
+<ul>
+<li><p>对于查询大量数据的调用请求，应将接口服务产生的结果缓存到硬盘（带过期时间，过期自动清除），下次若请求相同数据，则直接查询缓存结果并返回；</p>
+</li>
+<li><p>对于查询大量数据的调用请求，若有两个调用请求同时请求相同的数据，则后到的连接等待先到的连接查询完成，复用先到的连接产生的结果返回给调用者。</p>
+</li>
+</ul>
+<p>（这种做法的代价是一定程度上牺牲了数据的实时性，即命中缓存时，可能某些真实数据已经产生了变化）</p>
+<p><strong>3）限定请求数量</strong></p>
+<p>限定调用请求的最大并发数量，防止调用请求过多，超出搜计程序的负载能力。</p>
+<p><strong>4）调用请求必须要有默认limit参数</strong></p>
+<p>假设数据库的数据有无限多行，调用请求不允许一次请求超过一定行数（假设是10000行）。首先，搜计程序一次提供太多行的数据作为返回结果，会导致堆内存暴增；其次，调用者获取这么多行的数据，也会导致内存暴增。正确的做法应该是调用者分多次调用，每次仅获取一定量的数据。</p>
+<p><strong>5）及时释放执行步骤申请的内存若未被后续执行步骤引用</strong></p>
+<p>假设一次调用请求需经历15个执行步骤，部分较前的执行步骤到了第10个执行步骤时，可能已经没有后续执行步骤对其有引用关系，此时应将该未被引用的执行步骤的内容置为null，告知JVM这块内存是可以回收的。</p>
+<h3 id="用IO换取内存的策略"><a href="#用IO换取内存的策略" class="headerlink" title="用IO换取内存的策略"></a>用IO换取内存的策略</h3><p><img src="https://user-images.githubusercontent.com/4915189/71431522-40984300-270d-11ea-8fb8-9a3b79ec213a.png" alt="图09 将S1步骤的数据获取转为链式IO"></p>
+<p>如图09所示，S1为一个需用到大量堆内存的执行步骤。原有的做法是一次性将S1需要用到的全部数据都从数据库查出，并加载到内存。一种改进措施是，<strong>分多次查询数据，逐次将部分结果加载入内存</strong>。</p>
+<p>例如，如上图所示，先加载n1到内存中，进行必要计算后，将n1计算产生的结果缓存到硬盘，并在内存记录n1计算产生的结果的相关索引信息。</p>
+<p>紧接着，加载n2到内存中，重复前述步骤，直至全部数据查询完毕。此时，便将S1的全部计算执行完毕，且在内存中记录了少量的、必要的关于各个分步骤的索引信息，这些索引信息包括了结果缓存在硬盘什么位置、有多少行等。</p>
+<p>这个做法的代价是：</p>
+<p>1） 若有大量数据的调用请求时，将产生大量的顺序读和顺序写IO，给硬盘带来巨大负载，因此必须使用独立的硬盘，而不是和其他应用程序公用。另外，出于性能考虑，独立的硬盘最好是固态硬盘。</p>
+<p>2） 由于存在频繁的写，硬盘的寿命将比普通用途缩短很多；</p>
+<p>3） 由于采用了分小步骤执行，一定程度丧失了数据的实时性，如执行n2的计算时，很可能n1的数据在数据库中已经被修改了；</p>
+<p>4） <strong>开发的复杂度难以预估</strong>。聚合函数、计算函数、其他高级函数，以及两个执行步骤产生的结果的联表和分组，全部受到影响，这些逻辑基本都需要修改，以支持这种IO换取内存的策略。</p>
+<p>5）<strong>如若查询命中的数据量是与日俱增的，此方案将造成长时间写IO，最终能为程序新的性能瓶颈。</strong></p>
+<h2 id="彻底重构"><a href="#彻底重构" class="headerlink" title="彻底重构"></a>彻底重构</h2><p>目前搜计程序执行多个执行步骤，并汇总得到最终结果的过程无比复杂，相当于实现了一个自用的SQL的执行引擎。同事建议可以引入Kylin，以替代现有的执行引擎。</p>
+<p>Kylin是一套旨在对Hadoop环境下分析流程进行加速、且能够与SQL兼容性工具顺利协作的解决方案，Kylin成功将SQL接口与多维分析机制（OLAP）引入Hadoop，旨在对规模极为庞大的数据集加以支持。</p>
+<p>对于Kylin能否替代现有解决方案，还需要做进一步的研究。代价是，若此方案可行，原执行引擎需要全部推翻重写。</p>
+<h2 id="增大内存"><a href="#增大内存" class="headerlink" title="增大内存"></a>增大内存</h2><p>物理上，增大机器内存，搜计程序所需内存远大于8G。至于具体需要增大到多少，需根据并发量、请求数据量进行制定。建议大小是32G。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/07/jvmtop-profile/" rel="next" title="如何诊断java程序CPU占用率过高">
+                <i class="fa fa-chevron-left"></i> 如何诊断java程序CPU占用率过高
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/13/basic-concept-of-mysql-1/" rel="prev" title="MySQL基础回顾01 | 表连接与Group By">
+                MySQL基础回顾01 | 表连接与Group By <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#术语说明"><span class="nav-number">1.</span> <span class="nav-text">术语说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#现象描述"><span class="nav-number">2.</span> <span class="nav-text">现象描述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM表现"><span class="nav-number">2.1.</span> <span class="nav-text">JVM表现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OS表现"><span class="nav-number">2.2.</span> <span class="nav-text">OS表现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用者表现"><span class="nav-number">2.3.</span> <span class="nav-text">调用者表现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原因分析"><span class="nav-number">3.</span> <span class="nav-text">原因分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU及分析"><span class="nav-number">3.1.</span> <span class="nav-text">CPU及分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存分析"><span class="nav-number">3.2.</span> <span class="nav-text">内存分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GC分析"><span class="nav-number">3.3.</span> <span class="nav-text">GC分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存泄漏分析"><span class="nav-number">3.4.</span> <span class="nav-text">内存泄漏分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">4.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#重新审视产品需求"><span class="nav-number">4.1.</span> <span class="nav-text">重新审视产品需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在现有程序进行维护"><span class="nav-number">4.2.</span> <span class="nav-text">在现有程序进行维护</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常规策略"><span class="nav-number">4.2.1.</span> <span class="nav-text">常规策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用IO换取内存的策略"><span class="nav-number">4.2.2.</span> <span class="nav-text">用IO换取内存的策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#彻底重构"><span class="nav-number">4.3.</span> <span class="nav-text">彻底重构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增大内存"><span class="nav-number">4.4.</span> <span class="nav-text">增大内存</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

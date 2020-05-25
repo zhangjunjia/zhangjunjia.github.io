@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="系统设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="极客时间《左耳听风》专栏读书笔记之管理设计篇。">
+<meta name="keywords" content="系统设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《左耳听风》笔记：管理设计篇">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/01/15/chenhao-manage-design/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="极客时间《左耳听风》专栏读书笔记之管理设计篇。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/72590334-6b566f80-3938-11ea-9ea4-941ff10507cb.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/72600359-6d2b2d80-394e-11ea-8128-f62d79847adc.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/72600725-27bb3000-394f-11ea-9f68-6c96b340c900.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/72601496-7ddca300-3950-11ea-8134-c643112e15d8.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/74081465-54fc8900-4a8a-11ea-8838-f642af9be652.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/74098340-0f0af800-4b52-11ea-9e13-e5718f806d88.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/74098316-ceab7a00-4b51-11ea-9d63-20d7bdf82969.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/74099636-d292c880-4b60-11ea-8fc8-088a51734e4d.png">
+<meta property="og:updated_time" content="2020-05-25T10:12:28.373Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《左耳听风》笔记：管理设计篇">
+<meta name="twitter:description" content="极客时间《左耳听风》专栏读书笔记之管理设计篇。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/72590334-6b566f80-3938-11ea-9ea4-941ff10507cb.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/01/15/chenhao-manage-design/"/>
+
+
+
+
+
+  <title>《左耳听风》笔记：管理设计篇 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/01/15/chenhao-manage-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《左耳听风》笔记：管理设计篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-15T11:03:25+08:00">
+                2020-01-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统设计</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>极客时间《左耳听风》专栏读书笔记之管理设计篇。</p>
+<a id="more"></a>
+<h2 id="分布式锁-distributed-lock"><a href="#分布式锁-distributed-lock" class="headerlink" title="分布式锁 distributed lock"></a>分布式锁 distributed lock</h2><p>为什么需要分布式锁，分布式研究者Martin Kleppmann在<a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">How to do distributed locking</a>提到有以下两点，</p>
+<ul>
+<li>Efficiency：防止只需要做一次的工作被重复执行，浪费资源</li>
+<li>Correctness：防止竞态修改资源导致不一致性</li>
+</ul>
+<p>分布式锁需要具备以下几个特点，</p>
+<ul>
+<li>安全性/排他性：任何时候只能有一个客户端获得锁</li>
+<li>避免死锁：客户端最终一定能获得锁，即使获得锁后客户端崩溃也不会影响后来者获取锁</li>
+<li>容错性：只要集群中半数以上结点存活，就可以正常加解锁</li>
+</ul>
+<p>方案1：Redis分布式锁（RedLock算法，<a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">Distributed locks with Redis</a>）</p>
+<ul>
+<li>其算法共5个步骤，详见<a href="https://zhangjunjia.github.io/2019/08/21/redlock-algorithm/">redis的分布式锁算法redlock</a></li>
+<li>其底层原理依赖于Redis的NX特性和TTL特性<ul>
+<li><code>SET resource_name my_random_value NX PX 30000</code></li>
+<li><code>NX</code>表示不存在才创建，因此只要有客户端在该Redis实例取锁后，其他客户端就会失败</li>
+<li><code>PX 30000</code>表示key的timeout时间，即使客户端取锁后崩溃，其锁也会在timeout后被释放</li>
+<li><code>my_random_value</code>必须是一个随机值，在释放锁时使用原子性的Check And Set进行释放，原子性可通过lua脚本实现</li>
+</ul>
+</li>
+<li>Martin Kleppmann在<a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">How to do distributed locking</a>认为此算法在某些情况不安全（下文详细展开），Redis作者antirez的回应<a href="http://antirez.com/news/101" target="_blank" rel="noopener">Is Redlock safe?</a>很有意思，<ul>
+<li>Martin Kleppmann的方案需要被修改的存储本身具备version自增和校验功能，如果存储本身具备这个功能真的还需要分布式锁吗？</li>
+<li>如果要操作的资源不是存储呢？</li>
+</ul>
+</li>
+</ul>
+<p>方案2：zookeeper分布式锁（<a href="https://juejin.im/post/5c01532ef265da61362232ed" target="_blank" rel="noopener">七张图彻底讲清楚ZooKeeper分布式锁的实现原理【石杉的架构笔记】</a>）</p>
+<ul>
+<li><a href="https://curator.apache.org/" target="_blank" rel="noopener">Apache Curator</a>基于ZooKeeper封装了分布锁服务</li>
+<li>其底层原理是ZooKeeper的临时顺序节点，以及watch机制<ul>
+<li>临时特性在客户端断开时触发sessionTimeout，将会导致锁的释放</li>
+<li>顺序特性在多个客户端竞争锁时，序号最小的那个客户端才认为获取到锁（需要获取znode下的所有子结点用于判断）</li>
+<li>获取锁的结点在使用完锁时，主动删除节点，将触发其他客户端的watch回调，重新进入一轮分布式锁是否获取到的判断</li>
+</ul>
+</li>
+</ul>
+<p>方案3：分布式锁fencing。耗子叔以及Martin Kleppmannd都提到，以上方案都会存在一个问题，客户端取锁后进入Stop The World，在恢复后其实锁已经超时，但客户端仍认为自己持有锁依然去操作共享资源，此时将会导致不一致，如下图所示</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/72590334-6b566f80-3938-11ea-9ea4-941ff10507cb.png" alt="image"></p>
+<p>解决方案是使用fencing机制，分布式锁服务在每次取锁成功返回的version需要是递增的，操作存储时存储本身要校验操作者的version是不是最新的——若不是则进行拒绝，过程如下：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/72600359-6d2b2d80-394e-11ea-8128-f62d79847adc.png" alt="image"></p>
+<p>方案4：存储支持version自增和校验功能。但如上文所说，如果存储本身支持version自增和校验功能，还需要分布式锁吗？</p>
+<ul>
+<li>对于普通update，我们可以使用乐观锁，比如<code>UPDATE table_name SET xxx = #{xxx}, version=version+1 where version =#{version};</code></li>
+<li>如果乐观锁失败，我们可以用CAS，比如<code>SELECT stock FROM tb_product where product_id=#{product_id}; UPDATE tb_product SET stock=stock-#{num} WHERE product_id=#{product_id} AND stock=#{stock};</code></li>
+</ul>
+<p>其过程大概如下图所示：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/72600725-27bb3000-394f-11ea-9f68-6c96b340c900.png" alt="image"></p>
+<p>分布式锁总结：每个方案都有trade-off，使用RedLock、ZooKeeper方案，则存在锁过期的问题；使用fencing，则存在分布式锁服务冗余的问题；使用存储本身支持的version管理，则又可能存在性能问题。</p>
+<h2 id="配置中心-Configuration-Management"><a href="#配置中心-Configuration-Management" class="headerlink" title="配置中心 Configuration Management"></a>配置中心 Configuration Management</h2><p>配置中心，一般指的是软件的动态配置部分，有三个区分的维度：</p>
+<ul>
+<li>按运行环境分：如开发、预发、线上环境</li>
+<li>按依赖区分：如依赖基础服务如Redis，如依赖外部服务的URL，如软件内部的依赖</li>
+<li>按层次分：如IaaS、PaaS、SaaS</li>
+</ul>
+<p>配置中心的模型设计，应考虑如下因素：</p>
+<ul>
+<li>分层：如操作系统层、平台层、应用层，不同层有不同人员负责配置</li>
+<li>命名空间：需要有namaspace防止应用间的冲突，还需要制定一套命名规范</li>
+<li>环境差异：同一个key/value，在不同环境的值可以是不同的</li>
+<li>版本管理以及灰度测试：每一个key/value，都应该进行版本记录便于回滚，同时可以指定该配置灰度的机器范围</li>
+</ul>
+<p>配置中心的架构，大致如下：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/72601496-7ddca300-3950-11ea-8134-c643112e15d8.png" alt="image"></p>
+<p>国内比较成熟的开源分布式配置中心：携程的<a href="https://github.com/ctripcorp/apollo" target="_blank" rel="noopener">Apollo</a></p>
+<h2 id="边车模式-sidecar"><a href="#边车模式-sidecar" class="headerlink" title="边车模式 sidecar"></a>边车模式 sidecar</h2><p>随着微服务的流行，服务需要嵌入越来越多控制层的职责：限流、熔断、日志、服务发现、监视、协议转换。为了实现逻辑和控制的分离，这些控制层职责会被下沉。分别有两种下沉的方式，一是Lib/SDK的方式，二是Sidecar模式。</p>
+<p>使用Lib/SDK下沉控制职责，</p>
+<ul>
+<li>好处：嵌入到代码逻辑，对应用的性能影响较小</li>
+<li>坏处：Lib/SDK通常和编程语言有关，因此业务逻辑必须使用相同的语言</li>
+<li>坏处：升级Lib/SDK需要重新打包应用，重新部署所有应用</li>
+</ul>
+<p>使用sidecar下沉控制职责，</p>
+<ul>
+<li>好处：对应用无侵入，逻辑层、控制层可做到分开开发、部署，逻辑层可使用任意编程语言开发</li>
+<li>坏处：增加服务依赖，增加调用时延，增加运维复杂度（一般是结合docker和kubernates降低运维复杂度）</li>
+</ul>
+<p>sidecar服务和应用服务部署在同一结点内（一般是同一机器上，这样通信延迟不会明显增加），具备相同的生命周期，一起创建、一起停止。每个应用服务实例都一一对应有一个sidecar，sidecar可以很方便的对应用服务进行扩展而无需修改应用服务，</p>
+<ul>
+<li>sidecar帮助服务注册到服务发现系统，对其捆绑服务做健康检查，若发现异常从服务发现系统注销捆绑服务</li>
+<li>当应用服务要调外部服务时，sidecar帮助在服务发现系统中找到对端服务，做服务路由</li>
+<li>sidecar接管进出流量，日志、调用链监控、流控熔断等等都可以放在sidecar实现</li>
+<li>服务控制系统可以通过sidecar来控制应用服务，如流控、下线等</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/4915189/74081465-54fc8900-4a8a-11ea-8838-f642af9be652.png" alt="image"></p>
+<p>sidecar在设计上需要注意以下要点，</p>
+<ul>
+<li>service与sidecar的通信是设计重点，千万不要使用对应用有侵入的方式（如共享内存、信号量），建议使用网络通信（通过127.0.0.1通信开销不大）</li>
+<li>service与sidecar的通信协议要兼容原先的service间的通信协议，sidecar与sidecar的通信协议使用更开放和高效的协议</li>
+<li>业务逻辑不要放在sidecar</li>
+<li>需要在服务的整体打包、构建、部署、管控设计好，使用上docker和kubernates这类技术</li>
+<li>小心sidecar的通用功能如重试，有些服务不支持幂等调用，这可能产生副作用</li>
+<li>应用服务和sidecar可互相传递上下文信息，如应用服务可设置http头告知sidecar最大重试次数、sidecar可在http头告知限流发生</li>
+</ul>
+<p>sidecar适合什么场景，</p>
+<ul>
+<li>无侵入的改造老应用</li>
+<li>对多种语言混合开发的分布式服务系统进行扩展</li>
+<li>系统的多应用服务由不同供应商提供，通过sidecar统一通信规范</li>
+<li>标准化控制面的逻辑，由更专业人员进行开发（分工考虑）</li>
+</ul>
+<p>sidecar不适合什么场景，</p>
+<ul>
+<li>架构并不复杂的时候，使用nginx或haproxy即可；</li>
+<li>服务间协议不标准；</li>
+<li>不打算架构为分布式服务系统。</li>
+</ul>
+<h2 id="服务网格-service-mesh"><a href="#服务网格-service-mesh" class="headerlink" title="服务网格 service mesh"></a>服务网格 service mesh</h2><p>linkerd作者在<a href="https://buoyant.io/2017/04/25/whats-a-service-mesh-and-why-do-i-need-one/" target="_blank" rel="noopener">What’s a service mesh? And why do I need one? </a>定义了service mesh是什么：</p>
+<blockquote>
+<p>A service mesh is a dedicated infrastructure layer for handling service-to-service communication. It’s responsible for the reliable delivery of requests through the complex topology of services that comprise a modern, cloud native application. In practice, the service mesh is typically implemented as an array of lightweight network proxies that are deployed alongside application code, without the application needing to be aware.</p>
+</blockquote>
+<p>总结来说，</p>
+<ul>
+<li>service mesh是处理服务与服务间通信的基础设施；</li>
+<li>service mesh是一组轻量的服务通讯的网络代理；</li>
+<li>service mesh对于应用是透明无侵入的；</li>
+<li>service mesh用于解耦和分离分布式系统中控制层面的职责；</li>
+</ul>
+<p>service mesh本质是一个sidecar集群，<a href="https://philcalcado.com/2017/08/03/pattern_service_mesh.html" target="_blank" rel="noopener">Pattern: Service Mesh</a>介绍了它是如何演化出来的：</p>
+<ul>
+<li>一开始是最原始的两台主机上进程进行通信；</li>
+<li>然后分离出网络层来，进程的通信由底层的网络模型完成；</li>
+<li>由于消费能力不对等，必须在应用层中实现流控；</li>
+<li>流控功能下沉到了网络层；</li>
+<li>由于微服务的出现，必须在应用层中实现熔断、服务发现、限流等控制层逻辑，这些逻辑起初是以Lib/SDK的方式实现的；</li>
+<li>由于Lib/SDK绑定语言、不便于升级的弊端，控制层下沉到sidecar服务；</li>
+<li>sidecar服务集群与管理控制面板，组成了service mesh，如下图；</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/4915189/74098340-0f0af800-4b52-11ea-9e13-e5718f806d88.png" alt="image"><br>service mesh的主流开源方案是linkerd（scala实现，其创始人后面用go和rust实现了另一个版本conduit）和istio。istio的架构如下图：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/74098316-ceab7a00-4b51-11ea-9d63-20d7bdf82969.png" alt="image"></p>
+<p>其中，</p>
+<ul>
+<li>envoy为sidecar服务；</li>
+<li>mixer收集envoy的metrics，通过pilot下发控制规则，通过auth下发安全规则；</li>
+</ul>
+<p>service mesh的设计重点，</p>
+<ul>
+<li>本地sidecar出问题时，能自动切到灾备的sidecar；</li>
+<li>sidecar服务为实例粒度，若上升到一组服务的粒度，进一步整体接入的粒度，那它就成了gateway；</li>
+<li>能否和kubernates密切结合是关键。</li>
+</ul>
+<h2 id="网关模式-gateway"><a href="#网关模式-gateway" class="headerlink" title="网关模式 gateway"></a>网关模式 gateway</h2><p>service mesh的粒度太细，把粒度粗化到一组服务的级别，职责转为只负责接入，就成了gateway模式。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/74099636-d292c880-4b60-11ea-8fc8-088a51734e4d.png" alt="image"></p>
+<p>如上图，在架构上，gateway模式是一个多层的星形拓扑。gateway一般需要具备以下功能：</p>
+<ul>
+<li>请求路由：接入请求，路由到后端服务</li>
+<li>服务注册：开放能力供后端服务注册</li>
+<li>负载均衡：如何分发请求的策略</li>
+<li>弹力设计：弹力设计的那些异步、重试、幂等、流控、熔断、监视等都可以实现进去</li>
+<li>安全方面：SSL加密及证书管理、session鉴权、数据校验、恶意攻击识别</li>
+<li>灰度发布：对相同服务的不同版本划分不同比例的流量</li>
+<li>API聚合：将多个单独请求聚合成一个请求</li>
+<li>API编排：将前端的api编排能力以插件的方式添加进来</li>
+</ul>
+<p>网关的设计重点</p>
+<ul>
+<li>高性能：使用什么语言实现是重点</li>
+<li>高可用：集群化、服务化（不停机reload+Admin的API）、持续化（不宕机重启）</li>
+<li>高扩展：可插拔，如nginx的module</li>
+</ul>
+<p>读完本篇有个很大疑问，网关只负责接入流量，那服务的出流量怎么办？即如何访问其他服务。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/系统设计/" rel="tag"># 系统设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/14/chenhao-resilience-design/" rel="next" title="《左耳听风》笔记：弹性设计篇">
+                <i class="fa fa-chevron-left"></i> 《左耳听风》笔记：弹性设计篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/02/09/chat-root-design/" rel="prev" title="聊天室高并发架构概要">
+                聊天室高并发架构概要 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">48</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式锁-distributed-lock"><span class="nav-number">1.</span> <span class="nav-text">分布式锁 distributed lock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置中心-Configuration-Management"><span class="nav-number">2.</span> <span class="nav-text">配置中心 Configuration Management</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边车模式-sidecar"><span class="nav-number">3.</span> <span class="nav-text">边车模式 sidecar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务网格-service-mesh"><span class="nav-number">4.</span> <span class="nav-text">服务网格 service mesh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网关模式-gateway"><span class="nav-number">5.</span> <span class="nav-text">网关模式 gateway</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
