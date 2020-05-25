@@ -3,7 +3,7 @@ title: redis的分布式锁算法redlock
 date: 2019-08-21 08:07:44
 tags: ['Redis']
 comments: true
-categories: ['分布式系统']
+categories: ['分布式系统', '中间件']
 ---
 
 Redis单实例用于分布式锁的方案，在对可靠性要求不够高的场景下已经被大量应用，然而此方案存在一些缺陷，其作者提出了一种新的基于redis多实例的改进版算法。

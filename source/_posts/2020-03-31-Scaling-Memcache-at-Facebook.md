@@ -3,7 +3,7 @@ title: Paper阅读：Scaling Memcache at Facebook
 date: 2020-03-31 20:33:29
 tags: ['Paper阅读', 'Memcached']
 comments: true
-categories: ['系统设计']
+categories: ['系统设计', '中间件']
 ---
 
 记录阅读论文[Scaling Memcache at Facebook](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)的笔记。
