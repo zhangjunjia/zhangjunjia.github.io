@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CQRS,EventSourcing," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文浅谈event sourcing和cqrs的一些认识.">
+<meta name="keywords" content="CQRS,EventSourcing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈event sourcing和cqrs">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/05/07/event-sc-and-cqrs/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="本文浅谈event sourcing和cqrs的一些认识.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/81551856-1c37bd00-93b5-11ea-94fa-62a167b93f51.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/81569729-3d5ad680-93d2-11ea-88c2-1666a0295ab5.png">
+<meta property="og:updated_time" content="2020-05-25T13:10:49.906Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈event sourcing和cqrs">
+<meta name="twitter:description" content="本文浅谈event sourcing和cqrs的一些认识.">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/81551856-1c37bd00-93b5-11ea-94fa-62a167b93f51.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/05/07/event-sc-and-cqrs/"/>
+
+
+
+
+
+  <title>浅谈event sourcing和cqrs | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/05/07/event-sc-and-cqrs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">浅谈event sourcing和cqrs</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-07T21:07:14+08:00">
+                2020-05-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统设计</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文浅谈event sourcing和cqrs的一些认识.</p>
+<a id="more"></a>
+<h2 id="Event-Sourcing"><a href="#Event-Sourcing" class="headerlink" title="Event Sourcing"></a>Event Sourcing</h2><p>Martin Fowler在<a href="https://martinfowler.com/eaaDev/EventSourcing.html" target="_blank" rel="noopener">Event Sourcing</a>提到：</p>
+<blockquote>
+<p>Event Sourcing ensures that all changes to application state are stored as a sequence of events.<br>The key to Event Sourcing is that we guarantee that all changes to the domain objects are initiated by the event objects: Complete Rebuild, Temporal Query, Event Replay.<br>A system in use during a working day could be started at the beginning of the day from an overnight snapshot and hold the current application state in memory.</p>
+</blockquote>
+<p>概括来说，Event Sourcing有别于CRUD直接操作数据源，只记录数据的状态变化(state event)，通过replay这些event可以得到最终的数据状态视图。它的优点是Complete Rebuild（重新生成状态视图）, Temporal Query（查询历史视图，类似Git查看某个版本数据视图）, Event Replay（新模块可重放event满足自身需求）。在event积累太多的情况下，从头开始replay的耗时将难以接受，可以通过增加Snapshot记录中间状态来解决此问题。</p>
+<p>什么时候会用到Event Sourcing？</p>
+<ul>
+<li>需要做audit trail的时候，即需要审计追踪所有的状态变化；</li>
+<li>需要借助这些event来debug系统的时候，由于其可重放特性可重现问题；</li>
+<li>和cqrs结合做读写分离。</li>
+</ul>
+<h2 id="CQRS-Command-and-Query-Responsibility-Segregation"><a href="#CQRS-Command-and-Query-Responsibility-Segregation" class="headerlink" title="CQRS(Command and Query Responsibility Segregation)"></a>CQRS(Command and Query Responsibility Segregation)</h2><p>CQRS的想法很朴素，在CRUD模式read/write都是操作同一个数据源，CQRS把write的数据源和read的数据源分开。通过Command模块写到write库，write库的数据异步同步到read库，以供Query模块查询数据。CQRS的优点是数据库分离成了read库和write库，这样他们就可以各自scale了，不存在相互拖累的情况。分离之后，我们可以自行选择更适合的方案实现read库和write库，比如Apache Cassandra实现write库，Elasticsearch实现读库。</p>
+<p>Martin Fowler对<a href="https://martinfowler.com/bliki/CQRS.html" target="_blank" rel="noopener">CQRS</a>的评价是较为负面的：</p>
+<blockquote>
+<p>For some situations, this separation can be valuable, but beware that for most systems CQRS adds risky complexity.</p>
+</blockquote>
+<h2 id="Event-Sourcing-CQRS"><a href="#Event-Sourcing-CQRS" class="headerlink" title="Event Sourcing + CQRS"></a>Event Sourcing + CQRS</h2><p>这两者经常会被结合起来使用，<a href="https://www.slideshare.net/planetcassandra/codecentric-ag-cqrs-and-event-sourcing-applications-with-cassandra" target="_blank" rel="noopener">codecentric AG: CQRS and Event Sourcing Applications with Cassandra</a>提到了一种两种结合使用的pattern，如下图：</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/81551856-1c37bd00-93b5-11ea-94fa-62a167b93f51.png" alt="image"><br>（Event Sourcing + CQRS）</p>
+<p>上图中，</p>
+<ul>
+<li>Event Store使用Apache Cassandra实现；</li>
+<li>Query Store使用ElasticSearch实现；</li>
+<li>Command Model异步触发Event Processor更新Query Store，具体实现如下：</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/4915189/81569729-3d5ad680-93d2-11ea-88c2-1666a0295ab5.png" alt="image"></p>
+<ul>
+<li>Command Model需保证写Event Store和投递消息到Kafka是transaction的；</li>
+<li>Spark Job处理Kafka中的Event将最终数据产出到ElasticSearch；</li>
+</ul>
+<p>在需要生成新的数据视图时，只需要新建Spark Job直接重放处理Event Store中的数据，然后将结果写到Query Store中即可。</p>
+<p>这种Event Source+ES的组合能同时享受两者的好处，但同时也引入了问题：</p>
+<ul>
+<li>Query Store是最终一致性的，如果要依赖最新状态去做决策抱歉这做不到，如<code>update table set a = ? where a = ?</code>这类操作；</li>
+<li>Kafka只支持at least once投递，在产生重复event时消费端必须能够容错；</li>
+<li>Command Service必须能保证并发写的顺序性，并在重放时依然保持该顺序；Kafka的partition间是无序的，顺序写在实际被消费时顺序可能错乱；</li>
+<li>…..</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://ookami86.github.io/event-sourcing-in-practice/" target="_blank" rel="noopener">Event Sourcing in practice</a><br><a href="https://www.confluent.io/blog/event-sourcing-cqrs-stream-processing-apache-kafka-whats-connection/" target="_blank" rel="noopener">Event sourcing, CQRS, stream processing and Apache Kafka: What’s the connection?</a><br><a href="http://udidahan.com/2009/12/09/clarified-cqrs/" target="_blank" rel="noopener">Clarified CQRS</a><br><a href="https://medium.com/technology-learning/event-sourcing-and-cqrs-a-look-at-kafka-e0c1b90d17d8" target="_blank" rel="noopener">Building Scalable Applications Using Event Sourcing and CQRS</a><br><a href="https://docs.microsoft.com/en-us/azure/architecture/patterns/event-sourcing" target="_blank" rel="noopener">Event Sourcing pattern</a><br><a href="https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs" target="_blank" rel="noopener">Command and Query Responsibility Segregation (CQRS) pattern</a><br><a href="https://martinfowler.com/eaaDev/EventSourcing.html" target="_blank" rel="noopener">Martin Fowler: Event Sourcing</a><br><a href="https://www.slideshare.net/planetcassandra/codecentric-ag-cqrs-and-event-sourcing-applications-with-cassandra" target="_blank" rel="noopener">codecentric AG: CQRS and Event Sourcing Applications with Cassandra</a><br><a href="http://msdn.microsoft.com/en-us/library/jj554200.aspx" target="_blank" rel="noopener">A CQRS Journey by Microsoft</a><br><a href="https://martinfowler.com/bliki/CQRS.html" target="_blank" rel="noopener">Martin Fowler: CQRS</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CQRS/" rel="tag"># CQRS</a>
+          
+            <a href="/tags/EventSourcing/" rel="tag"># EventSourcing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/25/java-stateful-deploy/" rel="next" title="浅谈有状态Java服务热部署方案">
+                <i class="fa fa-chevron-left"></i> 浅谈有状态Java服务热部署方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/25/chronicle-map-and-ignite/" rel="prev" title="chronicle-map与apache ignite的使用场景及限制性">
+                chronicle-map与apache ignite的使用场景及限制性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Event-Sourcing"><span class="nav-number">1.</span> <span class="nav-text">Event Sourcing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CQRS-Command-and-Query-Responsibility-Segregation"><span class="nav-number">2.</span> <span class="nav-text">CQRS(Command and Query Responsibility Segregation)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Event-Sourcing-CQRS"><span class="nav-number">3.</span> <span class="nav-text">Event Sourcing + CQRS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

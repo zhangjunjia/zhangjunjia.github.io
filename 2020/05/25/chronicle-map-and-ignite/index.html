@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,ChronicleMap,ApacheIgnite," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文浅谈HashMap从Java Heap中offload的方案考虑.">
+<meta name="keywords" content="Java,ChronicleMap,ApacheIgnite">
+<meta property="og:type" content="article">
+<meta property="og:title" content="chronicle-map与apache ignite的使用场景及限制性">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/05/25/chronicle-map-and-ignite/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="本文浅谈HashMap从Java Heap中offload的方案考虑.">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-05-25T13:16:48.976Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="chronicle-map与apache ignite的使用场景及限制性">
+<meta name="twitter:description" content="本文浅谈HashMap从Java Heap中offload的方案考虑.">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/05/25/chronicle-map-and-ignite/"/>
+
+
+
+
+
+  <title>chronicle-map与apache ignite的使用场景及限制性 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/05/25/chronicle-map-and-ignite/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">chronicle-map与apache ignite的使用场景及限制性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-25T21:11:00+08:00">
+                2020-05-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文浅谈HashMap从Java Heap中offload的方案考虑.</p>
+<a id="more"></a>
+<p>现工作负责的一个datanode项目，其本质是一个巨大的分布式hashmap。其含有亿级别的key，value则是用户信息UserInfo。通过hash将该巨大的hashmap分成了多个partition，然后分布到50多台机器上，即每台机器有1至3个partition。partition的数据存放于机器上datanode进程的Java Heap中，这有几个好处：</p>
+<ul>
+<li>datanode进程中的业务逻辑代码直接访问Java Heap处理UserInfo，只有内存访问开销，无反序列化/网络开销；</li>
+<li>datanode进程可以将partition进一步分成多个slot，这样就可以多线程并行去读/写partition的UserInfo数据加速业务逻辑；</li>
+<li>partition数据存放于Java Heap中，datanode进程天生可以基于Heap中的UserInfo对象做各种锁操作保证并发安全。</li>
+</ul>
+<p>但这也带来了一些坏处：</p>
+<ul>
+<li>datanode业务逻辑和Java Heap数据绑定在一起，无法在不重启JVM情况下热更新datanode业务逻辑。</li>
+</ul>
+<p>上一篇文章<a href="https://github.com/zhangjunjia/zhangjunjia.github.io/issues/16" target="_blank" rel="noopener">浅谈有状态Java服务热部署方案</a>探讨了解决这个问题的一些方案，本文继续讨论此问题——将Java Heap做offload的方案。</p>
+<h2 id="chronicle-map"><a href="#chronicle-map" class="headerlink" title="chronicle-map"></a>chronicle-map</h2><p><a href="https://github.com/OpenHFT/Chronicle-Map" target="_blank" rel="noopener">chronicle-map</a>是Chronicle Software公司开源的一款堆外hashmap，它支持两种内存模式：</p>
+<ul>
+<li>与JVM进程绑定，数据存放于堆外内存（direct memory），JVM进程退出数据也就没了；</li>
+<li>不与JVM进程绑定，<strong>数据存放于共享内存</strong>（使用<a href="https://en.wikipedia.org/wiki/RAM_drive" target="_blank" rel="noopener">Ram Drive</a>和MappedByteBuffer实现的共享内存，Linux系统自带的Ram Drive是<code>/dev/shm/</code>），JVM进程退出了数据还在；</li>
+</ul>
+<p>第二种模式显然比较适合做Java Heap的offload。但对我们的datanode业务而言，Chronicle-Map存在着几个问题：</p>
+<ul>
+<li>Chronicle-Map建议的ValueType数据类型，只适合那种确定长度的业务数据，如每个Value对象由2个int和1个长度在10以内的string组成这样确定性的数据视图。而我们的业务数据，有大量的<code>int[]</code>、<code>float[]</code>、<code>String[]</code>对象，长度有非常大的不确定性，因此无法使用其建议的ValueType数据类型。因此我方业务只能使用实现其建议的ByteReader/ByteWriter接口写自定义数据序列化/反序列化操作，序列化开销对于我方业务频繁需要遍历几百万个Key的场景是无法接受的。</li>
+<li>Chronicle-Map的entrySet全量遍历会产生大量新生代对象，这个GC开销也是不能忽略的。</li>
+</ul>
+<p>其实第一个问题也不是不能规避。我们可以自行维护一套内存地址到Java数据结构（UserInfo）的映射关系，在访问第N个属性时再去按需反序列化该属性。但这样又带了新问题，按下葫芦浮起瓢：</p>
+<ul>
+<li>每个Value数据是不定长的，因此它们的映射关系也是不一样的，这一套映射关系需要能按照一定规则生成，维护好这样一套映射关系有一定的复杂度，而且对于新增/删除数据结构成员并不友好；</li>
+<li>读直接操作内存地址，在没有锁保护的情况下很容易和写操作冲突，产生难以预期的后果。</li>
+</ul>
+<p>综上，chronicle-map虽然好但不适合我们。</p>
+<h2 id="apache-ignite"><a href="#apache-ignite" class="headerlink" title="apache ignite"></a>apache ignite</h2><blockquote>
+<p>Apache Ignite® is a horizontally scalable, fault-tolerant distributed in-memory computing platform for building real-time applications that can process terabytes of data with in-memory speed.</p>
+</blockquote>
+<p><a href="https://ignite.apache.org/" target="_blank" rel="noopener">ignite</a>是apache顶级项目之一，上文是其官方定义，它可以和以下应用扮演同样角色：</p>
+<ul>
+<li>Memcache；</li>
+<li>Redis；</li>
+<li>MySQL；</li>
+<li>…</li>
+</ul>
+<p>ignite支持以下几种模式：</p>
+<ul>
+<li>in-memory：这种情况下，数据是全部in-memory的，这和我们的datanode有点像，在内存不足时是否要触发swap则是optional的；</li>
+<li>in-memory+native persistence：这种情况下，和Redis的AOF模式有点像，write操作更新内存后做append-only操作后立即返回，由后台线程定期去compact这些append-only的log。不同于Redis的是：ignite在这种模式下是支持SQL查询的，且可以根据B+树索引直接定位到DISK的数据记录，且in-memory的数据量是多少也是可配置的。</li>
+<li>in-memory+3rd database：这种情况下，ignite作为一个cache store，接管了对database的read/write操作，即cache模式中的<a href="https://docs.oracle.com/cd/E15357_01/coh.360/e15723/cache_rtwtwbra.htm#COHDG5180" target="_blank" rel="noopener">read-through和write-through</a>。ignite在这种模式下的SQL查询是受限的，它必须先把database的数据全部load到内存。</li>
+</ul>
+<p>ignite还有其他强大的特性：</p>
+<ul>
+<li>Queue、Set等数据结构支持（类比Redis）；</li>
+<li>客户端支持near cache（在业务进程的cache）；</li>
+<li>支持将计算闭包逻辑从业务端传输到ignite的node结点中运行（把计算搬到了存储结点中）；</li>
+<li>支持分布式join；</li>
+<li>支持分布式transaction（2PC，两阶段提交）；</li>
+<li>支持异步cache接口；</li>
+<li>支持集群化，非常方便scale，且有高可用方案支持；</li>
+<li>集群拓扑变化时自动进行数据rebalance；</li>
+<li>支持对cache对象加锁；</li>
+<li>对Hadoop、Spark等计算引擎有良好支持；</li>
+<li>对machine learning有很好的支持；</li>
+<li>支持多种语言客户端；</li>
+<li>支持作为微服务通信框架；</li>
+<li>支持Streaming；</li>
+<li>支持Kubernetes部署；</li>
+<li>…</li>
+</ul>
+<p>总的来讲，ignite非常强悍而且功能特性非常的多，且有很多production上应用的<a href="https://ignite.apache.org/use-cases/provenusecases.html" target="_blank" rel="noopener">示例</a>。但ignite的以下几点不符合我方的业务需求：</p>
+<ul>
+<li>ignite最小级别的高可用要求每个node的data有一份backup，这相当于总数据量乘以2，我们没有这么多的机器quota，要知道我们现在的数据量已经有几亿个KV了；</li>
+<li>ignite作为server端，客户端与其通信难免会有网络通信、序列化开销，对于我们动辄扫描几百万个key的应用场景，这些开销带来的时延是无法容忍的。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/ChronicleMap/" rel="tag"># ChronicleMap</a>
+          
+            <a href="/tags/ApacheIgnite/" rel="tag"># ApacheIgnite</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/07/event-sc-and-cqrs/" rel="next" title="浅谈event sourcing和cqrs">
+                <i class="fa fa-chevron-left"></i> 浅谈event sourcing和cqrs
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#chronicle-map"><span class="nav-number">1.</span> <span class="nav-text">chronicle-map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apache-ignite"><span class="nav-number">2.</span> <span class="nav-text">apache ignite</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
