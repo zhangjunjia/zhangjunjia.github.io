@@ -90,7 +90,7 @@
 <meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431467-f7e08a00-270c-11ea-922b-0f1638cb8b61.png">
 <meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431469-fca53e00-270c-11ea-97ce-e684f88792d6.png">
 <meta property="og:image" content="https://user-images.githubusercontent.com/4915189/71431473-029b1f00-270d-11ea-9acf-cd848b9705b7.png">
-<meta property="og:updated_time" content="2020-05-25T10:12:28.373Z">
+<meta property="og:updated_time" content="2020-05-29T08:19:06.689Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TCP状态转移总结">
 <meta name="twitter:description" content="简单总结几个个人觉得较为重要的TCP状态。">
@@ -353,6 +353,7 @@
 <li>服务端处于ESTABLISHED的Socket存在于服务端的全连接队列，队列数量配置内核参数backlog，队列满了将拒绝接受accept新连接，可配置内核参数设置队列满之后静默丢弃客户端的ACK还是发送回一个RST</li>
 </ul>
 <p><img src="https://user-images.githubusercontent.com/4915189/71431473-029b1f00-270d-11ea-9acf-cd848b9705b7.png" alt="image.png"></p>
+<h2 id="TIME-WAIT"><a href="#TIME-WAIT" class="headerlink" title="TIME_WAIT"></a>TIME_WAIT</h2><p>如果C端不维持TIME_WAIT状态，而是FIN_WAIT2后直接进入CLOSED状态，那么C端将响应RST分节，S端收到后将此分节解释成一个错误，因此若想实现正常关闭，此环节必不可少；<br>MSL是一个IP数据报能在互联网上存在的最长时间，而TIME_WAIT持续的时间是两个MSL，这实际上是对路由器异常的容错，防止程序收到脏数据；</p>
 
       
     </div>
@@ -383,8 +384,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/13/basic-concept-of-mysql-1/" rel="next" title="MySQL基础回顾01 | 表连接与Group By">
-                <i class="fa fa-chevron-left"></i> MySQL基础回顾01 | 表连接与Group By
+              <a href="/2018/09/13/basic-concept-of-mysql-1/" rel="next" title="MySQL基础回顾 | 表连接与Group By">
+                <i class="fa fa-chevron-left"></i> MySQL基础回顾 | 表连接与Group By
               </a>
             
           </div>
@@ -472,7 +473,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -527,7 +528,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CLOSED"><span class="nav-number">1.</span> <span class="nav-text">CLOSED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CLOSE-WAIT"><span class="nav-number">2.</span> <span class="nav-text">CLOSE_WAIT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FIN-WAIT"><span class="nav-number">3.</span> <span class="nav-text">FIN_WAIT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端的SYN-RCVD与ESTABLISHED"><span class="nav-number">4.</span> <span class="nav-text">服务端的SYN_RCVD与ESTABLISHED</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CLOSED"><span class="nav-number">1.</span> <span class="nav-text">CLOSED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CLOSE-WAIT"><span class="nav-number">2.</span> <span class="nav-text">CLOSE_WAIT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FIN-WAIT"><span class="nav-number">3.</span> <span class="nav-text">FIN_WAIT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端的SYN-RCVD与ESTABLISHED"><span class="nav-number">4.</span> <span class="nav-text">服务端的SYN_RCVD与ESTABLISHED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TIME-WAIT"><span class="nav-number">5.</span> <span class="nav-text">TIME_WAIT</span></a></li></ol></div>
             
 
           </div>
