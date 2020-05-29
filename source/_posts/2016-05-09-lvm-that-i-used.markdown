@@ -1,6 +1,6 @@
 ---
 layout: post
-title: LVM用到的一些特性
+title: LVM动态扩容
 date: '2016-05-09 17:25'
 comments: true
 categories: ['工具篇']  
