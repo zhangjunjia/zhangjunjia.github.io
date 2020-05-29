@@ -1,5 +1,5 @@
 ---
-title: MySQL基础回顾01 | 表连接与Group By
+title: MySQL基础回顾 | 表连接与Group By
 date: 2018-09-13 20:00:03
 tags: 'MySQL'
 comments: true
