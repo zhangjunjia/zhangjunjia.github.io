@@ -82,14 +82,14 @@
 <meta name="description" content="我选用LVM的目的是，">
 <meta name="keywords" content="LVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LVM用到的一些特性">
+<meta property="og:title" content="LVM动态扩容">
 <meta property="og:url" content="https://zhangjunjia.github.io/2016/05/09/lvm-that-i-used/index.html">
 <meta property="og:site_name" content="张俊佳的博客">
 <meta property="og:description" content="我选用LVM的目的是，">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-05-25T10:12:28.372Z">
+<meta property="og:updated_time" content="2020-05-29T08:28:51.207Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LVM用到的一些特性">
+<meta name="twitter:title" content="LVM动态扩容">
 <meta name="twitter:description" content="我选用LVM的目的是，">
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>LVM用到的一些特性 | 张俊佳的博客</title>
+  <title>LVM动态扩容 | 张俊佳的博客</title>
   
 
 
@@ -250,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">LVM用到的一些特性</h1>
+          <h1 class="post-title" itemprop="name headline">LVM动态扩容</h1>
         
 
         <div class="post-meta">
@@ -297,6 +297,16 @@
           
 
           
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/09/lvm-that-i-used/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2016/05/09/lvm-that-i-used/" itemprop="commentCount"></span>
+                </a>
+              </span>
             
           
 
@@ -415,6 +425,9 @@
 
           
 
+  
+    <div class="comments" id="comments">
+    </div>
   
 
 
@@ -699,6 +712,28 @@
 
 
 
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: true,
+        appId: 'nP7nKkEDO91U2MrtPXaa7MR2-gzGzoHsz',
+        appKey: 'nYtAx9bbOzPe9EDT8mW7tH5d',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
 
 
 
