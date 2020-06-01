@@ -170,6 +170,20 @@ def bfs():
         if node not in visited:
             visited.add(node)
             deque.append(node.childrens) # 下一层加到最右端
+
+# breadth-first search
+# 广度优先遍历（BFS）代码模板
+# 非递归，打印层次信息
+def bfs():
+    visited, deque = set(), [root]
+    level = 0
+    while deque:
+        size, level = len(deque), level+1
+        for _ in range(size): # 第level层
+            node = queue.popleft() # 从左到右一层层遍历
+            if node not in visited:
+                visited.add(node)
+                deque.append(node.childrens) # 下一层加到最右端
 ```
 
 ## 二分查找模板
