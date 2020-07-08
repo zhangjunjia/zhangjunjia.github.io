@@ -1,7 +1,7 @@
 ---
-title: Paper阅读：Kafka: a Distributed Messaging System for Log Processing
+title: 'Paper阅读：Kafka: a Distributed Messaging System for Log Processing'
 date: 2020-06-04 22:02:22
-tags: ['Kafka', 'Paper']
+tags: ['Kafka', 'Paper阅读']
 comments: true
 categories: ['分布式系统']
 ---
