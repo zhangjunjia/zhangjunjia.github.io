@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kafka,Paper阅读," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="记录阅读论文Google File System(GFS)的笔记。">
+<meta name="keywords" content="Kafka,Paper阅读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paper阅读:The Google File System">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/07/08/google-file-system-paper/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="记录阅读论文Google File System(GFS)的笔记。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/86358259-c3dcb780-bca1-11ea-99d0-f56c957a0571.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/86428940-9aaf3c00-bd20-11ea-8b36-5296662f6c90.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/86441384-b3c6e580-bd3e-11ea-806b-c5ccf9c56723.png">
+<meta property="og:updated_time" content="2020-07-08T07:28:17.645Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Paper阅读:The Google File System">
+<meta name="twitter:description" content="记录阅读论文Google File System(GFS)的笔记。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/86358259-c3dcb780-bca1-11ea-99d0-f56c957a0571.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/07/08/google-file-system-paper/"/>
+
+
+
+
+
+  <title>Paper阅读:The Google File System | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/07/08/google-file-system-paper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Paper阅读:The Google File System</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-07-08T15:25:29+08:00">
+                2020-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式系统/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/07/08/google-file-system-paper/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/07/08/google-file-system-paper/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/07/08/google-file-system-paper/" class="leancloud_visitors" data-flag-title="Paper阅读:The Google File System">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>记录阅读论文Google File System(GFS)的笔记。</p>
+<a id="more"></a>
+<h2 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h2><p>GFS的设计目标是：</p>
+<blockquote>
+<p>scalable filesystem：大文件、append写居多<br>running on commodity hardware：可容忍硬盘、机器、网络等故障<br>data intensive：数据密集</p>
+</blockquote>
+<p>GFS暴露的文件系统接口如下：</p>
+<ul>
+<li>创建/删除：create/delete</li>
+<li>读：read</li>
+<li>写：write/append/snapshot</li>
+</ul>
+<h2 id="从接口实现看系统架构"><a href="#从接口实现看系统架构" class="headerlink" title="从接口实现看系统架构"></a>从接口实现看系统架构</h2><h3 id="read"><a href="#read" class="headerlink" title="read"></a>read</h3><p>在GFS中，文件由1至多个chunk组成，每个chunk的大小是64MB，类似于下面的结构：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">文件名称：/boo/far（逻辑概念）</span><br><span class="line">文件内容：[chunk_0, chunk_1, chunk_2]（物理概念）</span><br></pre></td></tr></table></figure></p>
+<p>论文提到chunk是Linux文件系统的真实文件，GFS中所指的分布式文件是由多个chunk组成的逻辑文件。</p>
+<blockquote>
+<p>Each chunk replica is stored as a plain Linux file on a chunkserver and is extended only as needed.</p>
+</blockquote>
+<p><img src="https://user-images.githubusercontent.com/4915189/86358259-c3dcb780-bca1-11ea-99d0-f56c957a0571.png" alt="image"><br>（图1 GFS架构，摘自论文）</p>
+<p>GFS Client读取分布式文件内容如图1所示，</p>
+<ul>
+<li>client向master询问特定分布式文件的特定下标的chunk的信息；</li>
+<li>master在内存中维护<code>文件名 &lt;&gt; chunk下标数组</code>的映射，chunk下标数组的元素，存放了该chunk所在chunkserver的机器信息以及该chunk的唯一标识（chunk location）；<ul>
+<li>master在创建chunk时，会为其生成一个64bit的唯一标识，称之为chunk location；</li>
+<li>出于高可用、负载均衡等考虑，chunk会被replicate到多个chunkserver；</li>
+<li>master维护分布式文件目录信息、文件到chunk handle的映射、chunk handle到机器的映射，这些信息称为metadata；</li>
+</ul>
+</li>
+<li>client将master返回的信息缓存起来，挑选一个“网络距离最近”的chunkserver请求数据；<ul>
+<li>缓存chunk信息失效后，client会重新向master获取；</li>
+<li>client会批量读多个chunk的metadata，以减少和master的通信；</li>
+</ul>
+</li>
+<li>chunkserver接收到数据读取请求时，根据chunk handle定位到文件读取数据返回；<ul>
+<li>chunkserver发现chunk handle不存在时，client应失效对该chunk的metadata的缓存；</li>
+<li>chunkserver需要维护chunk handle到chunk文件的索引；</li>
+</ul>
+</li>
+</ul>
+<p>读取过程中，client先向master获取metadata，然后再向chunkserver发起真实数据读取请求。master是如何维护metadata的呢？</p>
+<ul>
+<li>文件名称到chunk信息的映射是维护在内存中的，在create/delete时更新此映射；</li>
+<li>chunk存放在哪些chunkserver是由chunkserver主动上报的，chunkserver天生知道它维护了哪些chunk文件，可以通过HeartBeat上报这类信息，当网络分区恢复或者chunkserver重启时它能让master第一时间感知chunk信息的变化。</li>
+</ul>
+<h3 id="write"><a href="#write" class="headerlink" title="write"></a>write</h3><p><img src="https://user-images.githubusercontent.com/4915189/86428940-9aaf3c00-bd20-11ea-8b36-5296662f6c90.png" alt="image"><br>（图2 client写数据的过程，摘自论文）</p>
+<ol>
+<li>client询问要写的chunk的primary replica以及secondary replica所在的chunkserver信息<ul>
+<li>持有lease的replica称为primary否则称为secondary，如果没有replica持有lease，master会挑选一个replica授予，chunkserver通过HeartBeat延长lease的失效时间；</li>
+</ul>
+</li>
+<li>client缓存master回复的信息直至expired或者chunkserver回复不持有lease；</li>
+<li>client以pipeline的方式将数据推送至所有replica，比如client-&gt;C1-&gt;C2-&gt;C3-&gt;C4，pipeline中下一跳的选择是网络距离最近的目标replica，每个replica一收到数据会立即向下一跳转发，数据此时是缓存在内存buffer的还未落盘；</li>
+<li>所有replica收完数据后，client通知primary replica将buffer的数据修改按照提交顺序串行落盘。每个数据修改有一个serial number，这个number是单调递增的用于代表落盘的顺序；</li>
+<li>primary落盘成功后，通知所有secondary以相同serial number的次序落盘；</li>
+<li>secondary回复primary落盘是否成功；</li>
+<li>primary回复client自身以及所有secondary是否落盘成功，任一replica的失败都会导致client重试步骤3到步骤7。</li>
+</ol>
+<p>append操作和write是相似的，不同点在于：</p>
+<ul>
+<li>步骤4，primary尝试append数据到末尾，假设append会导致chunk超过64Mb，primary会将当前chunk补齐到64Mb，同时告知所有secondary进行补齐，最后返回错误告知client应该在下一个chunk index去append数据。否则，primary写数据到chunk文件末尾，写成功后通知secondary在哪个chunk的哪个offset写数据，append操作在secondary变成了指定offset的write操作。</li>
+<li>步骤7，任一replica的失败同样会导致重试，这可能导致部分replica有多份需要append的数据，client需要实现幂等读取来容忍这种情况。</li>
+</ul>
+<h3 id="create"><a href="#create" class="headerlink" title="create"></a>create</h3><p>master通过新增chunk来扩充分布式文件，新增chunk的设计要点是：</p>
+<ul>
+<li>新增的chunk应该放在哪几台chunkserver？其原则是磁盘利用率最大化、机架容灾、负载均衡。3个replica至少应该分布到2个不同的机架，磁盘空间富余的chunkserver会优先选择，近期创建chunk较少的会优先选择（大量chunk同时创建在同一chunkserver意味着会立即带来较大的写负载）。</li>
+<li>新增的chunk文件可以认为是一个空文件，只有在真正写的时候才触发磁盘空间申请。</li>
+</ul>
+<h3 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h3><p>client发起delete，只是在master层面将分布式文件做重命名，例如将文件重命名增加一个<code>TRASH</code>的后缀。这些被标识TRASH的分布式文件有一个缓冲期，缓冲期仍可以像正常文件一样访问他们或者回滚，缓冲期后他们会被真正清除。chunkserver通过HeartBeat感知自身负责的chunk文件是否还有分布式文件与其关联，无关联的话chunkserver会将这些chunk文件真正清除。这种延迟删除的垃圾回收机制有以下好处：</p>
+<ul>
+<li>delete操作是可回滚的；</li>
+<li>对于delete请求，master只需要修改分布式文件名称即可返回，这无疑大大减轻master的负载；</li>
+<li>master扫描metadata并清除TRASH，chunkserver感知并清除chunk文件，这些流程都成为了常规的后台线程，这样一旦有失联的chunkserver重新加入集群，它们也能正确清除文件。</li>
+</ul>
+<h3 id="snapshot"><a href="#snapshot" class="headerlink" title="snapshot"></a>snapshot</h3><p>本质上是一种copy-on-write，master通过失效已授予的lease使得client写失败触发重新获取lease，这给了master去通知待写chunk所在的chunkserver去做chunk文件copy的机会，然后用新的copy文件来提供写。</p>
+<h2 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h2><p>下面尝试从CAP理论的视角来看GFS的设计。</p>
+<h3 id="consistency"><a href="#consistency" class="headerlink" title="consistency"></a>consistency</h3><p>对于master，任意涉及到文件namespace、文件到chunk映射修改的client操作都会写operation log、更新master的metadata内存，且同步到远端机器的operation log才算写成功，论文没有提及具体如何实现，应该也是某种二阶段提交。client写操作对metadata的修改是强一致的，完成后所有client都可以看到最新修改。</p>
+<p>master有一种shadow的角色，它的借助operation log重放metadata，会轻微落后于master。在master宕机时client可以从shadow读取metadata，它的metadata是弱一致的。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/86441384-b3c6e580-bd3e-11ea-806b-c5ccf9c56723.png" alt="image"><br>（图3 chunk的一致性模型，摘自论文）</p>
+<p>GFS对于chunk的一致性有两种定义：</p>
+<ul>
+<li>consitent：客户端永远能看到一致的数据，无论他们从哪个replica读取数据；</li>
+<li>defined：当某个chunk发生修改后，client能看到刚刚修改的所有数据。</li>
+</ul>
+<p>图3是GFS在几种写下的一致性保证：</p>
+<ul>
+<li>串行写：defined</li>
+<li>并发写：consistent + undefined（client端无法确认最终到底是哪个写导致的数据变化）</li>
+<li>追加写：defined but interspersed with inconsistent（append写只保证at least one，可能append了多次数据，且有的replica会有padding数据）</li>
+<li>写失败：inconsistent</li>
+</ul>
+<p>每个chunk文件在被修改时其chunk version都会自增，写操作会识别出那些chunk version落后的chunk并跳过写，这些落后的chunk会在垃圾回收过程被回收。每个64Mb的chunk文件的每个64Kb数据block，都会记录一个checksum（持久化到专门的logging文件），读取数据时需校验checksum是否正确来判断数据是否损坏。</p>
+<p>master对于分布式文件的新增、删除是强一致性的。GFS在master有一个文件锁的设计，对文件加写锁可以防止并发创建同名的分布式文件，对目录加写锁可以防止目录下的文件新增和删除。</p>
+<h3 id="availability"><a href="#availability" class="headerlink" title="availability"></a>availability</h3><p>GFS的设计中master是单点的，当监控系统监测到master故障，会从远端存放operation log的机器挑选一台快速启动顶替。故障转移的过程中，master是不可用的，任何依赖master的服务在故障转移过程也是不可用的。master和chunkserver都被设计成可以快速启动的。以master为例，它启动时读取最近一次checkpoint文件（B-Tree格式）和最近一次checkpoint时间点之后的增量operation log文件实现快速启动。</p>
+<p>写chunkserver的过程中，如果secondary失败则触发重试，若primary失败则该写操作会被failed掉，由客户端决定是否要重试写。</p>
+<h3 id="partition-tolerance"><a href="#partition-tolerance" class="headerlink" title="partition tolerance"></a>partition tolerance</h3><p>GFS的chunk默认有3个replica，其replicate数量是可调整的。写操作需要所有replica写成功才返回，这对读是有好处的，只需要读任意一份replica即可获取最新数据。当某些replica所在chunkserver宕机、磁盘故障时，GFS会触发re-replication，使得replica数量重归3份。GFS还会进行rebalancing，将replica从磁盘紧张的chunkserver迁移到磁盘富余的chunkserver。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>GFS是单master多chunkserver的设计，master通过HeartBeat感知chunkserver的数据视图并缓存在内存中。读、写请求都需要先通过master的内存视图定位到具体chunkserver，在向具体chunkserver进行真实数据交换。写chunkserver时，其一chunk replica所在chunkserver会被选为lease，这在某种程度上也是master权限的下放。</p>
+<h2 id="问题讨论"><a href="#问题讨论" class="headerlink" title="问题讨论"></a>问题讨论</h2><p>读paper很重要的一点是要把有问题的地方搞懂，因此提问题无疑是非常重要的。以下是搬运自<a href="http://oserror.com/distributed/gfs/" target="_blank" rel="noopener">Charles的技术博客：GFS</a>关于论文的一些问题：</p>
+<blockquote>
+<p>7.1 为什么存储三个副本？而不是两个或者四个？<br>7.2 chunk的大小为何选择64MB？这个选择主要基于哪些考虑？<br>7.3 gfs主要支持追加，改写操作比较少，为什么这么设计？如何设计一个仅支持追加操作的文件系统来构建分布式表格系统bigtable？<br>7.4 为什么要将数据流和控制流分开？如果不分开，如何实现追加流程？<br>7.5 gfs有时会出现重复记录或者padding记录，为什么？<br>7.6 lease是什么？在gfs中起到了什么作用？它与心跳有何区别？<br>7.7 gfs追加过程中如果出现备副本故障，如何处理？如果出现主副本故障，应该如何处理？<br>7.8 gfs master需要存储哪些信息？master的数据结构如何设计？<br>7.9 假设服务一千万个文件，每个文件1GB，master中存储元数据大概占多少内存？<br>7.10 master如何实现高可用性？<br>7.11 负载的影响因素有哪些？如何计算一台机器的负载值？<br>7.12 master新建chunk时如何选择chunkserver？如果新机器上线，负载值特别低，如何避免其他chunkserver同时往这台机器上迁移chunk？<br>7.13 如果chunkserver下线后过一会重新上线，gfs如何处理？<br>7.14 如何实现分布式文件系统的快照操作？<br>7.15 chunkserver数据结构如何设计？<br>7.16 磁盘可能出现位翻转错误，chunkserver如何应对？<br>7.17 chunkserver重启后可能有一些过期的chunk，master如何能够发现？</p>
+</blockquote>
+<p>以下是我个人补充的一些问题：</p>
+<ol>
+<li>为什么不用RAID？<ul>
+<li>RAID不是commodity hardware，无法做到机器级别、机架级别的容灾；</li>
+</ul>
+</li>
+<li>写失败后chunk数据不一致GFS是如何处理的？<ul>
+<li>application-level会检测数据中的checkpoint，来判断写入数据是否一致；</li>
+<li>对于append新增的padding，application-level会识别并丢弃；</li>
+<li>对于append被多次触发，application-level通过unique record id来幂等消费；</li>
+</ul>
+</li>
+<li>data flow的pipeline的拓扑相较tree的拓扑有何好处？<ul>
+<li>pipeline下一跳结点选择的原则是“网络最近”，这种拓扑能使得out带宽利用到极致，得到比tree拓扑更大的网络吞吐；</li>
+</ul>
+</li>
+<li>单master设计有什么好处？<ul>
+<li>不用维护多master的共识，使得master编程简单化，Kafka中Controller、Coordinator也是单master的设计；</li>
+</ul>
+</li>
+<li>GFS为什么不对chunk文件做cache？<ul>
+<li>chunk文件普遍比较大，client基本是以streaming的方式去读，重复读一个文件的概率不大，热点文件交给page cache缓存就够了；</li>
+</ul>
+</li>
+<li>consistent but undefined是如何发生的？<ul>
+<li>在并发append时：GFS may insert padding or record duplicates in between. They occupy regions considered to be inconsistent and are typically dwarfed by the amount of user data.</li>
+<li>在并发write时：If a write by the application is large or straddles a chunk boundary, GFS client code breaks it down into multiple write operations.</li>
+</ul>
+</li>
+<li>read、overwrite数据时检测出checksum错误会触发什么后续操作？<ul>
+<li>client接收到error，从其他replica读；master对该chunk replica重新replicate，完成后通知corrupt的replica删除；</li>
+</ul>
+</li>
+<li>master为什么不持久化chunk location？<ul>
+<li>chunkserver拥有final wordview，对于硬盘故障等导致的chunk丢失能主动感知；chunkserver级别的事件非常多（leave、dead、rename等），这类事件都会导致location变化，若都触发落盘master的I/O可能存在瓶颈；</li>
+</ul>
+</li>
+<li>master的operation log为什么需要checkpoint？<ul>
+<li>类似于Redis的aof机制，定期checkpoint可以减少append-only文件的大小便于故障时快速启动master；</li>
+</ul>
+</li>
+<li>lease机制的作用是什么？<ul>
+<li>将master的部分权限下放到chunkserver，指定的chunk从chunkserver中挑选一台primary出来做一些核心工作（写指令的排序）；</li>
+</ul>
+</li>
+<li>创建chunk时，该chunk放置到哪台chunkserver有什么考虑因素？<ul>
+<li>磁盘使用较少，最近创建chunk较少，散步到不同的机架；</li>
+</ul>
+</li>
+<li>chunkserver如何限制clone数据的带宽？<ul>
+<li>限制从源replica读数据的带宽；</li>
+</ul>
+</li>
+<li>为什么要使用垃圾回收清除文件？<ul>
+<li>假设master主动delete时chunkserver宕机，这无疑增加master的设计复杂度，且这种同步删除的动作也加重了master负载，垃圾回收清除可以认为是异步的；</li>
+</ul>
+</li>
+<li>如何识别stale的replica？<ul>
+<li>每次获取lease时，所有alive的replica的chunk version都会被master增加，落后的chunk version认为是stale的；</li>
+</ul>
+</li>
+<li>data flow为什么不经过master结点？<ul>
+<li>master是单点设计，要尽可能减小其负载；</li>
+</ul>
+</li>
+<li>master为什么要定期扫描metadata？<ul>
+<li>re-replication的考虑，找出哪些replica需要重新replicate；</li>
+<li>垃圾回收的考虑，找出哪些file需要过期清除；</li>
+</ul>
+</li>
+</ol>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://research.google.com/archive/gfs-sosp2003.pdf" target="_blank" rel="noopener">Google File System论文</a><br><a href="http://oserror.com/distributed/gfs/" target="_blank" rel="noopener">Charles的技术博客：GFS</a><br><a href="http://wulc.me/2019/01/20/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E7%AC%94%E8%AE%B0(3" target="_blank" rel="noopener">分布式系统笔记(3)-GFS</a>-GFS/)<br><a href="http://blog.itpub.net/31562044/viewspace-2646753/" target="_blank" rel="noopener">从 GFS 失败的架构设计来看一致性的重要性</a><br><a href="https://queue.acm.org/detail.cfm?id=1594206" target="_blank" rel="noopener">GFS: Evolution on Fast-forward</a>（强烈推荐阅读这一篇，GFS早期开发者关于其演讲的对话）</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          
+            <a href="/tags/Paper阅读/" rel="tag"># Paper阅读</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/04/kafka-paper/" rel="next" title="Paper阅读：Kafka: a Distributed Messaging System for Log Processing">
+                <i class="fa fa-chevron-left"></i> Paper阅读：Kafka: a Distributed Messaging System for Log Processing
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设计目标"><span class="nav-number">1.</span> <span class="nav-text">设计目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从接口实现看系统架构"><span class="nav-number">2.</span> <span class="nav-text">从接口实现看系统架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#read"><span class="nav-number">2.1.</span> <span class="nav-text">read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#write"><span class="nav-number">2.2.</span> <span class="nav-text">write</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#create"><span class="nav-number">2.3.</span> <span class="nav-text">create</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#delete"><span class="nav-number">2.4.</span> <span class="nav-text">delete</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#snapshot"><span class="nav-number">2.5.</span> <span class="nav-text">snapshot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAP理论"><span class="nav-number">3.</span> <span class="nav-text">CAP理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#consistency"><span class="nav-number">3.1.</span> <span class="nav-text">consistency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#availability"><span class="nav-number">3.2.</span> <span class="nav-text">availability</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#partition-tolerance"><span class="nav-number">3.3.</span> <span class="nav-text">partition tolerance</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题讨论"><span class="nav-number">5.</span> <span class="nav-text">问题讨论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: true,
+        appId: 'nP7nKkEDO91U2MrtPXaa7MR2-gzGzoHsz',
+        appKey: 'nYtAx9bbOzPe9EDT8mW7tH5d',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("nP7nKkEDO91U2MrtPXaa7MR2-gzGzoHsz", "nYtAx9bbOzPe9EDT8mW7tH5d");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
