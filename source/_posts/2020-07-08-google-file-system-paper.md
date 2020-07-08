@@ -1,7 +1,7 @@
 ---
 title: Paper阅读:The Google File System
 date: 2020-07-08 15:25:29
-tags: ['Kafka', 'Paper阅读']
+tags: ['Paper阅读']
 comments: true
 categories: ['分布式系统']
 ---
