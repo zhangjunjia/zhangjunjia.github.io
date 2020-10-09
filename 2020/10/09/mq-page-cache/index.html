@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="系统设计," />
+  <meta name="keywords" content="Kafka,Paper阅读," />
 
 
 
@@ -79,24 +79,22 @@
 
 
 
-<meta name="description" content="极客时间《左耳听风》专栏读书笔记之性能设计篇。">
-<meta name="keywords" content="系统设计">
+<meta name="description" content="Kafka和RocketMQ有很多围绕Page Cache的设计，本文带你一探究竟。">
+<meta name="keywords" content="Kafka,Paper阅读">
 <meta property="og:type" content="article">
-<meta property="og:title" content="《左耳听风》笔记：性能设计篇">
-<meta property="og:url" content="https://zhangjunjia.github.io/2020/02/15/chenhao-performance-design/index.html">
+<meta property="og:title" content="谈谈MQ | 与Page Cache的爱恨情仇">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/10/09/mq-page-cache/index.html">
 <meta property="og:site_name" content="张俊佳的博客">
-<meta property="og:description" content="极客时间《左耳听风》专栏读书笔记之性能设计篇。">
+<meta property="og:description" content="Kafka和RocketMQ有很多围绕Page Cache的设计，本文带你一探究竟。">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png">
-<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82790438-a2b4ca00-9e9e-11ea-9340-112f79c3c907.png">
-<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82790449-a7797e00-9e9e-11ea-8e4c-8d1ca60efaf4.png">
-<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/82790494-ba8c4e00-9e9e-11ea-9912-7bcfcecdc517.png">
-<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/74600725-6f5ce500-50d0-11ea-87e4-3b75d7c7b8a9.png">
-<meta property="og:updated_time" content="2020-05-25T10:12:28.374Z">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/93546442-5a617080-f995-11ea-8adc-80fa8e19e47d.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/94356704-d78e9300-00c3-11eb-94bb-b22a14bc3174.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/94389931-c5742980-0183-11eb-9ce2-eef5fb355baa.png">
+<meta property="og:updated_time" content="2020-10-09T06:33:21.879Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="《左耳听风》笔记：性能设计篇">
-<meta name="twitter:description" content="极客时间《左耳听风》专栏读书笔记之性能设计篇。">
-<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png">
+<meta name="twitter:title" content="谈谈MQ | 与Page Cache的爱恨情仇">
+<meta name="twitter:description" content="Kafka和RocketMQ有很多围绕Page Cache的设计，本文带你一探究竟。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/93546442-5a617080-f995-11ea-8adc-80fa8e19e47d.png">
 
 
 
@@ -126,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="https://zhangjunjia.github.io/2020/02/15/chenhao-performance-design/"/>
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/10/09/mq-page-cache/"/>
 
 
 
 
 
-  <title>《左耳听风》笔记：性能设计篇 | 张俊佳的博客</title>
+  <title>谈谈MQ | 与Page Cache的爱恨情仇 | 张俊佳的博客</title>
   
 
 
@@ -239,7 +237,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/02/15/chenhao-performance-design/">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/10/09/mq-page-cache/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张俊佳">
@@ -256,7 +254,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">《左耳听风》笔记：性能设计篇</h1>
+          <h1 class="post-title" itemprop="name headline">谈谈MQ | 与Page Cache的爱恨情仇</h1>
         
 
         <div class="post-meta">
@@ -268,8 +266,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-15T20:20:26+08:00">
-                2020-02-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-10-09T14:32:25+08:00">
+                2020-10-09
               </time>
             
 
@@ -291,8 +289,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/系统设计/" itemprop="url" rel="index">
-                    <span itemprop="name">系统设计</span>
+                  <a href="/categories/分布式系统/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式系统</span>
                   </a>
                 </span>
 
@@ -309,8 +307,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2020/02/15/chenhao-performance-design/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2020/02/15/chenhao-performance-design/" itemprop="commentCount"></span>
+                <a href="/2020/10/09/mq-page-cache/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/10/09/mq-page-cache/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -318,7 +316,7 @@
 
           
           
-             <span id="/2020/02/15/chenhao-performance-design/" class="leancloud_visitors" data-flag-title="《左耳听风》笔记：性能设计篇">
+             <span id="/2020/10/09/mq-page-cache/" class="leancloud_visitors" data-flag-title="谈谈MQ | 与Page Cache的爱恨情仇">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -349,64 +347,47 @@
       
 
       
-        <p>极客时间《左耳听风》专栏读书笔记之性能设计篇。</p>
+        <p>Kafka和RocketMQ有很多围绕Page Cache的设计，本文带你一探究竟。</p>
 <a id="more"></a>
-<h1 id="性能设计"><a href="#性能设计" class="headerlink" title="性能设计"></a>性能设计</h1><h2 id="缓存-cache"><a href="#缓存-cache" class="headerlink" title="缓存 cache"></a>缓存 cache</h2><p>本篇主要讲解了缓存读取更新的三种设计模式，cache章节的图片取自<a href="https://vladmihalcea.com/a-beginners-guide-to-cache-synchronization-strategies/" target="_blank" rel="noopener">A beginner’s guide to Cache synchronization strategies</a>。</p>
-<p>模式其一，cache aside。其特点是cache本身不与storage打交道，cache中item的新增由应用调用触发，其过程如下：</p>
-<p><img src="https://user-images.githubusercontent.com/4915189/82789987-d9d6ab80-9e9d-11ea-8fb0-6ce300f0cf55.png" alt="image"><br>（图片源自《Scaling Memcache at Facebook》）</p>
+<p>论文<a href="https://zhangjunjia.github.io/2020/06/04/kafka-paper/">Paper阅读：Kafka: a Distributed Messaging System for Log Processing</a>提到，Kafka Broker若通过<code>read</code>调用提供数据给Consumer需要经历以下4个步骤：</p>
 <ul>
-<li>miss：应用读cache发现缓存不存在，应用从数据库加载记录写入到cache，需要注意如果数据库也读不到最后设置某个占位符到cache防止因为不存在的key导致频繁读盘</li>
-<li>hit：从cache取值返回</li>
-<li>update：更新数据库，然后失效cache</li>
+<li>(1) read data from the storage media to the page cache in an OS</li>
+<li>(2) copy data in the page cache to an application buffer</li>
+<li>(3) copy application buffer to another kernel buffer</li>
+<li>(4) send the kernel buffer to the socket</li>
 </ul>
-<p>假定有以下时序，以上cache aside方案将存在问题：</p>
+<p>Kafka通过<code>sendfile</code>调用规避了步骤(2)和(3)，如果要读的数据也在Cache中，则步骤(1)也是不需要的，这就是Kafka高吞吐量的秘密之一。文章<a href="https://developer.ibm.com/articles/j-zerocopy/" target="_blank" rel="noopener">Efficient data transfer through zero copy</a>详细阐述了<code>read</code>和<code>tranferTo</code>的差别，概括来讲就是避免了user-space和kernel-space的内存拷贝以及减少user到kernel的来回切换。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/93546442-5a617080-f995-11ea-8adc-80fa8e19e47d.png" alt="image"></p>
+<p>（图1 引用自<a href="https://developer.ibm.com/articles/j-zerocopy/" target="_blank" rel="noopener">Efficient data transfer through zero copy</a>）</p>
+<p>在partition较少的情况下，这种模型性能非常优异。Producer写完Page Cache就返回了（底层是<code>pwrite</code>系统调用），由Kafka配置的刷盘间隔时间/条数调用<code>flush</code>刷盘，Consumer在和Producer的lag不大的前提下也是从Page Cache可以直接取到数据返回，图2虚线框表明了这种情况。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/94356704-d78e9300-00c3-11eb-94bb-b22a14bc3174.png" alt="image"></p>
+<p>（图2 一个partition文件 vs N个partition文件）</p>
+<p>但如果一个Broker上有1W甚至是10W级别的partition文件在同时写(producer)和读(consumer)呢？这会带来什么问题？</p>
 <ul>
-<li>cache已失效；</li>
-<li>A读cache，发现cache不存在；</li>
-<li>A读数据库，网络拥堵；</li>
-<li>B更新数据库；</li>
-<li>B使缓存失效；</li>
-<li>网络拥堵结束，A将数据写到cache（BOOM，脏数据）</li>
-<li>总结：以上时序出现概率特别低，因为读操作一般远快于写操作（需要加锁）。但还是有可能发生的，业务需要能容忍，cache需要加过期时间，这是在不动用分布式锁下的较简单方案（Facebook的方案）。</li>
+<li>写时，N个文件各自虽然是在顺序写，但在<code>flush</code>刷盘时站在OS的视角变成了随机写（如图2）</li>
+<li>进一步的，随着文件增多，<code>flush</code>的随机IO对写的吞吐量影响越来越大（寻址时间、磁头移动时间）</li>
 </ul>
-<p>模式其二，read/write-through，程序不直接和storage打交道，由cache代理负责缓存更新，如下：</p>
-<p><img src="https://user-images.githubusercontent.com/4915189/82790438-a2b4ca00-9e9e-11ea-9340-112f79c3c907.png" alt="image"><br><img src="https://user-images.githubusercontent.com/4915189/82790449-a7797e00-9e9e-11ea-8e4c-8d1ca60efaf4.png" alt="image"><br>（图片源自 <a href="https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/）" target="_blank" rel="noopener">https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/）</a></p>
-<p>模式其三，write back，是基于r/w through的优化，将写批量化提交，缺点是未提交的写可能丢失。<br><img src="https://user-images.githubusercontent.com/4915189/82790494-ba8c4e00-9e9e-11ea-9912-7bcfcecdc517.png" alt="image"></p>
-<p>需要注意的是，LRU是把无序的key-value数据结构变成有序的，在读写时都需要加锁修改数据结构，在高并发时可能成为瓶颈。</p>
-<h2 id="异步处理-asynchronize"><a href="#异步处理-asynchronize" class="headerlink" title="异步处理 asynchronize"></a>异步处理 asynchronize</h2><p>弹性设计讲了异步通讯，异步处理是指收到上游任务后立即返回一个确认信号，然后使用PULL模型或PUSH模型（需要考虑消费者的更多信息防止投递不出去或压垮消费者）将任务分发给下游消费者处理。</p>
-<p>异步处理一般会搭配另外一个设计模式event sourcing（事件溯源）。event sourcing不直接修改结果数据，而是把对数据的操作存储为一个个不可变的event，通过顺序重放event即可得出最终结果。</p>
-<p>异步处理也可用于处理分布式事务，如A给B转账。</p>
+<p>针对此问题，RocketMQ从存储模型上做了优化。单Broker支撑大量级的partition（在RocketMQ中称为Queue）时，写依然能做到顺序IO，如下图3所示。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/94389931-c5742980-0183-11eb-9ce2-eef5fb355baa.png" alt="image"><br>（图3 引用自<a href="http://www.daleizhou.tech/posts/rocketmq-store-commitlog.html" target="_blank" rel="noopener">RocketMQ存储实现分析</a>）</p>
+<p>Kafka在单Broker上，会同时打开N个文件用于消息的生产，N的数量是该Broker上partition的数量。RocketMQ在单Broker上，只会打开一个MappedFile文件，所有queue（等同于Kafka的partition）的消息生产顺序追加到这个文件中，该文件的大小固定为1G。RocketMQ在新建MappedFile时，会做一个预热操作，其关键代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">warmMappedFile</span><span class="params">(FlushDiskType type, <span class="keyword">int</span> pages)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, j = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.fileSize; i += MappedFile.OS_PAGE_SIZE, j++) &#123;</span><br><span class="line">        byteBuffer.put(i, (<span class="keyword">byte</span>) <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">this</span>.mlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>预热过程做了以下事情：</p>
 <ul>
-<li>A扣款，生成扣款凭证；</li>
-<li>凭证发到B，B收款，B对凭证和收款的处理是幂等的；</li>
-<li>转账失败需要事务补偿；</li>
+<li>将1G的MappedFile通过mmap映射到虚拟内存地址空间；</li>
+<li>通过<code>byteBuffer.put(i, (byte) 0)</code>触发<a href="https://en.wikipedia.org/wiki/Demand_paging" target="_blank" rel="noopener">Demand Paging</a>，将文件的内容真实映射到Page Cache；</li>
+<li>使用mlock锁定该文件的Page Cache，防止被OS置换到swap空间；</li>
 </ul>
-<p>异步处理设计需要有以下考量：</p>
+<p>预热提前占用Page Cache，相比Kafka的<code>pwrite</code>按需占用Page Cache的好处是：</p>
 <ul>
-<li>异步处理完成需要通知发起方；</li>
-<li>发起方定时检查那些没有回传的任务，需要异步处理系统支持幂等；</li>
-<li>事务需要补偿；</li>
-<li>强一致不适合使用异步处理；</li>
-<li>异步处理需要监控队列堆积；</li>
+<li>节省user和kernel来回切回的时间，mmap后读写只需要内存寻址；</li>
+<li>节省disk映射到Page Cache的时间，预热后disk的block和page cache已经形成对应关系，消息生产时一定能命中，不需要有磁盘IO（mlock进一步保证了”一定能命中cache“）；</li>
 </ul>
-<h2 id="数据库扩展"><a href="#数据库扩展" class="headerlink" title="数据库扩展"></a>数据库扩展</h2><p>读写分离</p>
+<p>由于只有一个MappedFile文件提供写，因此Kafka单Broker在大量级partition写时随机IO的问题得到了解决。但这带来了另外一个问题，消费者消息时如何从MappedFile定位到其需要的消息，不可能去做全文件扫描吧？</p>
+<p>MappedFile用于存储真实消息Record，RocketMQ维护了另外一个数据结构ConsumerQueue来索引真实的消息。单个ConsumerQueue文件存储30W条到MappedFile文件的消息Record的索引，便于消费者定位真实消息。但这不岂不是带来了新的问题，数据读取需要二次IO，最坏的情况下读MappedFile还会带来随机IO？</p>
 <ul>
-<li>写库容易出现单点故障</li>
-<li>需要强一致性的还是得落在写库上</li>
+<li>最近一个MappedFile和ConsumerQueue，都是mmap映射在Page Cache中的，只要消费者和生产者的lag不大，很大概率能从Page Cache读到需要的消息；</li>
+<li>如果消费者的lag太大，RocketMQ建议从slave读取数据（具体细节待展开），有效规避了lag落后太大的消费者污染Page Cache的问题。</li>
 </ul>
-<p>CQRS(Command and Query Responsibility Segregation)</p>
-<ul>
-<li>command只返回执行状态，会修改数据</li>
-<li>query返回结果数据，但不修改状态</li>
-<li>command和query分离，提高系统扩展性，将command转为event sourcing可使得写无状态化</li>
-</ul>
-<p><img src="https://user-images.githubusercontent.com/4915189/74600725-6f5ce500-50d0-11ea-87e4-3b75d7c7b8a9.png" alt="image"></p>
-<p>sharding是解决数据库太大的问题，把单体库按照某个规则分为多个库。分片的方式其一是按业务（需要仔细评估业务），其二是按哈希（扩展时会有重哈希的问题）。sharding后，需要有一个数据访问层解析SQL将任务分发给多个库，同时数据访问层还需要聚合多个库的结果返回给调用方。</p>
-<p>根本的解法，还是得将数据库、微服务从单体库拆分开。</p>
-<h2 id="秒杀-flash-sales"><a href="#秒杀-flash-sales" class="headerlink" title="秒杀 flash sales"></a>秒杀 flash sales</h2><p>第一道关，带简单逻辑的CDN（需要和运营商沟通，亚马逊目前有Lambda）。100W用户经过CDN这第一道关后，只放一定比例的用户到数据中心，这个比例值是动态算出来的。</p>
-<p>第二道关，数据中心的应对真实流量，之前所讲的弹性设计都可以在这里用上。</p>
-<p>CDN玩法非常适合那些用户有地域特征分布的。</p>
-<h2 id="边缘计算-edge-computing"><a href="#边缘计算-edge-computing" class="headerlink" title="边缘计算 edge computing"></a>边缘计算 edge computing</h2><p>边缘计算是为了降低数据中心架构复杂度，把一部分计算逻辑分到离用户较近的边缘节点。其关键技术有两个：API Gateway、Serverless/Faas。</p>
+<p>参考文献：<a href="https://www.jianshu.com/p/771cce379994" target="_blank" rel="noopener">https://www.jianshu.com/p/771cce379994</a></p>
 
       
     </div>
@@ -424,7 +405,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/系统设计/" rel="tag"># 系统设计</a>
+            <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          
+            <a href="/tags/Paper阅读/" rel="tag"># Paper阅读</a>
           
         </div>
       
@@ -437,8 +420,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/02/09/chat-root-design/" rel="next" title="聊天室高并发架构概要">
-                <i class="fa fa-chevron-left"></i> 聊天室高并发架构概要
+              <a href="/2020/07/08/google-file-system-paper/" rel="next" title="Paper阅读:The Google File System">
+                <i class="fa fa-chevron-left"></i> Paper阅读:The Google File System
               </a>
             
           </div>
@@ -446,10 +429,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/16/mysql-redis-kafka-high-availability/" rel="prev" title="浅谈MySQL/Redis/Kafka高可用">
-                浅谈MySQL/Redis/Kafka高可用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -504,17 +483,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -574,22 +544,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#性能设计"><span class="nav-number">1.</span> <span class="nav-text">性能设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存-cache"><span class="nav-number">1.1.</span> <span class="nav-text">缓存 cache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步处理-asynchronize"><span class="nav-number">1.2.</span> <span class="nav-text">异步处理 asynchronize</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库扩展"><span class="nav-number">1.3.</span> <span class="nav-text">数据库扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#秒杀-flash-sales"><span class="nav-number">1.4.</span> <span class="nav-text">秒杀 flash sales</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边缘计算-edge-computing"><span class="nav-number">1.5.</span> <span class="nav-text">边缘计算 edge computing</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
