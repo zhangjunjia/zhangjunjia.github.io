@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kafka,Paper阅读," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文谈谈Kafka和RocketMQ读取数据的差别。">
+<meta name="keywords" content="Kafka,Paper阅读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈MQ | 读取数据">
+<meta property="og:url" content="https://zhangjunjia.github.io/2020/11/03/mq-read-diff/index.html">
+<meta property="og:site_name" content="张俊佳的博客">
+<meta property="og:description" content="本文谈谈Kafka和RocketMQ读取数据的差别。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/97523900-50904b80-19de-11eb-9cd8-397b8e2f6126.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/97548775-8519fc80-1a0a-11eb-9473-aabb698f8dee.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/4915189/97953016-2b367f80-1dda-11eb-88c2-2b906b095ca5.png">
+<meta property="og:updated_time" content="2020-11-03T06:07:12.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="谈谈MQ | 读取数据">
+<meta name="twitter:description" content="本文谈谈Kafka和RocketMQ读取数据的差别。">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/4915189/97523900-50904b80-19de-11eb-9cd8-397b8e2f6126.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: 'GG0LAUR599',
+      apiKey: '5f48554ebe8cf78c3e0e2f6d8334177e',
+      indexName: 'jayzeezhang',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhangjunjia.github.io/2020/11/03/mq-read-diff/"/>
+
+
+
+
+
+  <title>谈谈MQ | 读取数据 | 张俊佳的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张俊佳的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Stay Hungry Stay Foolish</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhangjunjia.github.io/2020/11/03/mq-read-diff/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张俊佳">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张俊佳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">谈谈MQ | 读取数据</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-03T14:06:16+08:00">
+                2020-11-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式系统/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/11/03/mq-read-diff/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/11/03/mq-read-diff/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/11/03/mq-read-diff/" class="leancloud_visitors" data-flag-title="谈谈MQ | 读取数据">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文谈谈Kafka和RocketMQ读取数据的差别。</p>
+<a id="more"></a>
+<h2 id="Kafka读取数据"><a href="#Kafka读取数据" class="headerlink" title="Kafka读取数据"></a>Kafka读取数据</h2><p><img src="https://user-images.githubusercontent.com/4915189/97523900-50904b80-19de-11eb-9cd8-397b8e2f6126.png" alt="image"><br>（图1 Kafka读取数据流程）</p>
+<p>Kafka读取数据如图1所示。</p>
+<ul>
+<li>只有leader副本提供数据读取（写也是leader副本提供，读写不分离）</li>
+<li>consumer和replica需要告诉leader副本从哪个offset开始读、读多少内容返回</li>
+<li>leader副本从索引文件中定位符合offset要求的最小offset，但由于Kafka是稀疏索引，所以还需要从前一步确定的offset向后扫描log文件找到符合要求的真实offset，然后从该offset开始读取数据返回</li>
+</ul>
+<p>Kafka从log读记录的效率受Page Cache的影响，这个在<a href="https://github.com/zhangjunjia/zhangjunjia.github.io/issues/23" target="_blank" rel="noopener">上一篇</a>已经提到了。Kafka从索引文件确定offset，是一个二分查找的过程，在旧版本的Kafka，这个过程是这样的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> def <span class="title">indexSlotRangeFor</span><span class="params">(idx: ByteBuffer, target: Long, searchEntity: IndexSearchEntity)</span>: <span class="params">(Int, Int)</span> </span>= &#123;</span><br><span class="line">        <span class="comment">// 第1步：如果当前索引为空，直接返回&lt;-1,-1&gt;对</span></span><br><span class="line">        <span class="keyword">if</span>(_entries == <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span> (-<span class="number">1</span>, -<span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 第2步：要查找的位移值不能小于当前最小位移值</span></span><br><span class="line">        <span class="keyword">if</span>(compareIndexEntry(parseEntry(idx, <span class="number">0</span>), target, searchEntity) &gt; <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span> (-<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">        <span class="comment">// binary search for the entry</span></span><br><span class="line">        <span class="comment">// 第3步：执行二分查找算法</span></span><br><span class="line">        var lo = <span class="number">0</span></span><br><span class="line">        var hi = _entries - <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span>(lo &lt; hi) &#123;</span><br><span class="line">          val mid = ceil(hi/<span class="number">2.0</span> + lo/<span class="number">2.0</span>).toInt</span><br><span class="line">          val found = parseEntry(idx, mid)</span><br><span class="line">          val compareResult = compareIndexEntry(found, target, searchEntity)</span><br><span class="line">          <span class="keyword">if</span>(compareResult &gt; <span class="number">0</span>)</span><br><span class="line">            hi = mid - <span class="number">1</span></span><br><span class="line">          <span class="keyword">else</span> <span class="keyword">if</span>(compareResult &lt; <span class="number">0</span>)</span><br><span class="line">            lo = mid</span><br><span class="line">          <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> (mid, mid)</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">        (lo, <span class="keyword">if</span> (lo == _entries - <span class="number">1</span>) -<span class="number">1</span> <span class="keyword">else</span> lo + <span class="number">1</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Kafka的index文件是通过mmap映射到Page Cache的，上述二分查找代码，对Page Cache是不友好的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">page number: |0|1|2|3|4|5|6|7|8|9|10|11|12 |</span><br><span class="line">steps:       |1| | | | | |3| | |4|  |5 |2/6|</span><br></pre></td></tr></table></figure>
+<p>假设index文件的大小是13个Page，in-sync replica和consumer大概率都是读取最后的一个Page。如上所示，这时二分查找Page的序号是：#0,6,9,11,12。之所以先从#0开始读，是要确保读取offset不能小于index文件的最小位移。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">page number: |0|1|2|3|4|5|6|7|8|9|10|11|12|13 |</span><br><span class="line">steps:       |1| | | | | | |3| | | 4|5 | 6|2/7|</span><br></pre></td></tr></table></figure>
+<p>最后一个Page随着时间的推移总会被写满，这时会新增#13这个Page。如上所示，此时二分查找page的顺序就变成了#0,7,10,12,13。问题在于，Page Cache是遵循LRU淘汰策略的，Page 7大概率会因为长时间没使用而被淘汰了，此时的二分查找就会产生Page Fault。单个index文件page fault还能接受，Broker上有N个index文件page fault这个代价就高了。有没有一种策略，使得对于较新的消息的二分查找过程，尽可能不产生page fault呢？</p>
+<p>Kafka官方给出的解决方案是：冷热分离。</p>
+<p><img src="https://user-images.githubusercontent.com/4915189/97548775-8519fc80-1a0a-11eb-9473-aabb698f8dee.png" alt="image"><br>（图2 index索引项冷热分离）</p>
+<p>假设index文件有10W个稀疏索引，Kafka将最末尾的2个Page大小（8192字节）的索引定义为热区（换算成offsetindex是1024个稀疏索引）。Kafka将待查找offset和热区的第一个索引项做offset比较，若判断到待查找offset在热区，则在热区内做二分查找，否则在冷区内做二分查找。这背后的思想很朴素，最近2个Page大小的热区，大概率还没有被LRU策略淘汰掉。其代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> def _warmEntries: Int = <span class="number">8192</span> / entrySize</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> def <span class="title">indexSlotRangeFor</span><span class="params">(idx: ByteBuffer, target: Long, searchEntity: IndexSearchEntity)</span>: <span class="params">(Int, Int)</span> </span>= &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">  <span class="function">def <span class="title">binarySearch</span><span class="params">(begin: Int, end: Int)</span> : <span class="params">(Int, Int)</span> </span>= &#123;</span><br><span class="line">    <span class="comment">// binary search for the entry</span></span><br><span class="line">    var lo = begin</span><br><span class="line">    var hi = end</span><br><span class="line">    <span class="keyword">while</span>(lo &lt; hi) &#123;</span><br><span class="line">      val mid = (lo + hi + <span class="number">1</span>) &gt;&gt;&gt; <span class="number">1</span></span><br><span class="line">      val found = parseEntry(idx, mid)</span><br><span class="line">      val compareResult = compareIndexEntry(found, target, searchEntity)</span><br><span class="line">      <span class="keyword">if</span>(compareResult &gt; <span class="number">0</span>)</span><br><span class="line">        hi = mid - <span class="number">1</span></span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span>(compareResult &lt; <span class="number">0</span>)</span><br><span class="line">        lo = mid</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> (mid, mid)</span><br><span class="line">    &#125;</span><br><span class="line">    (lo, <span class="keyword">if</span> (lo == _entries - <span class="number">1</span>) -<span class="number">1</span> <span class="keyword">else</span> lo + <span class="number">1</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  val firstHotEntry = Math.max(<span class="number">0</span>, _entries - <span class="number">1</span> - _warmEntries)</span><br><span class="line">  <span class="comment">// 和热区的第一个索引比较，判断是否要在热区内二分查找</span></span><br><span class="line">  <span class="keyword">if</span>(compareIndexEntry(parseEntry(idx, firstHotEntry), target, searchEntity) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> binarySearch(firstHotEntry, _entries - <span class="number">1</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果小于index文件最小索引退出</span></span><br><span class="line">  <span class="keyword">if</span>(compareIndexEntry(parseEntry(idx, <span class="number">0</span>), target, searchEntity) &gt; <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> (-<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 在冷区二分查找</span></span><br><span class="line">  binarySearch(<span class="number">0</span>, firstHotEntry)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>热区定义为8192字节是一个经验数值，它对应1024个offsetindex索引项，可索引大概4MB大小的消息。最大情况下，这8192字节会包括3个Page，例如<code>[Page1:2048字节][Page2:4096字节][Page3:2048字节]</code>。这个数值太大，Page可能已经被LRU策略淘汰，仍会产生page fault那就没价值了；这个数值太小，那就降级为冷区二分查找，仍会出现所提的page新增时page fault的问题。</p>
+<h2 id="RocketMQ读取数据"><a href="#RocketMQ读取数据" class="headerlink" title="RocketMQ读取数据"></a>RocketMQ读取数据</h2><p><img src="https://user-images.githubusercontent.com/4915189/97953016-2b367f80-1dda-11eb-88c2-2b906b095ca5.png" alt="image"></p>
+<p>（图3 RocketMQ读取数据）</p>
+<p>有别于Kafka的partition级别的leader/follower，RocketMQ是Broker级别的master/slave，slave全量冗余master的数据。读取数据时，如果满足一定条件（数据太旧）会从slave读取，实现了某种程度上的「读写分离」。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// org.apache.rocketmq.store.DefaultMessageStore#getMessage</span></span><br><span class="line"><span class="keyword">long</span> diff = maxOffsetPy - maxPhyOffsetPulling;</span><br><span class="line"><span class="keyword">long</span> memory = (<span class="keyword">long</span>) (StoreUtil.TOTAL_PHYSICAL_MEMORY_SIZE</span><br><span class="line">    * (<span class="keyword">this</span>.messageStoreConfig.getAccessMessageInMemoryMaxRatio() / <span class="number">100.0</span>));</span><br><span class="line">getResult.setSuggestPullingFromSlave(diff &gt; memory);</span><br></pre></td></tr></table></figure>
+<p>什么情况下从slave读取数据？如上所示，</p>
+<blockquote>
+<p>maxOffsetPy 为当前最大物理偏移量，maxPhyOffsetPulling 为本次消息拉取最大物理偏移量，他们的差即可表示消息堆积量，TOTAL_PHYSICAL_MEMORY_SIZE 表示当前系统物理内存，accessMessageInMemoryMaxRatio 的默认值为 40，以上逻辑即可算出当前消息堆积量是否大于物理内存的 40 %，如果大于则将 suggestPullingFromSlave 设置为 true。<br>引用自：<a href="http://objcoding.com/2019/09/22/rocketmq-read-write-separation/" target="_blank" rel="noopener">http://objcoding.com/2019/09/22/rocketmq-read-write-separation/</a></p>
+</blockquote>
+<p><code>setSuggestPullingFromSlave</code>为true后还会结合其他开关配置项决定是否从slave读取数据，具体可以参考上面引用的链接，但核心逻辑就是上面的代码。consumer无论是从master还是slave读取数据，都需要经历：</p>
+<ul>
+<li>从consumerqueue读取位移数据（consumerqueue是mmap在内存中的）</li>
+<li>根据位移数据回源到MappedFile读取数据，该MappedFile大概率还在page cache中未被LRU淘汰（如果已经LRU淘汰掉了，能切到slave读冷数据可以避免page fault，这就是核心思思）</li>
+</ul>
+<p>从slave读取数据的价值是可以最大化利用master的page cache，使得冷数据的读取不影响到master的性能。slave同步master的数据则与上述过程不同，由于是Broker级别的replicate，因此不需要区分consumerqueue，所有master的数据都需要同步到slave。这个过程中，slave上报的offset作为游标，master根据该游标不断往slave推送新数据，slave接受数据后更新游标重复此过程。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li>RocketMQ主从同步源码分析：<a href="http://objcoding.com/2019/09/21/rocketmq-Master-slave-ha/#top" target="_blank" rel="noopener">http://objcoding.com/2019/09/21/rocketmq-Master-slave-ha/#top</a></li>
+<li>RocketMQ主从读写分离机制：<a href="http://objcoding.com/2019/09/22/rocketmq-read-write-separation/" target="_blank" rel="noopener">http://objcoding.com/2019/09/22/rocketmq-read-write-separation/</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          
+            <a href="/tags/Paper阅读/" rel="tag"># Paper阅读</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/09/mq-page-cache/" rel="next" title="谈谈MQ | 与Page Cache的爱恨情仇">
+                <i class="fa fa-chevron-left"></i> 谈谈MQ | 与Page Cache的爱恨情仇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">张俊佳</p>
+              <p class="site-description motion-element" itemprop="description">JayzeeZhang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka读取数据"><span class="nav-number">1.</span> <span class="nav-text">Kafka读取数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ读取数据"><span class="nav-number">2.</span> <span class="nav-text">RocketMQ读取数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">3.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张俊佳</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: true,
+        appId: 'nP7nKkEDO91U2MrtPXaa7MR2-gzGzoHsz',
+        appKey: 'nYtAx9bbOzPe9EDT8mW7tH5d',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("nP7nKkEDO91U2MrtPXaa7MR2-gzGzoHsz", "nYtAx9bbOzPe9EDT8mW7tH5d");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
